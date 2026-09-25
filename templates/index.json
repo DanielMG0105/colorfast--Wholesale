@@ -37,7 +37,15 @@
     "collection_showcase_main": {
       "type": "collection-showcase",
       "settings": {
-        "button_label": "Shop our bestsellers"
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "image_ratio": "1 / 1",
+        "blend_white": false,
+        "show_title": false,
+        "show_price": false,
+        "button_label": "Shop our bestsellers",
+        "background_color": "#c6c6c4"
       }
     }
   },
