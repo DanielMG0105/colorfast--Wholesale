@@ -1233,6 +1233,19 @@
     font-size: var(--menu-localization-font-size);
   }
 
+  /* ColorFast header icons (all breakpoints) */
+  /* Keep the stroke weight identical across icons regardless of their viewBox scale */
+  .header .header-actions__action svg :is(path, circle),
+  .header .search-action svg :is(path, circle) {
+    vector-effect: non-scaling-stroke;
+    stroke-width: 1.75px;
+  }
+
+  /* The bag glyph extends lower in its viewBox than search/account; lift it so the bottoms line up */
+  .header .header-actions__cart-icon .svg-wrapper svg {
+    transform: translateY(-6.5%);
+  }
+
   /* ColorFast desktop header layout */
   @media screen and (min-width: 990px) {
     .header {
@@ -1293,13 +1306,6 @@
       width: 19.8px;
       height: 22px;
       overflow: visible;
-    }
-
-    /* Keep the stroke weight identical across icons regardless of their viewBox scale */
-    .header .header-actions__action svg :is(path, circle),
-    .header .search-action svg :is(path, circle) {
-      vector-effect: non-scaling-stroke;
-      stroke-width: 1.75px;
     }
   }
 {% endstylesheet %}
