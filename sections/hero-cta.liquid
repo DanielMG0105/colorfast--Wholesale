@@ -26,6 +26,7 @@
     --hero-cta-position: {{ section.settings.media_position }};
     --hero-cta-btn-text: {{ section.settings.button_text_color }};
     --hero-cta-btn-border: {{ section.settings.button_border_color }};
+    --hero-cta-btn-border-width: {{ section.settings.button_border_width }}px;
     --hero-cta-btn-bg: {{ section.settings.button_background }};
     --hero-cta-btn-hover-bg: {{ section.settings.button_hover_background }};
     --hero-cta-btn-hover-text: {{ section.settings.button_hover_text_color }};
@@ -200,7 +201,7 @@
     align-items: center;
     justify-content: center;
     padding: calc(var(--hero-cta-btn-py) * 0.7) calc(var(--hero-cta-btn-px) * 0.6);
-    border: 1px solid var(--hero-cta-btn-border);
+    border: var(--hero-cta-btn-border-width) solid var(--hero-cta-btn-border);
     background-color: var(--hero-cta-btn-bg);
     color: var(--hero-cta-btn-text);
     font-family: var(--font-body--family);
@@ -380,6 +381,16 @@
       "id": "button_border_color",
       "label": "Color de borde",
       "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "label": "Grosor del borde",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 2
     },
     {
       "type": "color",
