@@ -1262,17 +1262,44 @@
       gap: 10px;
     }
 
+    /* Same 44px box for every action, glyph centered */
+    .header .search-action .header-actions__action,
+    .header .header-actions__action,
+    .header .header-actions__action cart-icon,
+    .header .header-actions__action .svg-wrapper,
+    .header .account-button shopify-account,
+    .header .account-button [slot='signed-out-avatar']:not(.hidden) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header .search-action .header-actions__action,
+    .header .header-actions__action {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+    }
+
     .header .header-actions__action:not(.account-button) svg,
     .header .search-action svg {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
     }
 
     /* The account SVG has no inner padding (15x17 viewBox) unlike the 20x20 icons,
        so size it to match their visible glyph height */
     .header .account-button__icon {
-      width: 19px;
-      height: 22px;
+      width: 18px;
+      height: 20px;
+      overflow: visible;
+    }
+
+    /* Keep the stroke weight identical across icons regardless of their viewBox scale */
+    .header .header-actions__action svg :is(path, circle),
+    .header .search-action svg :is(path, circle) {
+      vector-effect: non-scaling-stroke;
+      stroke-width: 1.75px;
     }
   }
 {% endstylesheet %}
