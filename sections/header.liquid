@@ -1299,9 +1299,14 @@
     left: calc(var(--cf-cx) - var(--cf-bub) / 2);
     inset-inline-end: auto;
     padding: 0;
-    border: 1.5px solid currentColor;
+    border: 2px solid currentColor;
     border-radius: 50%;
     color: inherit;
+  }
+
+  /* The cart drawer trigger uses .button-unstyled (overflow: hidden), which clipped the bubble */
+  .header .header-actions__action:has(cart-icon) {
+    overflow: visible;
   }
 
   .header .header-actions__cart-icon .cart-bubble__background {
