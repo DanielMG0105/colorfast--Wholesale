@@ -8,6 +8,14 @@
  * ------------------------------------------------------------
  */{
   "sections": {
+    "hero_cta_main": {
+      "type": "hero-cta",
+      "settings": {
+        "media_type": "image",
+        "button_label": "Shop the collection",
+        "button_link": "shopify://collections/all"
+      }
+    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -279,6 +287,7 @@
     }
   },
   "order": [
+    "hero_cta_main",
     "hero_jVaWmY",
     "product_list_fa6P9H"
   ]

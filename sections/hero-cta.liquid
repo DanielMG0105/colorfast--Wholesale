@@ -1,0 +1,435 @@
+{%- liquid
+  assign media_type = section.settings.media_type
+  assign image = section.settings.image
+  assign image_mobile = section.settings.image_mobile | default: image
+  assign video = section.settings.video
+  assign video_mobile = section.settings.video_mobile | default: video
+
+  assign has_video = false
+  if media_type == 'video' and video != blank
+    assign has_video = true
+  endif
+
+  assign fetch_priority = 'auto'
+  if section.index == 1
+    assign fetch_priority = 'high'
+  endif
+-%}
+
+<div
+  class="hero-cta hero-cta--{{ section.id }}"
+  style="
+    --hero-cta-height: {{ section.settings.height }}svh;
+    --hero-cta-height-mobile: {{ section.settings.height_mobile }}svh;
+    --hero-cta-bg: {{ section.settings.background_color }};
+    --hero-cta-overlay: {{ section.settings.overlay_color }};
+    --hero-cta-position: {{ section.settings.media_position }};
+    --hero-cta-btn-text: {{ section.settings.button_text_color }};
+    --hero-cta-btn-border: {{ section.settings.button_border_color }};
+    --hero-cta-btn-bg: {{ section.settings.button_background }};
+    --hero-cta-btn-hover-bg: {{ section.settings.button_hover_background }};
+    --hero-cta-btn-hover-text: {{ section.settings.button_hover_text_color }};
+    --hero-cta-btn-size: {{ section.settings.button_font_size }}px;
+    --hero-cta-btn-px: {{ section.settings.button_padding_x }}px;
+    --hero-cta-btn-py: {{ section.settings.button_padding_y }}px;
+  "
+>
+  <div class="hero-cta__media">
+    {%- if has_video -%}
+      <div class="hero-cta__media-item{% if video_mobile != video %} hero-cta__media-item--desktop{% endif %}">
+        {{
+          video
+          | video_tag:
+            image_size: '2400x',
+            autoplay: true,
+            loop: true,
+            controls: false,
+            muted: true,
+            playsinline: true,
+            class: 'hero-cta__video'
+        }}
+      </div>
+      {%- if video_mobile != video -%}
+        <div class="hero-cta__media-item hero-cta__media-item--mobile">
+          {{
+            video_mobile
+            | video_tag:
+              image_size: '1200x',
+              autoplay: true,
+              loop: true,
+              controls: false,
+              muted: true,
+              playsinline: true,
+              class: 'hero-cta__video'
+          }}
+        </div>
+      {%- endif -%}
+    {%- elsif image != blank -%}
+      <div class="hero-cta__media-item{% if image_mobile != image %} hero-cta__media-item--desktop{% endif %}">
+        {{
+          image
+          | image_url: width: 3840
+          | image_tag:
+            widths: '750, 1100, 1500, 1920, 2400, 3000, 3840',
+            sizes: '100vw',
+            fetchpriority: fetch_priority,
+            loading: 'eager',
+            class: 'hero-cta__image'
+        }}
+      </div>
+      {%- if image_mobile != image -%}
+        <div class="hero-cta__media-item hero-cta__media-item--mobile">
+          {{
+            image_mobile
+            | image_url: width: 1600
+            | image_tag:
+              widths: '375, 550, 750, 1100, 1600',
+              sizes: '100vw',
+              fetchpriority: fetch_priority,
+              loading: 'eager',
+              class: 'hero-cta__image'
+          }}
+        </div>
+      {%- endif -%}
+    {%- else -%}
+      <div class="hero-cta__media-item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hero-cta__placeholder' }}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_overlay -%}
+    <div class="hero-cta__overlay" aria-hidden="true"></div>
+  {%- endif -%}
+
+  {%- if section.settings.button_label != blank -%}
+    <div class="hero-cta__content">
+      <a
+        class="hero-cta__button"
+        {% if section.settings.button_link != blank %}
+          href="{{ section.settings.button_link }}"
+        {% else %}
+          role="link" aria-disabled="true"
+        {% endif %}
+        {% if section.settings.open_in_new_tab %}
+          target="_blank" rel="noopener"
+        {% endif %}
+      >
+        {{- section.settings.button_label | escape -}}
+      </a>
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .hero-cta {
+    position: relative;
+    width: 100%;
+    height: var(--hero-cta-height-mobile);
+    min-height: 480px;
+    overflow: hidden;
+    background-color: var(--hero-cta-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (min-width: 750px) {
+    .hero-cta {
+      height: var(--hero-cta-height);
+      min-height: 560px;
+    }
+  }
+
+  .hero-cta__media,
+  .hero-cta__media-item,
+  .hero-cta__overlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero-cta__image,
+  .hero-cta__video,
+  .hero-cta__media-item video,
+  .hero-cta__placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--hero-cta-position);
+  }
+
+  .hero-cta__placeholder {
+    background-color: rgb(var(--color-foreground-rgb, 0 0 0) / 0.05);
+  }
+
+  .hero-cta__media-item--mobile {
+    display: block;
+  }
+
+  .hero-cta__media-item--desktop {
+    display: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .hero-cta__media-item--mobile {
+      display: none;
+    }
+
+    .hero-cta__media-item--desktop {
+      display: block;
+    }
+  }
+
+  .hero-cta__overlay {
+    background-color: var(--hero-cta-overlay);
+    pointer-events: none;
+  }
+
+  .hero-cta__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+  }
+
+  .hero-cta__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--hero-cta-btn-py) * 0.7) calc(var(--hero-cta-btn-px) * 0.6);
+    border: 1px solid var(--hero-cta-btn-border);
+    background-color: var(--hero-cta-btn-bg);
+    color: var(--hero-cta-btn-text);
+    font-family: var(--font-body--family);
+    font-size: calc(var(--hero-cta-btn-size) * 0.9);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: 0;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  @media screen and (min-width: 750px) {
+    .hero-cta__button {
+      padding: var(--hero-cta-btn-py) var(--hero-cta-btn-px);
+      font-size: var(--hero-cta-btn-size);
+    }
+  }
+
+  .hero-cta__button:hover,
+  .hero-cta__button:focus-visible {
+    background-color: var(--hero-cta-btn-hover-bg);
+    color: var(--hero-cta-btn-hover-text);
+  }
+
+  .hero-cta__button:focus-visible {
+    outline: 2px solid var(--hero-cta-btn-border);
+    outline-offset: 4px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Hero CTA",
+  "tag": "section",
+  "class": "section-hero-cta",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Tipo de fondo",
+      "options": [
+        { "value": "image", "label": "Imagen" },
+        { "value": "video", "label": "Video" }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen",
+      "visible_if": "{{ section.settings.media_type == 'image' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Imagen móvil (opcional)",
+      "visible_if": "{{ section.settings.media_type == 'image' }}"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Se reproduce en bucle, sin sonido y en autoplay.",
+      "visible_if": "{{ section.settings.media_type == 'video' }}"
+    },
+    {
+      "type": "video",
+      "id": "video_mobile",
+      "label": "Video móvil (opcional)",
+      "visible_if": "{{ section.settings.media_type == 'video' }}"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Posición del fondo",
+      "options": [
+        { "value": "center center", "label": "Centro" },
+        { "value": "center top", "label": "Arriba" },
+        { "value": "center bottom", "label": "Abajo" },
+        { "value": "left center", "label": "Izquierda" },
+        { "value": "right center", "label": "Derecha" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "header",
+      "content": "Altura"
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Altura escritorio",
+      "min": 100,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Porcentaje de la altura de la pantalla."
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Altura móvil",
+      "min": 60,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Botón"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto",
+      "default": "Shop the collection"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace",
+      "default": "/collections/all"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "Abrir en nueva pestaña",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Tamaño de texto",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "button_padding_x",
+      "label": "Padding horizontal",
+      "min": 16,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 46
+    },
+    {
+      "type": "range",
+      "id": "button_padding_y",
+      "label": "Padding vertical",
+      "min": 12,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Color de texto",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Color de borde",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Fondo",
+      "alpha": true,
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Fondo (hover)",
+      "alpha": true,
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Color de texto (hover)",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Color de fondo",
+      "default": "#e8e8e8"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "Mostrar overlay",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Color de overlay",
+      "alpha": true,
+      "default": "rgba(0,0,0,0.15)",
+      "visible_if": "{{ section.settings.show_overlay }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero CTA"
+    }
+  ]
+}
+{% endschema %}
