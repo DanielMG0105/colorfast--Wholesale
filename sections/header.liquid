@@ -337,6 +337,20 @@
   }
 </script>
 
+{%- liquid
+  assign cf_menu_font = section.settings.cf_menu_font
+-%}
+<style>
+  {{ cf_menu_font | font_face: font_display: 'swap' }}
+  #header-component {
+    --cf-menu-font-family: {{ cf_menu_font.family }}, {{ cf_menu_font.fallback_families }};
+    --cf-menu-font-style: {{ cf_menu_font.style }};
+    --cf-menu-font-weight: {{ cf_menu_font.weight }};
+    --cf-menu-font-size: {{ section.settings.cf_menu_font_size }}px;
+    --cf-menu-letter-spacing: {{ section.settings.cf_menu_letter_spacing | divided_by: 100.0 }}em;
+  }
+</style>
+
 <header-component
   id="header-component"
   class="{{ class }}"
@@ -485,6 +499,27 @@
   src="{{ 'header.js' | asset_url }}"
   type="module"
 ></script>
+
+<script type="module">
+  // shopify-account lays out its slotted icon inside a closed shadow DOM, which leaves the glyph
+  // off-center in its 44px button. Measure and nudge the icon (not the host, so its dialog anchor is untouched).
+  const centerAccountIcon = () => {
+    for (const button of document.querySelectorAll('#header-component .account-button')) {
+      const icon = button.querySelector('.account-button__icon');
+      if (!icon) continue;
+      icon.style.translate = '';
+      const box = button.getBoundingClientRect();
+      const glyph = icon.getBoundingClientRect();
+      if (!glyph.width || !box.width) continue;
+      const dx = box.left + box.width / 2 - (glyph.left + glyph.width / 2);
+      const dy = box.top + box.height / 2 - (glyph.top + glyph.height / 2);
+      icon.style.translate = `${Math.round(dx * 2) / 2}px ${Math.round(dy * 2) / 2}px`;
+    }
+  };
+
+  customElements.whenDefined('shopify-account').then(() => requestAnimationFrame(centerAccountIcon));
+  window.addEventListener('resize', centerAccountIcon);
+</script>
 
 {% stylesheet %}
   body {
@@ -1261,18 +1296,42 @@
     }
 
     .header .menu-list__link {
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
+      font-family: var(--cf-menu-font-family, inherit);
+      font-style: var(--cf-menu-font-style, normal);
+      font-size: var(--cf-menu-font-size, 13.5px);
+      font-weight: var(--cf-menu-font-weight, 500);
+      letter-spacing: var(--cf-menu-letter-spacing, 0.05em);
       text-transform: uppercase;
+    }
+
+    /* Let the menu column take all free space so items don't collapse into "More"
+       just because the column was sized to its own content */
+    #header-component:not([data-menu-style='drawer'])
+      .header__columns:not(:has(.header__column--center)):has(.header__column--left header-menu) {
+      grid-template-columns: minmax(0, 1fr) auto;
     }
 
     .header .menu-list__link-title {
       padding-inline: 24px;
     }
 
-    .header header-actions {
-      gap: 10px;
+    /* Search lives outside header-actions, so drive both gaps from one value */
+    #header-component:not([data-menu-style='drawer']) .header__column--right {
+      --cf-icon-gap: 4px;
+    }
+
+    #header-component:not([data-menu-style='drawer']) .header__column--right:has(header-actions) {
+      gap: var(--cf-icon-gap);
+    }
+
+    #header-component:not([data-menu-style='drawer']) .header__column--right header-actions {
+      gap: var(--cf-icon-gap);
+      margin-inline-start: 0;
+    }
+
+    /* Tiny optical nudge so the visible search→account and account→bag gaps match */
+    #header-component:not([data-menu-style='drawer']) .header-actions__action:has(cart-icon) {
+      margin-inline-start: 0.5px;
     }
 
     /* Same 44px box for every action, glyph centered */
@@ -1888,6 +1947,36 @@
       "label": "t:settings.text_color_transparent",
       "placeholder": "t:settings.default",
       "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
+    },
+    {
+      "type": "header",
+      "content": "Menú (escritorio)"
+    },
+    {
+      "type": "font_picker",
+      "id": "cf_menu_font",
+      "label": "Fuente del menú",
+      "default": "montserrat_n5"
+    },
+    {
+      "type": "range",
+      "id": "cf_menu_font_size",
+      "label": "Tamaño de fuente del menú",
+      "min": 11,
+      "max": 18,
+      "step": 0.5,
+      "unit": "px",
+      "default": 13.5
+    },
+    {
+      "type": "range",
+      "id": "cf_menu_letter_spacing",
+      "label": "Espaciado entre letras del menú",
+      "info": "En centésimas de em (5 = 0.05em).",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 5
     }
   ],
   "presets": []

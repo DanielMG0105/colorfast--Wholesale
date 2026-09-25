@@ -10,6 +10,21 @@
 
 {% render 'contrast-override', background_color: section.settings.background_color, section_id: section.id %}
 
+{%- if section.settings.cf_custom_typography -%}
+  {%- assign cf_font = section.settings.cf_font -%}
+  <style>
+    {{ cf_font | font_face: font_display: 'swap' }}
+    #shopify-section-{{ section.id }} .announcement-bar .announcement-bar__text {
+      font-family: {{ cf_font.family }}, {{ cf_font.fallback_families }};
+      font-style: {{ cf_font.style }};
+      font-weight: {{ cf_font.weight }};
+      font-size: {{ section.settings.cf_font_size }}px;
+      letter-spacing: {{ section.settings.cf_letter_spacing | divided_by: 1000.0 }}em;
+      line-height: 1;
+    }
+  </style>
+{%- endif -%}
+
 <div class="section-background color-custom-{{ section.id }}"></div>
 <aside
   class="announcement-bar spacing-style section section--{{ section.settings.section_width }} color-custom-{{ section.id }}"
@@ -188,6 +203,46 @@
       "label": "t:settings.divider_color",
       "placeholder": "t:settings.default",
       "visible_if": "{{ section.settings.divider_width > 0 }}"
+    },
+    {
+      "type": "header",
+      "content": "Tipografía"
+    },
+    {
+      "type": "checkbox",
+      "id": "cf_custom_typography",
+      "label": "Usar tipografía personalizada",
+      "info": "Sustituye la tipografía de cada anuncio.",
+      "default": true
+    },
+    {
+      "type": "font_picker",
+      "id": "cf_font",
+      "label": "Fuente",
+      "default": "montserrat_n3",
+      "visible_if": "{{ section.settings.cf_custom_typography }}"
+    },
+    {
+      "type": "range",
+      "id": "cf_font_size",
+      "label": "Tamaño de fuente",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 26,
+      "visible_if": "{{ section.settings.cf_custom_typography }}"
+    },
+    {
+      "type": "range",
+      "id": "cf_letter_spacing",
+      "label": "Espaciado entre letras",
+      "info": "En milésimas de em (35 = 0.035em).",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "default": 35,
+      "visible_if": "{{ section.settings.cf_custom_typography }}"
     },
     {
       "type": "header",
