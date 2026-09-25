@@ -16,7 +16,27 @@
       "settings": {
         "heading": "Join us",
         "subheading": "Sign up to our mailing list for exclusive promotions",
-        "placeholder": "Email address"
+        "placeholder": "Email address",
+        "button_label": "Subscribe",
+        "success_message": "Thanks for subscribing!",
+        "left_menu": "footer-wholesale-1",
+        "right_menu": "footer-wholesale-2",
+        "font": "figtree_n5",
+        "heading_size": 58,
+        "subheading_size": 16,
+        "input_font_size": 16,
+        "link_size": 17,
+        "input_width": 720,
+        "input_height": 92,
+        "links_width": 900,
+        "link_gap": 22,
+        "links_spacing": 124,
+        "padding_top": 100,
+        "padding_bottom": 80,
+        "background_color": "#ffffff",
+        "text_color": "#000000",
+        "placeholder_color": "#9b9b9b",
+        "input_border_color": "#000000"
       }
     },
     "footer_utilities_jLGE8U": {
@@ -26,6 +46,7 @@
           "type": "footer-copyright",
           "settings": {
             "show_powered_by": true,
+            "text_color": "",
             "font_size": "0.75rem",
             "case": "none"
           },
@@ -34,6 +55,7 @@
         "footer_policy_list_VCdnpa": {
           "type": "footer-policy-list",
           "settings": {
+            "text_color": "",
             "font_size": "0.75rem",
             "case": "none"
           },
@@ -42,11 +64,20 @@
         "social_links_Ew63Kq": {
           "type": "social-links",
           "settings": {
+            "icon_color": "",
             "facebook_url": "https://www.facebook.com/",
             "instagram_url": "https://www.instagram.com/",
             "youtube_url": "https://www.youtube.com/",
             "tiktok_url": "https://www.tiktok.com/",
-            "twitter_url": "https://x.com/"
+            "twitter_url": "https://x.com/",
+            "threads_url": "",
+            "linkedin_url": "",
+            "bluesky_url": "",
+            "snapchat_url": "",
+            "pinterest_url": "",
+            "tumblr_url": "",
+            "vimeo_url": "",
+            "custom_url": ""
           },
           "blocks": {}
         }
@@ -60,9 +91,9 @@
       "settings": {
         "section_width": "page-width",
         "gap": 24,
+        "background_color": "{{ settings.color_palette.background }}",
         "divider_thickness": 1,
         "divider_color": "{{ settings.color_palette.color2 }}",
-        "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 20,
         "padding-block-end": 48
       }
