@@ -67,10 +67,20 @@
         "padding_top": 40,
         "padding_bottom": 28
       }
+    },
+    "video_banner_main": {
+      "type": "video-banner",
+      "settings": {
+        "height_mode": "ratio",
+        "show_poster": true,
+        "video_position": "center center",
+        "background_color": "#000000"
+      }
     }
   },
   "order": [
     "hero_cta_main",
-    "collection_showcase_main"
+    "collection_showcase_main",
+    "video_banner_main"
   ]
 }
