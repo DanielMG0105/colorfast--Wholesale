@@ -236,24 +236,24 @@
 
 {% schema %}
 {
-  "name": "Colección destacada",
+  "name": "Collection showcase",
   "tag": "section",
   "class": "section-collection-showcase",
   "settings": [
     {
       "type": "collection",
       "id": "collection",
-      "label": "Colección"
+      "label": "Collection"
     },
     {
       "type": "text",
       "id": "heading",
-      "label": "Título (opcional)"
+      "label": "Heading (optional)"
     },
     {
       "type": "range",
       "id": "products_to_show",
-      "label": "Productos a mostrar",
+      "label": "Products to show",
       "min": 2,
       "max": 12,
       "step": 1,
@@ -261,12 +261,12 @@
     },
     {
       "type": "header",
-      "content": "Diseño"
+      "content": "Layout"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columnas escritorio",
+      "label": "Desktop columns",
       "min": 2,
       "max": 6,
       "step": 1,
@@ -275,7 +275,7 @@
     {
       "type": "select",
       "id": "columns_mobile",
-      "label": "Columnas móvil",
+      "label": "Mobile columns",
       "options": [
         { "value": "1", "label": "1" },
         { "value": "2", "label": "2" }
@@ -285,38 +285,38 @@
     {
       "type": "select",
       "id": "image_ratio",
-      "label": "Proporción de imagen",
+      "label": "Image ratio",
       "options": [
-        { "value": "1 / 1", "label": "Cuadrada" },
-        { "value": "4 / 5", "label": "Vertical (4:5)" },
-        { "value": "3 / 4", "label": "Vertical (3:4)" },
-        { "value": "5 / 4", "label": "Horizontal (5:4)" }
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "3 / 4", "label": "Portrait (3:4)" },
+        { "value": "5 / 4", "label": "Landscape (5:4)" }
       ],
       "default": "1 / 1"
     },
     {
       "type": "checkbox",
       "id": "blend_white",
-      "label": "Fundir fondo blanco de imágenes",
-      "info": "Útil si las fotos tienen fondo blanco: se mezcla con el color de la sección.",
+      "label": "Blend white image backgrounds",
+      "info": "Useful when photos have a white background: it blends into the section color.",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "show_title",
-      "label": "Mostrar nombre del producto",
+      "label": "Show product title",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "show_price",
-      "label": "Mostrar precio",
+      "label": "Show price",
       "default": false
     },
     {
       "type": "range",
       "id": "gap",
-      "label": "Espacio entre productos",
+      "label": "Gap between products",
       "min": 0,
       "max": 120,
       "step": 4,
@@ -326,7 +326,7 @@
     {
       "type": "range",
       "id": "side_margin",
-      "label": "Margen lateral (escritorio)",
+      "label": "Side margin (desktop)",
       "min": 0,
       "max": 200,
       "step": 4,
@@ -335,30 +335,30 @@
     },
     {
       "type": "header",
-      "content": "Botón"
+      "content": "Button"
     },
     {
       "type": "text",
       "id": "button_label",
-      "label": "Texto",
+      "label": "Text",
       "default": "Shop our bestsellers"
     },
     {
       "type": "url",
       "id": "button_link",
-      "label": "Enlace",
-      "info": "Si se deja vacío, enlaza a la colección seleccionada."
+      "label": "Link",
+      "info": "If empty, links to the selected collection."
     },
     {
       "type": "font_picker",
       "id": "button_font",
-      "label": "Fuente",
+      "label": "Font",
       "default": "figtree_n4"
     },
     {
       "type": "range",
       "id": "button_font_size",
-      "label": "Tamaño de texto",
+      "label": "Text size",
       "min": 12,
       "max": 28,
       "step": 1,
@@ -368,8 +368,8 @@
     {
       "type": "range",
       "id": "button_letter_spacing",
-      "label": "Espaciado entre letras",
-      "info": "En milésimas de em (30 = 0.03em).",
+      "label": "Letter spacing",
+      "info": "In thousandths of an em (30 = 0.03em).",
       "min": 0,
       "max": 200,
       "step": 5,
@@ -378,7 +378,7 @@
     {
       "type": "range",
       "id": "button_width",
-      "label": "Ancho",
+      "label": "Width",
       "min": 200,
       "max": 800,
       "step": 10,
@@ -388,7 +388,7 @@
     {
       "type": "range",
       "id": "button_height",
-      "label": "Alto",
+      "label": "Height",
       "min": 40,
       "max": 120,
       "step": 2,
@@ -398,7 +398,7 @@
     {
       "type": "range",
       "id": "button_border_width",
-      "label": "Grosor del borde",
+      "label": "Border width",
       "min": 0,
       "max": 6,
       "step": 1,
@@ -408,39 +408,39 @@
     {
       "type": "color",
       "id": "button_text_color",
-      "label": "Color de texto",
+      "label": "Text color",
       "default": "#000000"
     },
     {
       "type": "color",
       "id": "button_border_color",
-      "label": "Color de borde",
+      "label": "Border color",
       "default": "#000000"
     },
     {
       "type": "color",
       "id": "button_background",
-      "label": "Fondo",
+      "label": "Background",
       "alpha": true,
       "default": "rgba(0,0,0,0)"
     },
     {
       "type": "color",
       "id": "button_hover_background",
-      "label": "Fondo (hover)",
+      "label": "Background (hover)",
       "alpha": true,
       "default": "#000000"
     },
     {
       "type": "color",
       "id": "button_hover_text_color",
-      "label": "Color de texto (hover)",
+      "label": "Text color (hover)",
       "default": "#ffffff"
     },
     {
       "type": "range",
       "id": "button_spacing",
-      "label": "Espacio sobre el botón",
+      "label": "Space above button",
       "min": 0,
       "max": 120,
       "step": 4,
@@ -449,24 +449,24 @@
     },
     {
       "type": "header",
-      "content": "Colores y espaciado"
+      "content": "Colors and spacing"
     },
     {
       "type": "color",
       "id": "background_color",
-      "label": "Color de fondo",
+      "label": "Background color",
       "default": "#c6c6c4"
     },
     {
       "type": "color",
       "id": "text_color",
-      "label": "Color de texto",
+      "label": "Text color",
       "default": "#000000"
     },
     {
       "type": "range",
       "id": "padding_top",
-      "label": "Padding superior",
+      "label": "Top padding",
       "min": 0,
       "max": 160,
       "step": 4,
@@ -476,7 +476,7 @@
     {
       "type": "range",
       "id": "padding_bottom",
-      "label": "Padding inferior",
+      "label": "Bottom padding",
       "min": 0,
       "max": 160,
       "step": 4,
@@ -486,7 +486,7 @@
   ],
   "presets": [
     {
-      "name": "Colección destacada"
+      "name": "Collection showcase"
     }
   ]
 }

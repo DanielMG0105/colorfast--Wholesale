@@ -248,9 +248,9 @@
     {
       "type": "select",
       "id": "media_type",
-      "label": "Tipo de fondo",
+      "label": "Background type",
       "options": [
-        { "value": "image", "label": "Imagen" },
+        { "value": "image", "label": "Image" },
         { "value": "video", "label": "Video" }
       ],
       "default": "image"
@@ -258,60 +258,60 @@
     {
       "type": "image_picker",
       "id": "image",
-      "label": "Imagen",
+      "label": "Image",
       "visible_if": "{{ section.settings.media_type == 'image' }}"
     },
     {
       "type": "image_picker",
       "id": "image_mobile",
-      "label": "Imagen móvil (opcional)",
+      "label": "Mobile image (optional)",
       "visible_if": "{{ section.settings.media_type == 'image' }}"
     },
     {
       "type": "video",
       "id": "video",
       "label": "Video",
-      "info": "Se reproduce en bucle, sin sonido y en autoplay.",
+      "info": "Plays muted, looped and autoplayed.",
       "visible_if": "{{ section.settings.media_type == 'video' }}"
     },
     {
       "type": "video",
       "id": "video_mobile",
-      "label": "Video móvil (opcional)",
+      "label": "Mobile video (optional)",
       "visible_if": "{{ section.settings.media_type == 'video' }}"
     },
     {
       "type": "select",
       "id": "media_position",
-      "label": "Posición del fondo",
+      "label": "Background position",
       "options": [
-        { "value": "center center", "label": "Centro" },
-        { "value": "center top", "label": "Arriba" },
-        { "value": "center bottom", "label": "Abajo" },
-        { "value": "left center", "label": "Izquierda" },
-        { "value": "right center", "label": "Derecha" }
+        { "value": "center center", "label": "Center" },
+        { "value": "center top", "label": "Top" },
+        { "value": "center bottom", "label": "Bottom" },
+        { "value": "left center", "label": "Left" },
+        { "value": "right center", "label": "Right" }
       ],
       "default": "center center"
     },
     {
       "type": "header",
-      "content": "Altura"
+      "content": "Height"
     },
     {
       "type": "range",
       "id": "height",
-      "label": "Altura escritorio",
+      "label": "Desktop height",
       "min": 100,
       "max": 150,
       "step": 5,
       "unit": "%",
       "default": 100,
-      "info": "Porcentaje de la altura de la pantalla."
+      "info": "Percentage of the screen height."
     },
     {
       "type": "range",
       "id": "height_mobile",
-      "label": "Altura móvil",
+      "label": "Mobile height",
       "min": 60,
       "max": 150,
       "step": 5,
@@ -320,30 +320,30 @@
     },
     {
       "type": "header",
-      "content": "Botón"
+      "content": "Button"
     },
     {
       "type": "text",
       "id": "button_label",
-      "label": "Texto",
+      "label": "Text",
       "default": "Shop the collection"
     },
     {
       "type": "url",
       "id": "button_link",
-      "label": "Enlace",
+      "label": "Link",
       "default": "/collections/all"
     },
     {
       "type": "checkbox",
       "id": "open_in_new_tab",
-      "label": "Abrir en nueva pestaña",
+      "label": "Open in new tab",
       "default": false
     },
     {
       "type": "range",
       "id": "button_font_size",
-      "label": "Tamaño de texto",
+      "label": "Text size",
       "min": 12,
       "max": 24,
       "step": 1,
@@ -373,19 +373,19 @@
     {
       "type": "color",
       "id": "button_text_color",
-      "label": "Color de texto",
+      "label": "Text color",
       "default": "#000000"
     },
     {
       "type": "color",
       "id": "button_border_color",
-      "label": "Color de borde",
+      "label": "Border color",
       "default": "#000000"
     },
     {
       "type": "range",
       "id": "button_border_width",
-      "label": "Grosor del borde",
+      "label": "Border width",
       "min": 0,
       "max": 6,
       "step": 1,
@@ -395,43 +395,43 @@
     {
       "type": "color",
       "id": "button_background",
-      "label": "Fondo",
+      "label": "Background",
       "alpha": true,
       "default": "rgba(0,0,0,0)"
     },
     {
       "type": "color",
       "id": "button_hover_background",
-      "label": "Fondo (hover)",
+      "label": "Background (hover)",
       "alpha": true,
       "default": "#000000"
     },
     {
       "type": "color",
       "id": "button_hover_text_color",
-      "label": "Color de texto (hover)",
+      "label": "Text color (hover)",
       "default": "#ffffff"
     },
     {
       "type": "header",
-      "content": "Colores"
+      "content": "Colors"
     },
     {
       "type": "color",
       "id": "background_color",
-      "label": "Color de fondo",
+      "label": "Background color",
       "default": "#e8e8e8"
     },
     {
       "type": "checkbox",
       "id": "show_overlay",
-      "label": "Mostrar overlay",
+      "label": "Show overlay",
       "default": false
     },
     {
       "type": "color",
       "id": "overlay_color",
-      "label": "Color de overlay",
+      "label": "Overlay color",
       "alpha": true,
       "default": "rgba(0,0,0,0.15)",
       "visible_if": "{{ section.settings.show_overlay }}"
