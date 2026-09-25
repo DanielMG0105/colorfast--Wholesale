@@ -92,7 +92,7 @@
         "padding-block-end": 48
       }
     },
-    "main": {
+    "collection_grid": {
       "type": "main-collection-showcase",
       "settings": {
         "top_line_source": "metafield",
@@ -104,6 +104,6 @@
   },
   "order": [
     "section",
-    "main"
+    "collection_grid"
   ]
 }
