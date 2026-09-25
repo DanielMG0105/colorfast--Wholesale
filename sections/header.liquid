@@ -1273,7 +1273,7 @@
   .header .header-actions__action svg :is(path, circle),
   .header .search-action svg :is(path, circle) {
     vector-effect: non-scaling-stroke;
-    stroke-width: 2px;
+    stroke-width: 2.25px;
   }
 
   /* The bag glyph extends lower in its viewBox than search/account; lift it so the bottoms line up */
@@ -1355,15 +1355,15 @@
 
     .header .header-actions__action:not(.account-button) svg,
     .header .search-action svg {
-      width: 34.2px;
-      height: 34.2px;
+      width: 32.5px;
+      height: 32.5px;
     }
 
     /* The account SVG has no inner padding (15x17 viewBox) unlike the 20x20 icons,
        so size it to match their visible glyph height */
     .header .account-button__icon {
-      width: 21.85px;
-      height: 24.2px;
+      width: 20.75px;
+      height: 23px;
       overflow: visible;
     }
   }
