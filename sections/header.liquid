@@ -1262,12 +1262,17 @@
       gap: 10px;
     }
 
-    .header .header-actions__action svg,
     .header .header-actions__action:not(.account-button) svg,
-    .header .account-button__icon,
     .header .search-action svg {
       width: 24px;
       height: 24px;
+    }
+
+    /* The account SVG has no inner padding (15x17 viewBox) unlike the 20x20 icons,
+       so size it to match their visible glyph height */
+    .header .account-button__icon {
+      width: 15px;
+      height: 17px;
     }
   }
 {% endstylesheet %}
