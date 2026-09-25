@@ -1,0 +1,527 @@
+{%- liquid
+  assign font = section.settings.font
+  assign left_menu = section.settings.left_menu
+  assign right_menu = section.settings.right_menu
+  assign form_id = 'NewsletterFooter-' | append: section.id
+-%}
+
+<style>
+  {{ font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="newsletter-footer"
+  style="
+    --nf-font-family: {{ font.family }}, {{ font.fallback_families }};
+    --nf-font-weight: {{ font.weight }};
+    --nf-font-style: {{ font.style }};
+    --nf-bg: {{ section.settings.background_color }};
+    --nf-text: {{ section.settings.text_color }};
+    --nf-muted: {{ section.settings.placeholder_color }};
+    --nf-border: {{ section.settings.input_border_color }};
+    --nf-heading-size: {{ section.settings.heading_size }}px;
+    --nf-subheading-size: {{ section.settings.subheading_size }}px;
+    --nf-input-size: {{ section.settings.input_font_size }}px;
+    --nf-link-size: {{ section.settings.link_size }}px;
+    --nf-input-width: {{ section.settings.input_width }}px;
+    --nf-input-height: {{ section.settings.input_height }}px;
+    --nf-links-width: {{ section.settings.links_width }}px;
+    --nf-link-gap: {{ section.settings.link_gap }}px;
+    --nf-links-spacing: {{ section.settings.links_spacing }}px;
+    --nf-pt: {{ section.settings.padding_top }}px;
+    --nf-pb: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="newsletter-footer__signup">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="newsletter-footer__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.subheading != blank -%}
+      <p class="newsletter-footer__subheading">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+
+    {%- form 'customer', id: form_id, class: 'newsletter-footer__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+
+      <div class="newsletter-footer__field">
+        <label class="visually-hidden" for="{{ form_id }}-email">
+          {{- section.settings.placeholder | escape -}}
+        </label>
+        <input
+          id="{{ form_id }}-email"
+          class="newsletter-footer__input"
+          type="email"
+          name="contact[email]"
+          value="{{ form.email }}"
+          placeholder="{{ section.settings.placeholder | escape }}"
+          autocomplete="email"
+          autocorrect="off"
+          autocapitalize="off"
+          required
+          {% if form.errors %}
+            aria-invalid="true" aria-describedby="{{ form_id }}-error"
+          {% elsif form.posted_successfully? %}
+            aria-describedby="{{ form_id }}-success"
+          {% endif %}
+        >
+        <button
+          type="submit"
+          class="newsletter-footer__submit"
+          aria-label="{{ section.settings.button_label | escape }}"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 14" fill="none" aria-hidden="true">
+            <path d="M1 7h33M28.5 1.5 34 7l-5.5 5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      {%- if form.errors -%}
+        <p id="{{ form_id }}-error" class="newsletter-footer__message" role="alert">
+          {{ form.errors.translated_fields.email | capitalize }}
+          {{ form.errors.messages.email }}
+        </p>
+      {%- elsif form.posted_successfully? -%}
+        <p id="{{ form_id }}-success" class="newsletter-footer__message" role="status">
+          {{ section.settings.success_message | escape }}
+        </p>
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+
+  {%- if left_menu != blank or right_menu != blank or request.design_mode -%}
+    <nav class="newsletter-footer__links" aria-label="Footer">
+      {%- for menu in (1..2) -%}
+        {%- liquid
+          if forloop.first
+            assign current_menu = left_menu
+          else
+            assign current_menu = right_menu
+          endif
+        -%}
+        <ul class="newsletter-footer__menu list-unstyled" role="list">
+          {%- if current_menu != blank -%}
+            {%- for link in current_menu.links -%}
+              <li>
+                <a
+                  class="newsletter-footer__link"
+                  href="{{ link.url }}"
+                  {% if link.current %}
+                    aria-current="page"
+                  {% endif %}
+                >
+                  {{- link.title | escape -}}
+                </a>
+              </li>
+            {%- endfor -%}
+          {%- elsif request.design_mode -%}
+            <li class="newsletter-footer__hint">Select a menu in the section settings</li>
+          {%- endif -%}
+        </ul>
+      {%- endfor -%}
+    </nav>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .newsletter-footer {
+    background-color: var(--nf-bg);
+    color: var(--nf-text);
+    font-family: var(--nf-font-family);
+    font-weight: var(--nf-font-weight);
+    font-style: var(--nf-font-style);
+    padding: calc(var(--nf-pt) * 0.6) 16px calc(var(--nf-pb) * 0.6);
+
+    @media screen and (min-width: 750px) {
+      padding: var(--nf-pt) 24px var(--nf-pb);
+    }
+  }
+
+  .newsletter-footer__signup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .newsletter-footer__heading {
+    margin: 0;
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: clamp(36px, 10vw, var(--nf-heading-size));
+    line-height: 1;
+    letter-spacing: 0.015em;
+    text-transform: uppercase;
+    color: inherit;
+  }
+
+  .newsletter-footer__subheading {
+    margin: 36px 0 0;
+    font-size: calc(var(--nf-subheading-size) * 0.85);
+    line-height: 1.3;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+
+    @media screen and (min-width: 750px) {
+      font-size: var(--nf-subheading-size);
+    }
+  }
+
+  .newsletter-footer__form {
+    width: 100%;
+    max-width: var(--nf-input-width);
+    margin-top: 26px;
+  }
+
+  .newsletter-footer__field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: calc(var(--nf-input-height) * 0.7);
+    border: 1px solid var(--nf-border);
+    border-radius: 999px;
+
+    @media screen and (min-width: 750px) {
+      height: var(--nf-input-height);
+    }
+  }
+
+  .newsletter-footer__input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 0 0 28px;
+    border: 0;
+    border-radius: 999px 0 0 999px;
+    background: transparent;
+    color: var(--nf-text);
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: var(--nf-input-size);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    outline: none;
+
+    @media screen and (min-width: 750px) {
+      padding-left: 48px;
+    }
+  }
+
+  .newsletter-footer__input::placeholder {
+    color: var(--nf-muted);
+    opacity: 1;
+  }
+
+  .newsletter-footer__field:focus-within {
+    outline: 2px solid var(--nf-border);
+    outline-offset: 3px;
+  }
+
+  .newsletter-footer__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 28px 0 16px;
+    border: 0;
+    background: transparent;
+    color: var(--nf-muted);
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+
+    @media screen and (min-width: 750px) {
+      padding-right: 46px;
+    }
+  }
+
+  .newsletter-footer__submit svg {
+    width: 36px;
+    height: 14px;
+  }
+
+  .newsletter-footer__submit:hover,
+  .newsletter-footer__submit:focus-visible {
+    color: var(--nf-text);
+  }
+
+  .newsletter-footer__submit:hover svg {
+    transform: translateX(4px);
+    transition: transform 0.2s ease;
+  }
+
+  .newsletter-footer__message {
+    margin: 16px 0 0;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .newsletter-footer__links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--nf-link-gap);
+    max-width: var(--nf-links-width);
+    margin: calc(var(--nf-links-spacing) * 0.5) auto 0;
+
+    @media screen and (min-width: 750px) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: var(--nf-links-spacing);
+    }
+  }
+
+  .newsletter-footer__menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--nf-link-gap);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+
+    @media screen and (min-width: 750px) {
+      text-align: start;
+    }
+  }
+
+  .newsletter-footer__link {
+    color: var(--nf-text);
+    font-size: calc(var(--nf-link-size) * 0.9);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-decoration: none;
+
+    @media screen and (min-width: 750px) {
+      font-size: var(--nf-link-size);
+    }
+  }
+
+  .newsletter-footer__link:hover,
+  .newsletter-footer__link[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .newsletter-footer__hint {
+    font-size: 14px;
+    opacity: 0.5;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Newsletter footer",
+  "tag": "section",
+  "class": "section-newsletter-footer",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Join us"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Sign up to our mailing list for exclusive promotions"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Email placeholder",
+      "default": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Submit button accessible label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks for subscribing!"
+    },
+    {
+      "type": "header",
+      "content": "Links"
+    },
+    {
+      "type": "link_list",
+      "id": "left_menu",
+      "label": "Left menu"
+    },
+    {
+      "type": "link_list",
+      "id": "right_menu",
+      "label": "Right menu"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "figtree_n5"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 24,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 58
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "Subheading size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "input_font_size",
+      "label": "Input text size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "link_size",
+      "label": "Link size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "input_width",
+      "label": "Input width",
+      "min": 300,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "default": 720
+    },
+    {
+      "type": "range",
+      "id": "input_height",
+      "label": "Input height",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 92
+    },
+    {
+      "type": "range",
+      "id": "links_width",
+      "label": "Links container width",
+      "min": 400,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 900
+    },
+    {
+      "type": "range",
+      "id": "link_gap",
+      "label": "Space between links",
+      "min": 4,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "links_spacing",
+      "label": "Space above links",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "default": 124
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_color",
+      "label": "Placeholder and arrow color",
+      "default": "#9b9b9b"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter footer"
+    }
+  ]
+}
+{% endschema %}
