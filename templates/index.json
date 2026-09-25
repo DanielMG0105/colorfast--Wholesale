@@ -76,7 +76,6 @@
         "height": 350,
         "height_mobile": 200,
         "show_poster": true,
-        "poster_image": "",
         "link": "",
         "link_label": "Custom dye program",
         "background_color": "#000000"
