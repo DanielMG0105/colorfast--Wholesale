@@ -33,9 +33,16 @@
         "show_overlay": false,
         "overlay_color": "#00000026"
       }
+    },
+    "collection_showcase_main": {
+      "type": "collection-showcase",
+      "settings": {
+        "button_label": "Shop our bestsellers"
+      }
     }
   },
   "order": [
-    "hero_cta_main"
+    "hero_cta_main",
+    "collection_showcase_main"
   ]
 }
