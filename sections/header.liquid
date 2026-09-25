@@ -1281,6 +1281,50 @@
     transform: translateY(-6.5%);
   }
 
+  /* Outlined cart bubble centered on the bag's top-right corner.
+     Geometry is derived from the bag glyph inside its 20x20 viewBox (right edge 0.83, top 0.1485, minus the 6.5% lift). */
+  .header .header-actions__cart-icon {
+    --cf-bag: var(--icon-size-md);
+    --cf-box: 44px;
+    --cf-bub: 24px;
+    --cf-off: calc((var(--cf-box) - var(--cf-bag)) / 2);
+    --cf-cx: calc(var(--cf-off) + var(--cf-bag) * 0.83 + 0.5px);
+    --cf-cy: calc(var(--cf-off) + var(--cf-bag) * 0.0835 + 2px);
+  }
+
+  .header .header-actions__cart-icon .cart-bubble {
+    width: var(--cf-bub);
+    height: var(--cf-bub);
+    top: calc(var(--cf-cy) - var(--cf-bub) / 2);
+    left: calc(var(--cf-cx) - var(--cf-bub) / 2);
+    inset-inline-end: auto;
+    padding: 0;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    color: inherit;
+  }
+
+  .header .header-actions__cart-icon .cart-bubble__background {
+    display: none;
+  }
+
+  .header .header-actions__cart-icon .cart-bubble__text {
+    font-family: var(--cf-menu-font-family, inherit);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    color: inherit;
+  }
+
+  /* Cut the bag outline around the bubble with a 2px gap (the mask moves with the svg, so undo its lift) */
+  .header .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
+    mask: radial-gradient(
+      circle at calc(var(--cf-cx) - var(--cf-off)) calc(var(--cf-cy) - var(--cf-off) + var(--cf-bag) * 0.065),
+      transparent calc(var(--cf-bub) / 2 + 2px),
+      #000 calc(var(--cf-bub) / 2 + 2.5px)
+    );
+  }
+
   /* ColorFast desktop header layout */
   @media screen and (min-width: 990px) {
     .header {
@@ -1357,6 +1401,10 @@
     .header .search-action svg {
       width: 32.5px;
       height: 32.5px;
+    }
+
+    .header .header-actions__cart-icon {
+      --cf-bag: 32.5px;
     }
 
     /* The account SVG has no inner padding (15x17 viewBox) unlike the 20x20 icons,
