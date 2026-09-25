@@ -71,11 +71,13 @@
     "video_banner_main": {
       "type": "video-banner",
       "settings": {
+        "video": "shopify://files/videos/custom-dye-program.mp4",
         "video_position": "center center",
         "height_mode": "ratio",
         "height": 350,
         "height_mobile": 200,
         "show_poster": true,
+        "poster_image": "shopify://shop_images/poster.jpg",
         "link": "",
         "link_label": "Custom dye program",
         "background_color": "#000000"
