@@ -20,7 +20,7 @@
             "text": "10% OFF YOUR FIRST ORDER",
             "link": "",
             "font": "var(--font-subheading--family)",
-            "font_size": "0.75rem",
+            "font_size": "1.5rem",
             "weight": "",
             "letter_spacing": "normal",
             "case": "none",
