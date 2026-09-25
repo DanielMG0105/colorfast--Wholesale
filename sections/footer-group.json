@@ -33,7 +33,7 @@
         "links_spacing": 124,
         "padding_top": 100,
         "padding_bottom": 80,
-        "background_color": "#C8C8C7",
+        "background_color": "{{ settings.color_palette.background }}",
         "text_color": "#000000",
         "placeholder_color": "#9b9b9b",
         "input_border_color": "#000000"
