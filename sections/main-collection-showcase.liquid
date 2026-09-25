@@ -1,0 +1,575 @@
+{%- liquid
+  assign font = section.settings.font
+  assign color_option_names = section.settings.color_option_names | downcase | split: ','
+-%}
+
+<style>
+  {{ font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="collection-grid"
+  style="
+    --cg-bg: {{ section.settings.background_color }};
+    --cg-text: {{ section.settings.text_color }};
+    --cg-font-family: {{ font.family }}, {{ font.fallback_families }};
+    --cg-font-weight: {{ font.weight }};
+    --cg-font-style: {{ font.style }};
+    --cg-title-size: {{ section.settings.title_size }}px;
+    --cg-letter-spacing: {{ section.settings.letter_spacing | divided_by: 1000.0 }}em;
+    --cg-columns: {{ section.settings.columns_desktop }};
+    --cg-columns-mobile: {{ section.settings.columns_mobile }};
+    --cg-column-gap: {{ section.settings.column_gap }}px;
+    --cg-row-gap: {{ section.settings.row_gap }}px;
+    --cg-margin: {{ section.settings.side_margin }}px;
+    --cg-ratio: {{ section.settings.image_ratio }};
+    --cg-blend: {% if section.settings.blend_white %}multiply{% else %}normal{% endif %};
+    --cg-swatch-size: {{ section.settings.swatch_size }}px;
+    --cg-pt: {{ section.settings.padding_top }}px;
+    --cg-pb: {{ section.settings.padding_bottom }}px;
+  "
+>
+  {%- if section.settings.show_title -%}
+    <h1 class="collection-grid__heading">{{ collection.title | escape }}</h1>
+  {%- endif -%}
+
+  {%- paginate collection.products by section.settings.products_per_page -%}
+    {%- if collection.products.size > 0 -%}
+      <ul class="collection-grid__list list-unstyled" role="list">
+        {%- for product in collection.products -%}
+          {%- liquid
+            assign top_line = blank
+            case section.settings.top_line_source
+              when 'metafield'
+                assign top_line = product.metafields.custom.style_code.value | default: product.selected_or_first_available_variant.sku
+              when 'sku'
+                assign top_line = product.selected_or_first_available_variant.sku
+              when 'vendor'
+                assign top_line = product.vendor
+            endcase
+
+            assign bottom_line = product.title
+            if section.settings.top_line_source == 'title_split' and section.settings.title_delimiter != blank
+              assign title_parts = product.title | split: section.settings.title_delimiter
+              if title_parts.size > 1
+                assign top_line = title_parts | first | strip
+                assign bottom_line = product.title | remove_first: title_parts[0] | remove_first: section.settings.title_delimiter | strip
+              endif
+            endif
+
+            assign color_option = blank
+            for option in product.options_with_values
+              assign option_name = option.name | downcase | strip
+              for accepted in color_option_names
+                assign accepted_name = accepted | strip
+                if option_name == accepted_name
+                  assign color_option = option
+                  break
+                endif
+              endfor
+              if color_option != blank
+                break
+              endif
+            endfor
+
+            assign image = product.featured_media
+          -%}
+          <li class="collection-grid__item">
+            <a class="collection-grid__link" href="{{ product.url }}">
+              <div class="collection-grid__media">
+                {%- if image -%}
+                  {{
+                    image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '300, 450, 600, 800, 1000, 1200',
+                      sizes: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+                      loading: 'lazy',
+                      alt: product.title,
+                      class: 'collection-grid__image',
+                      data-card-image: ''
+                  }}
+                {%- else -%}
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'collection-grid__image collection-grid__placeholder' }}
+                {%- endif -%}
+              </div>
+
+              <p class="collection-grid__title">
+                {%- if top_line != blank -%}
+                  <span class="collection-grid__title-line">{{ top_line | escape }}</span>
+                {%- endif -%}
+                <span class="collection-grid__title-line">{{ bottom_line | escape }}</span>
+              </p>
+            </a>
+
+            {%- if section.settings.show_swatches and color_option != blank -%}
+              <ul class="collection-grid__swatches list-unstyled" role="list" aria-label="{{ color_option.name | escape }}">
+                {%- for value in color_option.values limit: section.settings.max_swatches -%}
+                  {%- liquid
+                    assign swatch_color = value.swatch.color | default: value
+                    assign swatch_bg = 'background-color: ' | append: swatch_color | append: ';'
+                    if value.swatch.image
+                      assign swatch_image_url = value.swatch.image | image_url: width: 72
+                      assign swatch_bg = 'background-image: url(' | append: swatch_image_url | append: ');'
+                    endif
+
+                    assign is_light = false
+                    if value.swatch.color
+                      assign brightness = value.swatch.color | color_brightness
+                      if brightness > 200
+                        assign is_light = true
+                      endif
+                    else
+                      assign value_handle = value | handle
+                      if value_handle contains 'white' or value_handle contains 'natural' or value_handle contains 'cream' or value_handle contains 'ivory'
+                        assign is_light = true
+                      endif
+                    endif
+
+                    assign variant_image = blank
+                    if value.variant.featured_media
+                      assign variant_image = value.variant.featured_media | image_url: width: 1200
+                    endif
+                  -%}
+                  <li>
+                    <a
+                      class="collection-grid__swatch{% if is_light %} collection-grid__swatch--light{% endif %}"
+                      href="{{ value.variant.url | default: product.url }}"
+                      style="{{ swatch_bg }}"
+                      title="{{ value | escape }}"
+                      {% if variant_image != blank %}
+                        data-swatch-image="{{ variant_image }}"
+                      {% endif %}
+                    >
+                      <span class="visually-hidden">{{ value | escape }}</span>
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {%- if paginate.pages > 1 -%}
+        <nav class="collection-grid__pagination" aria-label="Pagination">
+          {%- if paginate.previous -%}
+            <a href="{{ paginate.previous.url }}" aria-label="Previous page">&larr;</a>
+          {%- endif -%}
+          {%- for part in paginate.parts -%}
+            {%- if part.is_link -%}
+              <a href="{{ part.url }}">{{ part.title }}</a>
+            {%- elsif part.title == paginate.current_page -%}
+              <span aria-current="page">{{ part.title }}</span>
+            {%- else -%}
+              <span>{{ part.title }}</span>
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if paginate.next -%}
+            <a href="{{ paginate.next.url }}" aria-label="Next page">&rarr;</a>
+          {%- endif -%}
+        </nav>
+      {%- endif -%}
+    {%- else -%}
+      <p class="collection-grid__empty">No products found in this collection.</p>
+    {%- endif -%}
+  {%- endpaginate -%}
+</div>
+
+<script type="module">
+  // Preview a color's variant image when hovering/focusing its swatch; restore on leave.
+  for (const item of document.querySelectorAll('.collection-grid__item')) {
+    const img = item.querySelector('[data-card-image]');
+    if (!img) continue;
+    const original = { src: img.src, srcset: img.srcset };
+    const restore = () => {
+      img.src = original.src;
+      img.srcset = original.srcset;
+    };
+    for (const swatch of item.querySelectorAll('[data-swatch-image]')) {
+      const preview = () => {
+        img.srcset = '';
+        img.src = swatch.dataset.swatchImage;
+      };
+      swatch.addEventListener('mouseenter', preview);
+      swatch.addEventListener('focus', preview);
+      swatch.addEventListener('mouseleave', restore);
+      swatch.addEventListener('blur', restore);
+    }
+  }
+</script>
+
+{% stylesheet %}
+  .collection-grid {
+    background-color: var(--cg-bg);
+    color: var(--cg-text);
+    font-family: var(--cg-font-family);
+    font-weight: var(--cg-font-weight);
+    font-style: var(--cg-font-style);
+    padding: calc(var(--cg-pt) * 0.6) 16px calc(var(--cg-pb) * 0.6);
+
+    @media screen and (min-width: 750px) {
+      padding: var(--cg-pt) var(--cg-margin) var(--cg-pb);
+    }
+  }
+
+  .collection-grid__heading {
+    margin: 0 0 48px;
+    text-align: center;
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: calc(var(--cg-title-size) * 2);
+    letter-spacing: var(--cg-letter-spacing);
+    text-transform: uppercase;
+    color: inherit;
+  }
+
+  .collection-grid__list {
+    display: grid;
+    grid-template-columns: repeat(var(--cg-columns-mobile), minmax(0, 1fr));
+    gap: calc(var(--cg-row-gap) * 0.6) 16px;
+    margin: 0;
+    padding: 0;
+
+    @media screen and (min-width: 750px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--cg-row-gap) var(--cg-column-gap);
+    }
+
+    @media screen and (min-width: 990px) {
+      grid-template-columns: repeat(var(--cg-columns), minmax(0, 1fr));
+    }
+  }
+
+  .collection-grid__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .collection-grid__link {
+    display: block;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .collection-grid__media {
+    aspect-ratio: var(--cg-ratio);
+    overflow: hidden;
+  }
+
+  .collection-grid__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: var(--cg-blend);
+    transition: transform 0.4s ease;
+  }
+
+  .collection-grid__placeholder {
+    fill: currentColor;
+    opacity: 0.25;
+  }
+
+  @media (hover: hover) {
+    .collection-grid__link:hover .collection-grid__image {
+      transform: scale(1.03);
+    }
+  }
+
+  .collection-grid__title {
+    display: flex;
+    flex-direction: column;
+    margin: 16px 0 0;
+    font-size: calc(var(--cg-title-size) * 0.8);
+    line-height: 1.3;
+    letter-spacing: var(--cg-letter-spacing);
+    text-transform: uppercase;
+
+    @media screen and (min-width: 750px) {
+      font-size: var(--cg-title-size);
+    }
+  }
+
+  .collection-grid__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin: 32px 0 0;
+    padding: 0;
+  }
+
+  .collection-grid__swatch {
+    display: block;
+    width: var(--cg-swatch-size);
+    height: var(--cg-swatch-size);
+    border: 1px solid var(--cg-text);
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.15s ease;
+  }
+
+  /* Light swatches get an inner ring so they read against the background, as in the design */
+  .collection-grid__swatch--light {
+    box-shadow: inset 0 0 0 2px var(--cg-bg);
+  }
+
+  .collection-grid__swatch:hover,
+  .collection-grid__swatch:focus-visible {
+    transform: scale(1.1);
+  }
+
+  .collection-grid__pagination {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: var(--cg-row-gap);
+    font-size: var(--cg-title-size);
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    [aria-current='page'] {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  }
+
+  .collection-grid__empty {
+    text-align: center;
+    font-size: var(--cg-title-size);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection showcase grid",
+  "tag": "section",
+  "class": "section-main-collection-showcase",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show collection title",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Product title"
+    },
+    {
+      "type": "select",
+      "id": "top_line_source",
+      "label": "Top line (style code)",
+      "info": "Metafield uses custom.style_code and falls back to the first variant SKU.",
+      "options": [
+        { "value": "metafield", "label": "Metafield (custom.style_code)" },
+        { "value": "sku", "label": "First variant SKU" },
+        { "value": "vendor", "label": "Vendor" },
+        { "value": "title_split", "label": "Split product title" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "metafield"
+    },
+    {
+      "type": "text",
+      "id": "title_delimiter",
+      "label": "Title delimiter",
+      "info": "E.g. with \" | \", \"MBC015-C470 | 470GSM Crewneck\" becomes two lines.",
+      "default": " | ",
+      "visible_if": "{{ section.settings.top_line_source == 'title_split' }}"
+    },
+    {
+      "type": "header",
+      "content": "Swatches"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "color_option_names",
+      "label": "Color option names",
+      "info": "Comma-separated option names treated as color.",
+      "default": "Color,Colour"
+    },
+    {
+      "type": "range",
+      "id": "max_swatches",
+      "label": "Maximum swatches",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "swatch_size",
+      "label": "Swatch size",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "figtree_n5"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Title size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Letter spacing",
+      "info": "In thousandths of an em (30 = 0.03em).",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Desktop columns",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Mobile columns",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "options": [
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "3 / 4", "label": "Portrait (3:4)" }
+      ],
+      "default": "1 / 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "blend_white",
+      "label": "Blend white image backgrounds",
+      "info": "Useful when photos have a white background: it blends into the section color.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Column gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "label": "Row gap",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "side_margin",
+      "label": "Side margin (desktop)",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "default": 132
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#c8c8c7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    }
+  ]
+}
+{% endschema %}
