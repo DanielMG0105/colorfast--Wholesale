@@ -1232,6 +1232,44 @@
     font-family: var(--menu-localization-font);
     font-size: var(--menu-localization-font-size);
   }
+
+  /* ColorFast desktop header layout */
+  @media screen and (min-width: 990px) {
+    .header {
+      --page-margin: 24px;
+    }
+
+    .header:not(.header--compact) .header__row--top {
+      --header-padding: 18px;
+    }
+
+    .header__row .header-logo {
+      margin-inline-end: 24px;
+    }
+
+    .header .menu-list__link {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .header .menu-list__link-title {
+      padding-inline: 24px;
+    }
+
+    .header header-actions {
+      gap: 10px;
+    }
+
+    .header .header-actions__action svg,
+    .header .header-actions__action:not(.account-button) svg,
+    .header .account-button__icon,
+    .header .search-action svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
 {% endstylesheet %}
 
 {% unless request.design_mode %}
