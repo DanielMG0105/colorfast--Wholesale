@@ -22,6 +22,13 @@
       letter-spacing: {{ section.settings.cf_letter_spacing | divided_by: 1000.0 }}em;
       line-height: 1;
     }
+
+    @media screen and (max-width: 749px) {
+      #shopify-section-{{ section.id }} .announcement-bar .announcement-bar__text {
+        font-size: {{ section.settings.cf_font_size | times: 0.5 | at_least: 12 | at_most: 15 }}px;
+        letter-spacing: {{ section.settings.cf_letter_spacing | divided_by: 2000.0 }}em;
+      }
+    }
   </style>
 {%- endif -%}
 
@@ -137,6 +144,22 @@
   .announcement-bar__link {
     position: absolute;
     inset: 0;
+  }
+
+  /* Mobile: compact bar */
+  @media screen and (max-width: 749px) {
+    .announcement-bar.spacing-style {
+      padding-block: calc(var(--padding-block-start) * 0.6 + var(--section-top-offset, 0px))
+        calc(var(--padding-block-end) * 0.6);
+    }
+
+    .announcement-bar__text {
+      font-size: 0.8125rem;
+    }
+
+    .announcement-bar__slider {
+      --button-size: 32px;
+    }
   }
 {% endstylesheet %}
 
