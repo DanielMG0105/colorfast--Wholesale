@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "product_showcase": {
       "type": "main-product-showcase",
@@ -16,7 +17,8 @@
           "settings": {
             "heading": "Product Details",
             "use_description": false,
-            "content": ""
+            "content": "",
+            "page": ""
           }
         },
         "size_fit": {
@@ -24,7 +26,8 @@
           "settings": {
             "heading": "Size & Fit",
             "use_description": false,
-            "content": ""
+            "content": "",
+            "page": ""
           }
         },
         "shipping": {
@@ -32,7 +35,8 @@
           "settings": {
             "heading": "Shipping & Returns",
             "use_description": false,
-            "content": ""
+            "content": "",
+            "page": ""
           }
         }
       },
@@ -42,9 +46,26 @@
         "shipping"
       ],
       "settings": {
-        "background_color": "#c8c8c7",
+        "add_label": "Add to cart",
+        "added_label": "Added",
+        "sold_out_label": "Sold out",
+        "color_option_names": "Color,Colour",
         "show_wholesale": true,
-        "show_bulk_grid": true
+        "wholesale_heading": "Wholesale pricing",
+        "wholesale_tiers": "1-99: 24.49\n100-299: 23.27\n300-999: 22.10\n1000+: 21.00",
+        "show_bulk_grid": true,
+        "bulk_heading": "",
+        "bulk_hint": "",
+        "heading_font": "figtree_n7",
+        "body_font": "figtree_n5",
+        "title_size": 36,
+        "media_width": 45,
+        "side_margin": 160,
+        "padding_top": 80,
+        "padding_bottom": 100,
+        "background_color": "#c8c8c7",
+        "text_color": "#000000",
+        "border_color": "#4d4d4d"
       }
     },
     "product_recommendations_qggXJq": {
@@ -54,7 +75,7 @@
           "type": "text",
           "name": "t:names.header",
           "settings": {
-            "text": "<h3>You may also like </h3>",
+            "text": "<h3>You may also like&nbsp;</h3>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -169,6 +190,7 @@
       "block_order": [
         "text_cbcgyb"
       ],
+      "disabled": true,
       "name": "t:names.product_recommendations",
       "settings": {
         "product": "{{ closest.product }}",
