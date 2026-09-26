@@ -46,7 +46,29 @@
     <h2 class="collection-showcase__heading">{{ section.settings.heading | escape }}</h2>
   {%- endif -%}
 
-  <ul class="collection-showcase__grid list-unstyled" role="list">
+  {%- liquid
+    assign layout = section.settings.layout
+    assign grid_class = ''
+    if layout == 'slider'
+      assign grid_class = ' collection-showcase__grid--slider'
+    elsif layout == 'slider_mobile'
+      assign grid_class = ' collection-showcase__grid--slider-mobile'
+    endif
+  -%}
+
+  <collection-showcase-slider class="collection-showcase__slider">
+  {%- if layout == 'slider' and section.settings.show_arrows -%}
+    <button
+      type="button"
+      class="collection-showcase__arrow collection-showcase__arrow--prev"
+      aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+      data-direction="-1"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  {%- endif -%}
+
+  <ul class="collection-showcase__grid{{ grid_class }} list-unstyled" role="list" data-track>
     {%- if collection != blank and collection.products_count > 0 -%}
       {%- for product in collection.products limit: limit -%}
         <li class="collection-showcase__item">
@@ -96,6 +118,18 @@
     {%- endif -%}
   </ul>
 
+  {%- if layout == 'slider' and section.settings.show_arrows -%}
+    <button
+      type="button"
+      class="collection-showcase__arrow collection-showcase__arrow--next"
+      aria-label="{{ 'accessibility.slideshow_next' | t }}"
+      data-direction="1"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  {%- endif -%}
+  </collection-showcase-slider>
+
   {%- if section.settings.button_label != blank -%}
     <div class="collection-showcase__actions">
       <a
@@ -111,6 +145,53 @@
     </div>
   {%- endif -%}
 </div>
+
+{%- if section.settings.layout != 'grid' -%}
+  <script type="module">
+    if (!customElements.get('collection-showcase-slider')) {
+      customElements.define(
+        'collection-showcase-slider',
+        class extends HTMLElement {
+          connectedCallback() {
+            this.track = this.querySelector('[data-track]');
+            this.prev = this.querySelector('[data-direction="-1"]');
+            this.next = this.querySelector('[data-direction="1"]');
+            this.querySelectorAll('[data-direction]').forEach((button) =>
+              button.addEventListener('click', () => this.go(Number(button.dataset.direction)))
+            );
+            this.update = this.update.bind(this);
+            this.track.addEventListener('scroll', this.update, { passive: true });
+            this.observer = new ResizeObserver(this.update);
+            this.observer.observe(this.track);
+          }
+
+          disconnectedCallback() {
+            this.observer?.disconnect();
+          }
+
+          // Scroll by the visible width, snapped to whole items
+          go(direction) {
+            const item = this.track.firstElementChild;
+            if (!item) return;
+            const gap = parseFloat(getComputedStyle(this.track).columnGap) || 0;
+            const step = item.offsetWidth + gap;
+            const perPage = Math.max(1, Math.floor((this.track.clientWidth + gap) / step));
+            const rtl = getComputedStyle(this).direction === 'rtl' ? -1 : 1;
+            this.track.scrollBy({ left: direction * rtl * step * perPage, behavior: 'smooth' });
+          }
+
+          update() {
+            const max = this.track.scrollWidth - this.track.clientWidth;
+            const position = Math.abs(this.track.scrollLeft);
+            this.toggleAttribute('scrollable', max > 1);
+            if (this.prev) this.prev.disabled = position <= 1;
+            if (this.next) this.next.disabled = position >= max - 1;
+          }
+        }
+      );
+    }
+  </script>
+{%- endif -%}
 
 {% stylesheet %}
   .collection-showcase {
@@ -140,6 +221,106 @@
       grid-template-columns: repeat(var(--cs-columns), minmax(0, 1fr));
       gap: var(--cs-gap);
     }
+  }
+
+  .collection-showcase__slider {
+    position: relative;
+    display: block;
+  }
+
+  /* Slider: horizontal track with scroll snap. Mobile shows a peek of the next item. */
+  .collection-showcase__grid--slider,
+  .collection-showcase__grid--slider-mobile {
+    @media screen and (max-width: 749px) {
+      --cs-slider-gap: calc(var(--cs-gap) * 0.5);
+
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: calc(
+        (100% - (var(--cs-columns-mobile) - 1) * var(--cs-slider-gap)) / (var(--cs-columns-mobile) + 0.25)
+      );
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 16px;
+      scrollbar-width: none;
+      margin-inline: -16px;
+      padding-inline: 16px;
+    }
+  }
+
+  .collection-showcase__grid--slider {
+    @media screen and (min-width: 750px) {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: calc((100% - (var(--cs-columns) - 1) * var(--cs-gap)) / var(--cs-columns));
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+  }
+
+  .collection-showcase__grid--slider::-webkit-scrollbar,
+  .collection-showcase__grid--slider-mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .collection-showcase__grid--slider > .collection-showcase__item,
+  .collection-showcase__grid--slider-mobile > .collection-showcase__item {
+    scroll-snap-align: start;
+  }
+
+  .collection-showcase__arrow {
+    display: none;
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--cs-btn-border);
+    border-radius: 50%;
+    background-color: var(--cs-bg);
+    color: var(--cs-text);
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: background-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .collection-showcase__slider[scrollable] > .collection-showcase__arrow {
+      display: flex;
+    }
+  }
+
+  .collection-showcase__arrow--prev {
+    inset-inline-start: calc(min(var(--cs-margin), 64px) * -0.75);
+  }
+
+  .collection-showcase__arrow--next {
+    inset-inline-end: calc(min(var(--cs-margin), 64px) * -0.75);
+  }
+
+  [dir='rtl'] .collection-showcase__arrow svg {
+    transform: scaleX(-1);
+  }
+
+  .collection-showcase__arrow:hover:not([disabled]) {
+    background-color: var(--cs-text);
+    color: var(--cs-bg);
+  }
+
+  .collection-showcase__arrow[disabled] {
+    opacity: 0.3;
+    cursor: default;
   }
 
   .collection-showcase__link {
@@ -255,13 +436,31 @@
       "id": "products_to_show",
       "label": "Products to show",
       "min": 2,
-      "max": 12,
+      "max": 16,
       "step": 1,
       "default": 4
     },
     {
       "type": "header",
       "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "slider", "label": "Slider" },
+        { "value": "slider_mobile", "label": "Slider on mobile only" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show slider arrows (desktop)",
+      "default": true,
+      "visible_if": "{{ section.settings.layout == 'slider' }}"
     },
     {
       "type": "range",
