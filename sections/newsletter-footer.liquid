@@ -148,9 +148,15 @@
     const syncFooterBackground = () => {
       const footer = document.querySelector('footer');
       if (!footer) return;
+      const pageColor = getComputedStyle(document.body).backgroundColor;
+      // A section can opt in with "Use this background for the footer"
+      const chosen = document.querySelector('#MainContent [data-footer-bg="use"]');
+      if (chosen) {
+        footer.style.setProperty('--cf-page-bg', findBackground(chosen) || pageColor);
+        return;
+      }
       const sections = document.querySelectorAll('#MainContent > .shopify-section');
       const last = sections[sections.length - 1];
-      const pageColor = getComputedStyle(document.body).backgroundColor;
       // Media sections (video banner, hero) are not a page color: fall back to the page background
       const ignored = !last || last.querySelector('[data-footer-bg="ignore"]');
       const color = (!ignored && findBackground(last)) || pageColor;

@@ -10,6 +10,9 @@
 
 <div
   class="media-text-stack{% if section.settings.media_position == 'right' %} media-text-stack--reverse{% endif %}"
+  {% if section.settings.footer_uses_background %}
+    data-footer-bg="use"
+  {% endif %}
   style="
     --mts-bg: {{ section.settings.background_color }};
     --mts-text: {{ section.settings.text_color }};
@@ -527,6 +530,13 @@
       "id": "text_color",
       "label": "Text color",
       "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "footer_uses_background",
+      "label": "Use this background for the footer",
+      "info": "The footer takes this section's background color on this page.",
+      "default": false
     }
   ],
   "presets": [

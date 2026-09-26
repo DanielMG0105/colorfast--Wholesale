@@ -82,7 +82,8 @@
         "padding_top": 32,
         "padding_bottom": 80,
         "background_color": "#c8c8c7",
-        "text_color": "#000000"
+        "text_color": "#000000",
+        "footer_uses_background": true
       }
     },
     "wordmark_banner": {
