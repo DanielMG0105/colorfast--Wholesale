@@ -1,0 +1,506 @@
+{%- liquid
+  assign heading_font = section.settings.heading_font
+  assign body_font = section.settings.body_font
+-%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+  {{ body_font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="media-text-stack{% if section.settings.media_position == 'right' %} media-text-stack--reverse{% endif %}"
+  style="
+    --mts-bg: {{ section.settings.background_color }};
+    --mts-text: {{ section.settings.text_color }};
+    --mts-heading-family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+    --mts-heading-weight: {{ heading_font.weight }};
+    --mts-body-family: {{ body_font.family }}, {{ body_font.fallback_families }};
+    --mts-body-weight: {{ body_font.weight }};
+    --mts-heading-size: {{ section.settings.heading_size }}px;
+    --mts-body-size: {{ section.settings.body_size }}px;
+    --mts-media-width: {{ section.settings.media_width }}%;
+    --mts-gap: {{ section.settings.column_gap }}%;
+    --mts-media-gap: {{ section.settings.media_gap }}px;
+    --mts-ratio: {{ section.settings.media_ratio }};
+    --mts-margin-media: {{ section.settings.media_margin }}px;
+    --mts-margin-text: {{ section.settings.text_margin }}px;
+    --mts-text-offset: {{ section.settings.text_offset }}px;
+    --mts-text-max: {{ section.settings.text_max_width }}px;
+    --mts-pt: {{ section.settings.padding_top }}px;
+    --mts-pb: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="media-text-stack__media">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign media_alt = block.settings.alt | default: block.settings.image.alt | escape
+      -%}
+      <figure class="media-text-stack__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.video != blank -%}
+          {{
+            block.settings.video
+            | video_tag:
+              poster: nil,
+              autoplay: true,
+              loop: true,
+              muted: true,
+              controls: false,
+              playsinline: true,
+              preload: 'metadata',
+              class: 'media-text-stack__asset'
+          }}
+        {%- elsif block.settings.image != blank -%}
+          {{
+            block.settings.image
+            | image_url: width: 1600
+            | image_tag:
+              widths: '600, 900, 1200, 1600',
+              sizes: '(min-width: 990px) 40vw, 100vw',
+              loading: 'lazy',
+              alt: media_alt,
+              class: 'media-text-stack__asset'
+          }}
+        {%- else -%}
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'media-text-stack__asset media-text-stack__placeholder' }}
+        {%- endif -%}
+
+        {%- if block.settings.overlay_logo != blank -%}
+          {%- assign overlay_style = 'width: ' | append: block.settings.overlay_width | append: '%' -%}
+          {{
+            block.settings.overlay_logo
+            | image_url: width: 600
+            | image_tag:
+              loading: 'lazy',
+              alt: '',
+              class: 'media-text-stack__overlay',
+              style: overlay_style
+          }}
+        {%- endif -%}
+      </figure>
+    {%- endfor -%}
+  </div>
+
+  <div class="media-text-stack__content">
+    {%- if section.settings.heading != blank -%}
+      <h1 class="media-text-stack__heading">{{ section.settings.heading | escape | newline_to_br }}</h1>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <div class="media-text-stack__text rte">{{ section.settings.text }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.button_label != blank -%}
+      <a
+        class="media-text-stack__button"
+        {% if section.settings.button_link != blank %}
+          href="{{ section.settings.button_link }}"
+        {% else %}
+          role="link" aria-disabled="true"
+        {% endif %}
+      >
+        {{- section.settings.button_label | escape -}}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .media-text-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    background-color: var(--mts-bg);
+    color: var(--mts-text);
+    padding: calc(var(--mts-pt) * 0.5) 16px calc(var(--mts-pb) * 0.6);
+
+    @media screen and (min-width: 990px) {
+      display: grid;
+      grid-template-columns: var(--mts-media-width) minmax(0, 1fr);
+      column-gap: var(--mts-gap);
+      align-items: start;
+      padding: var(--mts-pt) var(--mts-margin-text) var(--mts-pb) var(--mts-margin-media);
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .media-text-stack--reverse {
+      grid-template-columns: minmax(0, 1fr) var(--mts-media-width);
+      padding-left: var(--mts-margin-text);
+      padding-right: var(--mts-margin-media);
+
+      .media-text-stack__media {
+        order: 2;
+      }
+    }
+  }
+
+  .media-text-stack__media {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--mts-media-gap) * 0.6);
+
+    @media screen and (min-width: 990px) {
+      gap: var(--mts-media-gap);
+    }
+  }
+
+  .media-text-stack__item {
+    position: relative;
+    margin: 0;
+    aspect-ratio: var(--mts-ratio);
+    overflow: hidden;
+  }
+
+  .media-text-stack__asset,
+  .media-text-stack__item video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .media-text-stack__placeholder {
+    fill: currentColor;
+    opacity: 0.25;
+  }
+
+  .media-text-stack__overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: auto;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .media-text-stack__content {
+    max-width: var(--mts-text-max);
+    font-family: var(--mts-body-family);
+    font-weight: var(--mts-body-weight);
+
+    @media screen and (min-width: 990px) {
+      position: sticky;
+      top: calc(var(--header-height, 80px) + 24px);
+      padding-top: var(--mts-text-offset);
+    }
+  }
+
+  .media-text-stack__heading {
+    margin: 0;
+    font-family: var(--mts-heading-family);
+    font-weight: var(--mts-heading-weight);
+    font-size: calc(var(--mts-heading-size) * 0.75);
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: inherit;
+
+    @media screen and (min-width: 750px) {
+      font-size: var(--mts-heading-size);
+    }
+  }
+
+  .media-text-stack__text {
+    margin-top: 40px;
+    font-size: calc(var(--mts-body-size) * 0.85);
+    line-height: 1.4;
+
+    @media screen and (min-width: 750px) {
+      margin-top: 72px;
+      font-size: var(--mts-body-size);
+    }
+
+    p {
+      margin: 0 0 1.9em;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .media-text-stack__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: min(100%, 360px);
+    min-height: 72px;
+    margin-top: 56px;
+    padding: 0 40px;
+    border: 1px solid var(--mts-text);
+    border-radius: 999px;
+    color: var(--mts-text);
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.25s ease, color 0.25s ease;
+
+    @media screen and (min-width: 990px) {
+      min-height: 98px;
+      margin-top: 120px;
+    }
+  }
+
+  .media-text-stack__button:hover,
+  .media-text-stack__button:focus-visible {
+    background-color: var(--mts-text);
+    color: var(--mts-bg);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Media stack with text",
+  "tag": "section",
+  "class": "section-media-text-stack",
+  "blocks": [
+    {
+      "type": "media",
+      "name": "Media",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Replaces the image. Plays muted, looped and autoplayed."
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Image description (alt text)"
+        },
+        {
+          "type": "image_picker",
+          "id": "overlay_logo",
+          "label": "Overlay logo (optional)",
+          "info": "Centered on top of the media, e.g. a white Colorfast logo PNG."
+        },
+        {
+          "type": "range",
+          "id": "overlay_width",
+          "label": "Overlay logo width",
+          "min": 10,
+          "max": 80,
+          "step": 1,
+          "unit": "%",
+          "default": 30
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Line breaks are kept.",
+      "default": "Colorfast Apparel\nCustom Dye Program"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Inquire now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading font",
+      "default": "figtree_n6"
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "Body font",
+      "default": "figtree_n4"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 20,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 21
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Media position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "label": "Media column width",
+      "min": 25,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Gap between columns",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "%",
+      "default": 7
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Media ratio",
+      "options": [
+        { "value": "16 / 9", "label": "Landscape (16:9)" },
+        { "value": "4 / 3", "label": "Landscape (4:3)" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" }
+      ],
+      "default": "16 / 9"
+    },
+    {
+      "type": "range",
+      "id": "media_gap",
+      "label": "Space between media",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "media_margin",
+      "label": "Media side margin (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "text_margin",
+      "label": "Text side margin (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "text_offset",
+      "label": "Text top offset (desktop)",
+      "min": 0,
+      "max": 300,
+      "step": 4,
+      "unit": "px",
+      "default": 112
+    },
+    {
+      "type": "range",
+      "id": "text_max_width",
+      "label": "Text max width",
+      "min": 400,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "default": 960
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#c8c8c7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Media stack with text",
+      "blocks": [
+        { "type": "media" },
+        { "type": "media" },
+        { "type": "media" }
+      ]
+    }
+  ]
+}
+{% endschema %}

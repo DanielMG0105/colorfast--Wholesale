@@ -1,0 +1,62 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "video_banner": {
+      "type": "video-banner",
+      "settings": {
+        "height_mode": "ratio",
+        "show_poster": true,
+        "video_position": "center center",
+        "background_color": "#000000",
+        "link_label": "Custom dye program"
+      }
+    },
+    "dye_program": {
+      "type": "media-text-stack",
+      "blocks": {
+        "media_1": {
+          "type": "media",
+          "settings": {
+            "overlay_width": 30
+          }
+        },
+        "media_2": {
+          "type": "media",
+          "settings": {
+            "overlay_width": 30
+          }
+        },
+        "media_3": {
+          "type": "media",
+          "settings": {
+            "overlay_width": 30
+          }
+        }
+      },
+      "block_order": [
+        "media_1",
+        "media_2",
+        "media_3"
+      ],
+      "settings": {
+        "heading": "Colorfast Apparel\nCustom Dye Program",
+        "text": "<p>Our Custom Dye Program is designed to give brands, creatives, and teams the freedom to make our blanks completely their own. Using our PFD (Prepared for Dye) garments as the starting point, we can develop custom colors, washes, and specialty finishes tailored to the look and feel of your project. Whether you're looking for a clean solid dye, a faded vintage treatment, a washed-down color, or something more unique, our process allows you to create a finish that feels intentional and specific to your brand.</p><p>Because each garment begins in a dye-ready state, the fabric is able to take color and treatment more naturally, helping achieve richer tones, softer character, and more dimensional finishes. Our goal is to maintain the quality, construction, fit, and hand feel of the original blank while giving it a completely new identity through color and wash. From small capsule collections to larger production runs, the Custom Dye Program offers a flexible way to create elevated, one-of-a-kind garments without having to develop a completely new body from the ground up.</p>",
+        "button_label": "Inquire now",
+        "button_link": "shopify://pages/contact",
+        "background_color": "#c8c8c7"
+      }
+    }
+  },
+  "order": [
+    "video_banner",
+    "dye_program"
+  ]
+}
