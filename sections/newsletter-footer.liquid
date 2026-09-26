@@ -150,7 +150,10 @@
       if (!footer) return;
       const sections = document.querySelectorAll('#MainContent > .shopify-section');
       const last = sections[sections.length - 1];
-      const color = (last && findBackground(last)) || getComputedStyle(document.body).backgroundColor;
+      const pageColor = getComputedStyle(document.body).backgroundColor;
+      // Media sections (video banner, hero) are not a page color: fall back to the page background
+      const ignored = !last || last.querySelector('[data-footer-bg="ignore"]');
+      const color = (!ignored && findBackground(last)) || pageColor;
       footer.style.setProperty('--cf-page-bg', color);
     };
 
@@ -257,6 +260,20 @@
     @media screen and (min-width: 750px) {
       padding-left: 48px;
     }
+  }
+
+  /* Beat the theme's global input:not([type=checkbox], [type=radio]) background so the field shows the section color */
+  .newsletter-footer .newsletter-footer__input,
+  .newsletter-footer .newsletter-footer__input:focus,
+  .newsletter-footer .newsletter-footer__input:autofill {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  /* Browsers paint autofilled fields with their own color; keep it invisible */
+  .newsletter-footer .newsletter-footer__input:-webkit-autofill {
+    -webkit-text-fill-color: var(--nf-text);
+    transition: background-color 600000s 0s;
   }
 
   .newsletter-footer__input::placeholder {
@@ -551,7 +568,7 @@
       "type": "checkbox",
       "id": "match_page_background",
       "label": "Match page background",
-      "info": "Uses the background color of the last section on each page (e.g. white on home, gray on collections). The background color below is used as a fallback.",
+      "info": "Uses the background color of the last section on each page (e.g. gray on collections). If the page ends with a video or image section, the page background is used instead.",
       "default": true
     },
     {
