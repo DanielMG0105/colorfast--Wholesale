@@ -11,6 +11,9 @@
 
 <div
   class="newsletter-footer"
+  {% if section.settings.match_page_background %}
+    data-match-page-bg
+  {% endif %}
   style="
     --nf-font-family: {{ font.family }}, {{ font.fallback_families }};
     --nf-font-weight: {{ font.weight }};
@@ -123,7 +126,56 @@
   {%- endif -%}
 </div>
 
+{%- if section.settings.match_page_background -%}
+  <script type="module">
+    // Paint the whole footer with the background of the last section of the page,
+    // so it blends with white pages (home) and gray pages (collection).
+    const isSolid = (color) => color && color !== 'transparent' && !/rgba\([^)]*,\s*0\)$/.test(color);
+
+    const findBackground = (element, depth = 0) => {
+      const color = getComputedStyle(element).backgroundColor;
+      if (isSolid(color)) return color;
+      if (depth >= 3) return null;
+      const width = element.getBoundingClientRect().width;
+      for (const child of element.children) {
+        if (child.getBoundingClientRect().width < width * 0.9) continue;
+        const found = findBackground(child, depth + 1);
+        if (found) return found;
+      }
+      return null;
+    };
+
+    const syncFooterBackground = () => {
+      const footer = document.querySelector('footer');
+      if (!footer) return;
+      const sections = document.querySelectorAll('#MainContent > .shopify-section');
+      const last = sections[sections.length - 1];
+      const color = (last && findBackground(last)) || getComputedStyle(document.body).backgroundColor;
+      footer.style.setProperty('--cf-page-bg', color);
+    };
+
+    syncFooterBackground();
+    window.addEventListener('load', syncFooterBackground);
+    for (const event of ['shopify:section:load', 'shopify:section:unload', 'shopify:section:reorder']) {
+      document.addEventListener(event, () => requestAnimationFrame(syncFooterBackground));
+    }
+  </script>
+{%- endif -%}
+
 {% stylesheet %}
+  /* Page-matched footer: the newsletter, the utilities row and any gaps share the page background */
+  footer:has(.newsletter-footer[data-match-page-bg]) {
+    background-color: var(--cf-page-bg, transparent);
+  }
+
+  footer:has(.newsletter-footer[data-match-page-bg]) .newsletter-footer {
+    background-color: var(--cf-page-bg, var(--nf-bg));
+  }
+
+  footer:has(.newsletter-footer[data-match-page-bg]) .shopify-section .section-background {
+    background-color: var(--cf-page-bg, var(--color-background));
+  }
+
   .newsletter-footer {
     background-color: var(--nf-bg);
     color: var(--nf-text);
@@ -314,7 +366,9 @@
   "tag": "section",
   "class": "section-newsletter-footer",
   "enabled_on": {
-    "groups": ["footer"]
+    "groups": [
+      "footer"
+    ]
   },
   "settings": [
     {
@@ -494,9 +548,16 @@
       "content": "Colors"
     },
     {
+      "type": "checkbox",
+      "id": "match_page_background",
+      "label": "Match page background",
+      "info": "Uses the background color of the last section on each page (e.g. white on home, gray on collections). The background color below is used as a fallback.",
+      "default": true
+    },
+    {
       "type": "color",
       "id": "background_color",
-      "label": "Background color",
+      "label": "Background color (fallback)",
       "default": "#ffffff"
     },
     {
