@@ -1,0 +1,773 @@
+{%- liquid
+  assign font = section.settings.font
+  assign garments = section.blocks | where: 'type', 'garment'
+  assign color_lines = section.settings.colors | newline_to_br | split: '<br />'
+-%}
+
+<style>
+  {{ font | font_face: font_display: 'swap' }}
+</style>
+
+<dye-color-preview
+  class="dye-preview{% if section.settings.show_vignette %} dye-preview--vignette{% endif %}"
+  style="
+    --dp-bg: {{ section.settings.background_color }};
+    --dp-text: {{ section.settings.text_color }};
+    --dp-vignette: {{ section.settings.vignette_color }};
+    --dp-font-family: {{ font.family }}, {{ font.fallback_families }};
+    --dp-font-weight: {{ font.weight }};
+    --dp-image-width: {{ section.settings.image_width }}px;
+    --dp-wheel-size: {{ section.settings.wheel_size }}px;
+    --dp-pt: {{ section.settings.padding_top }}px;
+    --dp-pb: {{ section.settings.padding_bottom }}px;
+  "
+>
+  {%- comment -%} Color presets for the wheel arrows, from "Name: #hex" lines {%- endcomment -%}
+  <script type="application/json" data-presets>
+    [
+      {%- assign first_preset = true -%}
+      {%- for line in color_lines -%}
+        {%- assign parts = line | strip | split: ':' -%}
+        {%- if parts.size > 1 -%}
+          {%- unless first_preset %},{% endunless -%}
+          {"name": {{ parts[0] | strip | json }}, "hex": {{ parts[1] | strip | json }}}
+          {%- assign first_preset = false -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  </script>
+
+  <div class="dye-preview__stage">
+    {%- for block in garments -%}
+      {%- liquid
+        assign garment_image = block.settings.image
+        if garment_image == blank and block.settings.product != blank
+          assign garment_image = block.settings.product.featured_image
+        endif
+        assign garment_label = block.settings.label | default: block.settings.product.title
+        assign garment_url = block.settings.product.url
+      -%}
+      <div
+        class="dye-preview__garment"
+        data-garment
+        {% unless forloop.first %}
+          hidden
+        {% endunless %}
+        {{ block.shopify_attributes }}
+      >
+        {%- if garment_label != blank -%}
+          {%- if garment_url != blank -%}
+            <a class="dye-preview__pill" href="{{ garment_url }}">{{ garment_label | escape }}</a>
+          {%- else -%}
+            <p class="dye-preview__pill">{{ garment_label | escape }}</p>
+          {%- endif -%}
+        {%- endif -%}
+
+        <div class="dye-preview__row">
+          <button type="button" class="dye-preview__arrow" data-garment-step="-1" aria-label="Previous garment">
+            {%- render 'dye-preview-arrow', direction: 'left' -%}
+          </button>
+
+          <div class="dye-preview__image">
+            {%- if garment_image != blank -%}
+              {%- assign mask_url = garment_image | image_url: width: 1200 -%}
+              {%- assign garment_alt = garment_label | default: garment_image.alt | escape -%}
+              {{
+                garment_image
+                | image_url: width: 1200
+                | image_tag: widths: '400, 600, 800, 1200', sizes: '(min-width: 750px) 430px, 80vw', loading: 'lazy', alt: garment_alt
+              }}
+              {%- liquid
+                assign tint_style = "--dp-mask: url('" | append: mask_url | append: "');"
+                assign tint_class = 'dye-preview__tint'
+                if block.settings.protect_image != blank
+                  assign protect_url = block.settings.protect_image | image_url: width: 1200
+                  assign tint_style = tint_style | append: " --dp-protect: url('" | append: protect_url | append: "');"
+                  assign tint_class = tint_class | append: ' dye-preview__tint--protected'
+                endif
+              -%}
+              <span class="{{ tint_class }}" style="{{ tint_style }}" aria-hidden="true"></span>
+            {%- else -%}
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'dye-preview__placeholder' }}
+            {%- endif -%}
+          </div>
+
+          <button type="button" class="dye-preview__arrow" data-garment-step="1" aria-label="Next garment">
+            {%- render 'dye-preview-arrow', direction: 'right' -%}
+          </button>
+        </div>
+      </div>
+    {%- else -%}
+      <div class="dye-preview__garment" data-garment>
+        <p class="dye-preview__pill">Add a garment block</p>
+        <div class="dye-preview__row">
+          <div class="dye-preview__image">
+            {{ 'product-apparel-1' | placeholder_svg_tag: 'dye-preview__placeholder' }}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="dye-preview__selector">
+    {%- if section.settings.selector_label != blank -%}
+      <p class="dye-preview__pill">{{ section.settings.selector_label | escape }}</p>
+    {%- endif -%}
+
+    <div class="dye-preview__row">
+      <button type="button" class="dye-preview__arrow" data-color-step="-1" aria-label="Previous color">
+        {%- render 'dye-preview-arrow', direction: 'left' -%}
+      </button>
+
+      <div
+        class="dye-preview__wheel"
+        data-wheel
+        role="slider"
+        tabindex="0"
+        aria-label="Color"
+        aria-valuemin="0"
+        aria-valuemax="359"
+        aria-valuenow="0"
+        aria-valuetext="Original"
+      >
+        <span class="dye-preview__handle" data-handle aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M14.5 4.5 19.5 9.5" stroke="#000" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M16.2 2.8a2.4 2.4 0 0 1 3.4 0l1.6 1.6a2.4 2.4 0 0 1 0 3.4l-2.1 2.1-5-5z" fill="#000"/>
+            <path d="M13.3 7.2 4.6 15.9 3.5 20.5l4.6-1.1 8.7-8.7" fill="#fff" stroke="#000" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+
+      <button type="button" class="dye-preview__arrow" data-color-step="1" aria-label="Next color">
+        {%- render 'dye-preview-arrow', direction: 'right' -%}
+      </button>
+    </div>
+
+    {%- if section.settings.show_hex_input -%}
+      <label class="dye-preview__hex">
+        <span class="visually-hidden">HEX color</span>
+        <input type="text" inputmode="text" maxlength="7" placeholder="#RRGGBB" spellcheck="false" data-hex-input>
+      </label>
+    {%- endif -%}
+
+    {%- if section.settings.show_color_name -%}
+      <p class="dye-preview__color-name" data-color-name aria-live="polite">&nbsp;</p>
+    {%- endif -%}
+
+    {%- if section.settings.show_reset -%}
+      <button type="button" class="dye-preview__reset" data-reset>{{ section.settings.reset_label | escape }}</button>
+    {%- endif -%}
+  </div>
+</dye-color-preview>
+
+<script type="module">
+  if (!customElements.get('dye-color-preview')) {
+    customElements.define(
+      'dye-color-preview',
+      class DyeColorPreview extends HTMLElement {
+        connectedCallback() {
+          this.presets = JSON.parse(this.querySelector('[data-presets]')?.textContent || '[]');
+          this.presetIndex = -1;
+          this.garments = [...this.querySelectorAll('[data-garment]')];
+          this.garmentIndex = 0;
+          this.wheel = this.querySelector('[data-wheel]');
+          this.handle = this.querySelector('[data-handle]');
+          this.colorName = this.querySelector('[data-color-name]');
+
+          this.querySelectorAll('[data-garment-step]').forEach((button) =>
+            button.addEventListener('click', () => this.stepGarment(Number(button.dataset.garmentStep)))
+          );
+          this.querySelectorAll('[data-color-step]').forEach((button) =>
+            button.addEventListener('click', () => this.stepPreset(Number(button.dataset.colorStep)))
+          );
+          this.querySelector('[data-reset]')?.addEventListener('click', () => this.reset());
+          this.hexInput = this.querySelector('[data-hex-input]');
+          this.hexInput?.addEventListener('change', () => {
+            let value = this.hexInput.value.trim();
+            if (!value.startsWith('#')) value = `#${value}`;
+            if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) this.setHex(value.toUpperCase(), value.toUpperCase());
+          });
+
+          this.wheel.addEventListener('pointerdown', (event) => {
+            this.wheel.setPointerCapture(event.pointerId);
+            this.pickFromPointer(event);
+            const move = (e) => this.pickFromPointer(e);
+            const up = () => {
+              this.wheel.removeEventListener('pointermove', move);
+              this.wheel.removeEventListener('pointerup', up);
+            };
+            this.wheel.addEventListener('pointermove', move);
+            this.wheel.addEventListener('pointerup', up);
+          });
+
+          this.wheel.addEventListener('keydown', (event) => {
+            const keys = { ArrowRight: [10, 0], ArrowLeft: [-10, 0], ArrowUp: [0, 0.1], ArrowDown: [0, -0.1] };
+            if (!keys[event.key]) return;
+            event.preventDefault();
+            const [dh, ds] = keys[event.key];
+            const state = this.state ?? { hue: 0, sat: 1 };
+            this.setColor((state.hue + dh + 360) % 360, Math.min(1, Math.max(0, state.sat + ds)));
+          });
+
+          this.toggleArrows();
+          this.placeHandle(0.5, 0.5);
+        }
+
+        toggleArrows() {
+          if (this.garments.length < 2) {
+            this.querySelectorAll('[data-garment-step]').forEach((button) => (button.style.visibility = 'hidden'));
+          }
+          if (this.presets.length < 2) {
+            this.querySelectorAll('[data-color-step]').forEach((button) => (button.style.visibility = 'hidden'));
+          }
+        }
+
+        stepGarment(step) {
+          if (this.garments.length < 2) return;
+          this.garments[this.garmentIndex].hidden = true;
+          this.garmentIndex = (this.garmentIndex + step + this.garments.length) % this.garments.length;
+          this.garments[this.garmentIndex].hidden = false;
+        }
+
+        // Wheel geometry: angle from the top, clockwise -> hue; distance from center -> saturation (white center)
+        pickFromPointer(event) {
+          const rect = this.wheel.getBoundingClientRect();
+          const x = event.clientX - rect.left - rect.width / 2;
+          const y = event.clientY - rect.top - rect.height / 2;
+          const radius = rect.width / 2;
+          const sat = Math.min(1, Math.hypot(x, y) / radius);
+          const angle = (Math.atan2(x, -y) * 180) / Math.PI;
+          const hue = (angle + 270 + 360) % 360;
+          this.presetIndex = -1;
+          this.setColor(hue, sat);
+        }
+
+        setColor(hue, sat, name) {
+          this.state = { hue, sat };
+          const lightness = 100 - 50 * sat;
+          const color = `hsl(${Math.round(hue)} 100% ${lightness}%)`;
+          this.applyColor(color, name ?? this.hslToHex(hue, 100, lightness).toUpperCase());
+          const angle = ((hue - 270 + 360) % 360) * (Math.PI / 180);
+          this.placeHandle(0.5 + (Math.sin(angle) * sat) / 2, 0.5 - (Math.cos(angle) * sat) / 2);
+          this.wheel.setAttribute('aria-valuenow', String(Math.round(hue)));
+        }
+
+        applyColor(color, label) {
+          this.style.setProperty('--dp-color', color);
+          this.classList.add('is-tinted');
+          if (this.colorName) this.colorName.textContent = label;
+          if (this.hexInput && document.activeElement !== this.hexInput) {
+            this.hexInput.value = color.startsWith('#') ? color.toUpperCase() : this.currentHex();
+          }
+          this.wheel.setAttribute('aria-valuetext', label);
+        }
+
+        stepPreset(step) {
+          if (!this.presets.length) return;
+          this.presetIndex = (this.presetIndex + step + this.presets.length) % this.presets.length;
+          const preset = this.presets[this.presetIndex];
+          this.setHex(preset.hex, preset.name);
+        }
+
+        // Apply an exact color and place the dropper at the closest point of the wheel
+        setHex(hex, name) {
+          const { h, s, l } = this.hexToHsl(hex);
+          this.state = { hue: h, sat: Math.min(1, Math.max(0, (100 - l) / 50)) };
+          this.applyColor(hex, name);
+          const sat = this.state.sat * (s / 100);
+          const angle = ((h - 270 + 360) % 360) * (Math.PI / 180);
+          this.placeHandle(0.5 + (Math.sin(angle) * sat) / 2, 0.5 - (Math.cos(angle) * sat) / 2);
+          this.wheel.setAttribute('aria-valuenow', String(Math.round(h)));
+        }
+
+        reset() {
+          this.style.removeProperty('--dp-color');
+          this.classList.remove('is-tinted');
+          this.presetIndex = -1;
+          this.state = null;
+          this.placeHandle(0.5, 0.5);
+          if (this.colorName) this.colorName.innerHTML = '&nbsp;';
+          if (this.hexInput) this.hexInput.value = '';
+          this.wheel.setAttribute('aria-valuetext', 'Original');
+        }
+
+        currentHex() {
+          if (!this.state) return '';
+          return this.hslToHex(this.state.hue, 100, 100 - 50 * this.state.sat).toUpperCase();
+        }
+
+        placeHandle(x, y) {
+          this.handle.style.left = `${x * 100}%`;
+          this.handle.style.top = `${y * 100}%`;
+        }
+
+        hexToHsl(hex) {
+          const value = hex.replace('#', '');
+          const full = value.length === 3 ? [...value].map((c) => c + c).join('') : value;
+          const r = parseInt(full.slice(0, 2), 16) / 255;
+          const g = parseInt(full.slice(2, 4), 16) / 255;
+          const b = parseInt(full.slice(4, 6), 16) / 255;
+          const max = Math.max(r, g, b);
+          const min = Math.min(r, g, b);
+          const l = (max + min) / 2;
+          let h = 0;
+          let s = 0;
+          if (max !== min) {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+            else if (max === g) h = (b - r) / d + 2;
+            else h = (r - g) / d + 4;
+            h *= 60;
+          }
+          return { h, s: s * 100, l: l * 100 };
+        }
+
+        hslToHex(h, s, l) {
+          const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+          const f = (n) => {
+            const k = (n + h / 30) % 12;
+            const c = l / 100 - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+            return Math.round(c * 255)
+              .toString(16)
+              .padStart(2, '0');
+          };
+          return `#${f(0)}${f(8)}${f(4)}`;
+        }
+      }
+    );
+  }
+</script>
+
+{% stylesheet %}
+  .dye-preview {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    background-color: var(--dp-bg);
+    color: var(--dp-text);
+    font-family: var(--dp-font-family);
+    font-weight: var(--dp-font-weight);
+    padding: calc(var(--dp-pt) * 0.6) 16px calc(var(--dp-pb) * 0.6);
+    overflow: hidden;
+
+    @media screen and (min-width: 750px) {
+      padding: var(--dp-pt) 24px var(--dp-pb);
+    }
+  }
+
+  /* Dark tinted edges, as in the design */
+  .dye-preview--vignette::before,
+  .dye-preview--vignette::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: min(320px, 18vw);
+    pointer-events: none;
+  }
+
+  .dye-preview--vignette::before {
+    left: 0;
+    background: linear-gradient(to right, var(--dp-vignette), transparent);
+  }
+
+  .dye-preview--vignette::after {
+    right: 0;
+    background: linear-gradient(to left, var(--dp-vignette), transparent);
+  }
+
+  .dye-preview__stage,
+  .dye-preview__selector {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .dye-preview__garment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    width: 100%;
+  }
+
+  .dye-preview__garment[hidden] {
+    display: none;
+  }
+
+  .dye-preview__pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 214px;
+    min-height: 34px;
+    margin: 0;
+    padding: 0 20px;
+    border: 1px solid var(--dp-text);
+    border-radius: 999px;
+    color: var(--dp-text);
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .dye-preview__row {
+    display: grid;
+    grid-template-columns: 44px auto 44px;
+    align-items: center;
+    column-gap: clamp(16px, 5vw, 76px);
+  }
+
+  .dye-preview__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--dp-text);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    svg {
+      width: 42px;
+      height: 12px;
+    }
+  }
+
+  .dye-preview__arrow[data-garment-step='-1']:hover,
+  .dye-preview__arrow[data-color-step='-1']:hover {
+    transform: translateX(-4px);
+  }
+
+  .dye-preview__arrow[data-garment-step='1']:hover,
+  .dye-preview__arrow[data-color-step='1']:hover {
+    transform: translateX(4px);
+  }
+
+  .dye-preview__image {
+    position: relative;
+    width: min(var(--dp-image-width), 62vw);
+    isolation: isolate;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  /* Color layer multiplied over the white garment and cut to its shape, so folds and shadows stay */
+  .dye-preview__tint {
+    position: absolute;
+    inset: 0;
+    background-color: var(--dp-color, transparent);
+    mix-blend-mode: multiply;
+    -webkit-mask: var(--dp-mask) center / contain no-repeat;
+    mask: var(--dp-mask) center / contain no-repeat;
+    opacity: 0;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+    pointer-events: none;
+  }
+
+  /* Protected zones (zipper, drawcords, labels): subtract the protection image from the tint mask */
+  .dye-preview__tint--protected {
+    -webkit-mask:
+      var(--dp-mask) center / contain no-repeat,
+      var(--dp-protect) center / contain no-repeat;
+    -webkit-mask-composite: source-out;
+    mask:
+      var(--dp-mask) center / contain no-repeat,
+      var(--dp-protect) center / contain no-repeat;
+    mask-composite: subtract;
+  }
+
+  .dye-preview.is-tinted .dye-preview__tint {
+    opacity: 1;
+  }
+
+  .dye-preview__placeholder {
+    display: block;
+    width: 100%;
+    height: auto;
+    fill: currentColor;
+    opacity: 0.3;
+  }
+
+  .dye-preview__selector {
+    gap: 26px;
+  }
+
+  .dye-preview__wheel {
+    position: relative;
+    width: min(var(--dp-wheel-size), 60vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    /* Hue around the circle (magenta at the top, red on the right) with a white center */
+    background:
+      radial-gradient(closest-side, #fff, rgb(255 255 255 / 0)),
+      conic-gradient(
+        hsl(270 100% 50%),
+        hsl(300 100% 50%),
+        hsl(330 100% 50%),
+        hsl(0 100% 50%),
+        hsl(30 100% 50%),
+        hsl(60 100% 50%),
+        hsl(90 100% 50%),
+        hsl(120 100% 50%),
+        hsl(150 100% 50%),
+        hsl(180 100% 50%),
+        hsl(210 100% 50%),
+        hsl(240 100% 50%),
+        hsl(270 100% 50%)
+      );
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .dye-preview__wheel:focus-visible {
+    outline: 2px solid var(--dp-text);
+    outline-offset: 6px;
+  }
+
+  .dye-preview__handle {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    /* Anchor the dropper tip on the picked point */
+    transform: translate(-12%, -88%);
+    pointer-events: none;
+    transition: left 0.2s ease, top 0.2s ease;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.4));
+    }
+  }
+
+  .dye-preview__hex input {
+    width: 140px;
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--dp-text);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--dp-text);
+    font: inherit;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .dye-preview__hex input::placeholder {
+    color: var(--dp-text);
+    opacity: 0.5;
+  }
+
+  .dye-preview__color-name {
+    margin: 0;
+    min-height: 1.2em;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .dye-preview__reset {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--dp-text);
+    font: inherit;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    cursor: pointer;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Dye color preview",
+  "tag": "section",
+  "class": "section-dye-color-preview",
+  "blocks": [
+    {
+      "type": "garment",
+      "name": "Garment",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "Optional: links the label and uses the product image if no image is set."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Garment image",
+          "info": "Use a white garment on a transparent background (PNG) for accurate tinting."
+        },
+        {
+          "type": "image_picker",
+          "id": "protect_image",
+          "label": "Protected zones (optional)",
+          "info": "PNG the same size as the garment image. Paint the zones that must keep their color (zipper, drawcords, labels); leave the rest transparent."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Defaults to the product title.",
+          "default": "470 GSM Zip Hoodie"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Color selector"
+    },
+    {
+      "type": "text",
+      "id": "selector_label",
+      "label": "Selector label",
+      "default": "Color selector"
+    },
+    {
+      "type": "textarea",
+      "id": "colors",
+      "label": "Color presets",
+      "info": "One per line as Name: #hex. The arrows next to the wheel cycle through them.",
+      "default": "Natural: #EDE6D6\nBlack: #1C1C1C\nNavy: #1F2A44\nForest: #2F4A3A\nBurgundy: #6B1F2A\nSand: #C9B48F\nSage: #9AA98C\nSky: #8FB3D9\nRust: #B0532A\nLavender: #B7A6D3"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hex_input",
+      "label": "Show HEX input",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_color_name",
+      "label": "Show selected color name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reset",
+      "label": "Show reset link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "reset_label",
+      "label": "Reset label",
+      "default": "Original color"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "figtree_n6"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Garment width",
+      "min": 200,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 430
+    },
+    {
+      "type": "range",
+      "id": "wheel_size",
+      "label": "Wheel size",
+      "min": 120,
+      "max": 400,
+      "step": 4,
+      "unit": "px",
+      "default": 248
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vignette",
+      "label": "Show side vignette",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "vignette_color",
+      "label": "Vignette color",
+      "default": "#252f32"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Dye color preview",
+      "blocks": [
+        {
+          "type": "garment"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

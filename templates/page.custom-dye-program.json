@@ -138,11 +138,35 @@
         "text_color": "#ffffff",
         "border_color": "#ffffff"
       }
+    },
+    "dye_color_preview": {
+      "type": "dye-color-preview",
+      "blocks": {
+        "garment_1": {
+          "type": "garment",
+          "settings": {
+            "label": "470 GSM Zip Hoodie"
+          }
+        }
+      },
+      "block_order": [
+        "garment_1"
+      ],
+      "settings": {
+        "selector_label": "Color selector",
+        "show_hex_input": false,
+        "show_color_name": true,
+        "show_reset": true,
+        "background_color": "#000000",
+        "text_color": "#ffffff",
+        "show_vignette": true
+      }
     }
   },
   "order": [
     "video_banner",
     "dye_program",
-    "wordmark_banner"
+    "wordmark_banner",
+    "dye_color_preview"
   ]
 }
