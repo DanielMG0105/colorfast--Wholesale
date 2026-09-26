@@ -907,6 +907,168 @@
     font-size: 13px;
     opacity: 0.7;
   }
+
+  /* Mobile: compact product info */
+  @media screen and (max-width: 749px) {
+    .product-showcase__grid {
+      gap: 28px;
+    }
+
+    .product-showcase__media {
+      gap: 16px;
+    }
+
+    .product-showcase__title {
+      font-size: calc(var(--ps-title-size) * 0.55);
+      line-height: 1.2;
+    }
+
+    .product-showcase__price {
+      margin-top: 12px;
+      font-size: 19px;
+    }
+
+    .product-showcase__description {
+      margin-top: 16px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .product-showcase__option {
+      margin-top: 20px;
+    }
+
+    .product-showcase__option + .product-showcase__option {
+      margin-top: 24px;
+    }
+
+    .product-showcase__label {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .product-showcase__values {
+      gap: 8px;
+    }
+
+    .product-showcase__values--swatches {
+      gap: 10px;
+    }
+
+    .product-showcase__swatch {
+      width: 22px;
+      height: 22px;
+    }
+
+    .product-showcase__pill {
+      min-width: 42px;
+      height: 40px;
+      padding: 0 10px;
+      font-size: 14px;
+    }
+
+    .product-showcase__buy {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .product-showcase__quantity {
+      height: 48px;
+      padding: 0 6px;
+    }
+
+    .product-showcase__step {
+      width: 36px;
+      height: 36px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .product-showcase .product-showcase__qty-input {
+      width: 40px;
+      font-size: 16px;
+    }
+
+    .product-showcase__add {
+      height: 48px;
+      font-size: 14px;
+    }
+
+    .product-showcase__accordions {
+      gap: 18px;
+      margin-top: 48px;
+    }
+
+    .product-showcase__accordion summary {
+      font-size: 15px;
+    }
+
+    .product-showcase__plus {
+      width: 12px;
+      height: 12px;
+    }
+
+    .product-showcase__accordion-body {
+      padding: 10px 0 0 26px;
+      font-size: 14px;
+    }
+
+    .product-showcase__wholesale {
+      margin-top: 44px;
+
+      summary {
+        font-size: 17px;
+      }
+    }
+
+    .product-showcase__circle-plus {
+      width: 18px;
+      height: 18px;
+
+      &::before,
+      &::after {
+        width: 8px;
+      }
+    }
+
+    .product-showcase__table {
+      font-size: 14px;
+    }
+
+    .product-showcase__tiers {
+      margin-top: 14px;
+
+      td {
+        width: 110px;
+        height: 34px;
+      }
+    }
+
+    .product-showcase__bulk {
+      margin-top: 36px;
+    }
+
+    .product-showcase__bulk-table {
+      width: 100%;
+      table-layout: fixed;
+      font-size: 13px;
+
+      th,
+      td {
+        width: auto;
+        height: 34px;
+      }
+
+      input {
+        height: 34px;
+        font-size: 16px;
+      }
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
