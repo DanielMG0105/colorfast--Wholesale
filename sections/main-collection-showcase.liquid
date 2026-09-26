@@ -23,6 +23,7 @@
     --cg-row-gap: {{ section.settings.row_gap }}px;
     --cg-margin: {{ section.settings.side_margin }}px;
     --cg-ratio: {{ section.settings.image_ratio }};
+    --cg-image-padding: {{ section.settings.image_padding }}%;
     --cg-blend: {% if section.settings.blend_white %}multiply{% else %}normal{% endif %};
     --cg-swatch-size: {{ section.settings.swatch_size }}px;
     --cg-pt: {{ section.settings.padding_top }}px;
@@ -39,11 +40,24 @@
         {%- for product in collection.products -%}
           {%- liquid
             assign top_line = blank
+            # Style code from the SKU: drop one trailing segment per option (e.g. MBT026-C220-WHT-XS -> MBT026-C220)
+            assign sku_code = blank
+            assign sku = product.selected_or_first_available_variant.sku
+            if sku != blank
+              assign sku_parts = sku | split: '-'
+              assign keep = sku_parts.size | minus: product.options.size
+              if product.has_only_default_variant or keep < 1
+                assign sku_code = sku
+              else
+                assign sku_code = sku_parts | slice: 0, keep | join: '-'
+              endif
+            endif
+
             case section.settings.top_line_source
               when 'metafield'
-                assign top_line = product.metafields.custom.style_code.value | default: product.selected_or_first_available_variant.sku
+                assign top_line = product.metafields.custom.style_code.value | default: sku_code
               when 'sku'
-                assign top_line = product.selected_or_first_available_variant.sku
+                assign top_line = sku_code
               when 'vendor'
                 assign top_line = product.vendor
             endcase
@@ -213,6 +227,15 @@
     }
   }
 
+  /* First section under a transparent header: start below the header, as in the design */
+  body:has(#header-component[transparent]) .content-for-layout > .shopify-section:first-child .collection-grid {
+    padding-top: calc(var(--cg-pt) * 0.6 + var(--header-group-height, 0px));
+
+    @media screen and (min-width: 750px) {
+      padding-top: calc(var(--cg-pt) + var(--header-group-height, 0px));
+    }
+  }
+
   .collection-grid__heading {
     margin: 0 0 48px;
     text-align: center;
@@ -257,6 +280,8 @@
 
   .collection-grid__media {
     aspect-ratio: var(--cg-ratio);
+    padding: var(--cg-image-padding);
+    box-sizing: border-box;
     overflow: hidden;
   }
 
@@ -283,7 +308,7 @@
   .collection-grid__title {
     display: flex;
     flex-direction: column;
-    margin: 16px 0 0;
+    margin: 20px 0 0;
     font-size: calc(var(--cg-title-size) * 0.8);
     line-height: 1.3;
     letter-spacing: var(--cg-letter-spacing);
@@ -353,7 +378,9 @@
   "tag": "section",
   "class": "section-main-collection-showcase",
   "enabled_on": {
-    "templates": ["collection"]
+    "templates": [
+      "collection"
+    ]
   },
   "settings": [
     {
@@ -379,13 +406,28 @@
       "type": "select",
       "id": "top_line_source",
       "label": "Top line (style code)",
-      "info": "Metafield uses custom.style_code and falls back to the first variant SKU.",
+      "info": "Metafield uses custom.style_code and falls back to the first variant SKU without its color and size.",
       "options": [
-        { "value": "metafield", "label": "Metafield (custom.style_code)" },
-        { "value": "sku", "label": "First variant SKU" },
-        { "value": "vendor", "label": "Vendor" },
-        { "value": "title_split", "label": "Split product title" },
-        { "value": "none", "label": "None" }
+        {
+          "value": "metafield",
+          "label": "Metafield (custom.style_code)"
+        },
+        {
+          "value": "sku",
+          "label": "First variant SKU"
+        },
+        {
+          "value": "vendor",
+          "label": "Vendor"
+        },
+        {
+          "value": "title_split",
+          "label": "Split product title"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
       ],
       "default": "metafield"
     },
@@ -481,8 +523,14 @@
       "id": "columns_mobile",
       "label": "Mobile columns",
       "options": [
-        { "value": "1", "label": "1" },
-        { "value": "2", "label": "2" }
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
       ],
       "default": "2"
     },
@@ -491,9 +539,18 @@
       "id": "image_ratio",
       "label": "Image ratio",
       "options": [
-        { "value": "1 / 1", "label": "Square" },
-        { "value": "4 / 5", "label": "Portrait (4:5)" },
-        { "value": "3 / 4", "label": "Portrait (3:4)" }
+        {
+          "value": "1 / 1",
+          "label": "Square"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "3 / 4",
+          "label": "Portrait (3:4)"
+        }
       ],
       "default": "1 / 1"
     },
@@ -503,6 +560,17 @@
       "label": "Blend white image backgrounds",
       "info": "Useful when photos have a white background: it blends into the section color.",
       "default": false
+    },
+    {
+      "type": "range",
+      "id": "image_padding",
+      "label": "Image padding",
+      "info": "Space around the garment inside its cell, as a percentage.",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "%",
+      "default": 8
     },
     {
       "type": "range",
@@ -532,7 +600,7 @@
       "max": 240,
       "step": 4,
       "unit": "px",
-      "default": 132
+      "default": 140
     },
     {
       "type": "range",
@@ -542,7 +610,7 @@
       "max": 200,
       "step": 4,
       "unit": "px",
-      "default": 80
+      "default": 72
     },
     {
       "type": "range",
