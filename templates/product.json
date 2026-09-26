@@ -58,14 +58,16 @@
         "bulk_hint": "",
         "heading_font": "figtree_n7",
         "body_font": "figtree_n5",
-        "title_size": 36,
-        "media_width": 45,
-        "side_margin": 160,
+        "title_size": 42,
+        "media_width": 43,
+        "side_margin": 172,
         "padding_top": 80,
         "padding_bottom": 100,
         "background_color": "#c8c8c7",
         "text_color": "#000000",
-        "border_color": "#4d4d4d"
+        "border_color": "#4d4d4d",
+        "column_gap": 17,
+        "side_margin_right": 112
       }
     },
     "product_recommendations_qggXJq": {
