@@ -40,6 +40,8 @@
         "collection": "demo",
         "heading": "",
         "products_to_show": 4,
+        "layout": "slider",
+        "show_arrows": true,
         "columns_desktop": 4,
         "columns_mobile": "2",
         "image_ratio": "1 / 1",
