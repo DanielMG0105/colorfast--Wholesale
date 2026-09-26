@@ -84,10 +84,60 @@
         "background_color": "#c8c8c7",
         "text_color": "#000000"
       }
+    },
+    "wordmark_banner": {
+      "type": "wordmark-banner",
+      "blocks": {
+        "line_logo": {
+          "type": "text_line",
+          "settings": {
+            "text": "colorfast",
+            "size": 10,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 0,
+            "space_above": 0
+          }
+        },
+        "line_by_you": {
+          "type": "text_line",
+          "settings": {
+            "text": "BY|YOU",
+            "size": 9,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 11,
+            "space_above": 0.9
+          }
+        },
+        "line_tagline": {
+          "type": "text_line",
+          "settings": {
+            "text": "OUR BLANKS|YOUR WAY",
+            "size": 1.5,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 47,
+            "space_above": 1.5
+          }
+        }
+      },
+      "block_order": [
+        "line_logo",
+        "line_by_you",
+        "line_tagline"
+      ],
+      "settings": {
+        "show_borders": true,
+        "background_color": "#000000",
+        "text_color": "#ffffff",
+        "border_color": "#ffffff"
+      }
     }
   },
   "order": [
     "video_banner",
+    "wordmark_banner",
     "dye_program"
   ]
 }
