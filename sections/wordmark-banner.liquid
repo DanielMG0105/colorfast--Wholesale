@@ -1,0 +1,421 @@
+{%- assign font = section.settings.font -%}
+
+<style>
+  {{ font | font_face: font_display: 'swap' }}
+</style>
+
+<wordmark-banner
+  class="wordmark-banner{% if section.settings.show_borders %} wordmark-banner--borders{% endif %}"
+  style="
+    --wb-bg: {{ section.settings.background_color }};
+    --wb-text: {{ section.settings.text_color }};
+    --wb-border: {{ section.settings.border_color }};
+    --wb-border-width: {{ section.settings.border_width }}px;
+    --wb-border-offset: {{ section.settings.border_offset }}px;
+    --wb-padding: {{ section.settings.padding }}px;
+    --wb-side: {{ section.settings.side_padding }}%;
+    --wb-font-family: {{ font.family }}, {{ font.fallback_families }};
+    --wb-font-weight: {{ font.weight }};
+    --wb-font-style: {{ font.style }};
+  "
+>
+  <div class="wordmark-banner__inner">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'text_line' -%}
+          {%- assign groups = block.settings.text | split: '|' -%}
+          <div
+            class="wordmark-banner__line"
+            data-size="{{ block.settings.size }}"
+            data-mode="{{ block.settings.width_mode }}"
+            data-stretch="{{ block.settings.stretch }}"
+            data-gap="{{ block.settings.gap }}"
+            style="--wb-space: {{ block.settings.space_above }}cqw;"
+            {{ block.shopify_attributes }}
+          >
+            <span class="visually-hidden">{{ block.settings.text | replace: '|', ' ' | escape }}</span>
+            {%- for group in groups -%}
+              <span class="wordmark-banner__group" aria-hidden="true">
+                <span class="wordmark-banner__glyphs">{{ group | strip | escape }}</span>
+              </span>
+            {%- endfor -%}
+          </div>
+        {%- when 'image_line' -%}
+          <div
+            class="wordmark-banner__image-line"
+            style="--wb-space: {{ block.settings.space_above }}cqw; --wb-image-width: {{ block.settings.width }}%;"
+            {{ block.shopify_attributes }}
+          >
+            {%- if block.settings.image != blank -%}
+              {%- assign image_alt = block.settings.image.alt | default: shop.name | escape -%}
+              {{
+                block.settings.image
+                | image_url: width: 2400
+                | image_tag: widths: '800, 1200, 1600, 2400', sizes: '80vw', loading: 'lazy', alt: image_alt
+              }}
+            {%- else -%}
+              {{ 'image' | placeholder_svg_tag: 'wordmark-banner__placeholder' }}
+            {%- endif -%}
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+</wordmark-banner>
+
+<script type="module">
+  // Size each text line from the container width and stretch its glyphs horizontally so the
+  // groups (split with "|") fill the line edge to edge, like an extended display typeface.
+  if (!customElements.get('wordmark-banner')) {
+    customElements.define(
+      'wordmark-banner',
+      class WordmarkBanner extends HTMLElement {
+        connectedCallback() {
+          this.lines = [...this.querySelectorAll('.wordmark-banner__line')];
+          this.observer = new ResizeObserver(() => this.layout());
+          this.observer.observe(this);
+          document.fonts?.ready.then(() => this.layout());
+          this.layout();
+        }
+
+        disconnectedCallback() {
+          this.observer?.disconnect();
+        }
+
+        layout() {
+          for (const line of this.lines) {
+            const width = line.clientWidth;
+            if (!width) continue;
+            const groups = [...line.querySelectorAll('.wordmark-banner__group')];
+            line.style.fontSize = `${(parseFloat(line.dataset.size) / 100) * width}px`;
+
+            for (const group of groups) {
+              group.style.width = '';
+              group.firstElementChild.style.transform = '';
+            }
+
+            const natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
+            const total = natural.reduce((sum, value) => sum + value, 0);
+            if (!total) continue;
+
+            const gap = groups.length > 1 ? (parseFloat(line.dataset.gap) / 100) * width : 0;
+            let stretch =
+              line.dataset.mode === 'fill' ? (width - gap) / total : parseFloat(line.dataset.stretch) / 100;
+            // Never overflow the line
+            stretch = Math.min(stretch, (width - gap) / total);
+
+            groups.forEach((group, i) => {
+              group.style.width = `${natural[i] * stretch}px`;
+              group.firstElementChild.style.transform = `scaleX(${stretch})`;
+            });
+            line.classList.add('is-fitted');
+          }
+        }
+      }
+    );
+  }
+</script>
+
+{% stylesheet %}
+  .wordmark-banner {
+    position: relative;
+    display: block;
+    background-color: var(--wb-bg);
+    color: var(--wb-text);
+    padding: calc(var(--wb-padding) * 0.5 + var(--wb-border-offset) * 0.5) 16px;
+
+    @media screen and (min-width: 750px) {
+      padding: calc(var(--wb-padding) + var(--wb-border-offset)) var(--wb-side);
+    }
+  }
+
+  .wordmark-banner--borders::before,
+  .wordmark-banner--borders::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--wb-border-width);
+    background-color: var(--wb-border);
+  }
+
+  .wordmark-banner--borders::before {
+    top: calc(var(--wb-border-offset) * 0.5);
+
+    @media screen and (min-width: 750px) {
+      top: var(--wb-border-offset);
+    }
+  }
+
+  .wordmark-banner--borders::after {
+    bottom: calc(var(--wb-border-offset) * 0.5);
+
+    @media screen and (min-width: 750px) {
+      bottom: var(--wb-border-offset);
+    }
+  }
+
+  .wordmark-banner__inner {
+    container-type: inline-size;
+  }
+
+  .wordmark-banner__line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: var(--wb-space);
+    font-family: var(--wb-font-family);
+    font-weight: var(--wb-font-weight);
+    font-style: var(--wb-font-style);
+    line-height: 0.74;
+    white-space: nowrap;
+  }
+
+  .wordmark-banner__line:first-child,
+  .wordmark-banner__image-line:first-child {
+    margin-top: 0;
+  }
+
+  /* Before the script runs, keep lines readable instead of stretched */
+  .wordmark-banner__line:not(.is-fitted) {
+    justify-content: center;
+    gap: 0.4em;
+  }
+
+  .wordmark-banner__group {
+    display: inline-block;
+  }
+
+  .wordmark-banner__glyphs {
+    display: inline-block;
+    transform-origin: left center;
+  }
+
+  .wordmark-banner__image-line {
+    margin-top: var(--wb-space);
+
+    img,
+    svg {
+      display: block;
+      width: var(--wb-image-width);
+      height: auto;
+      margin: 0 auto;
+    }
+  }
+
+  .wordmark-banner__placeholder {
+    aspect-ratio: 6 / 1;
+    fill: currentColor;
+    opacity: 0.3;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Wordmark banner",
+  "tag": "section",
+  "class": "section-wordmark-banner",
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "text_line",
+      "name": "Text line",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "info": "Use | to push groups to the edges, e.g. BY|YOU or OUR BLANKS|YOUR WAY.",
+          "default": "BY|YOU"
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "label": "Size",
+          "info": "Font size as a percentage of the banner width.",
+          "min": 0.5,
+          "max": 20,
+          "step": 0.5,
+          "unit": "%",
+          "default": 9
+        },
+        {
+          "type": "select",
+          "id": "width_mode",
+          "label": "Width",
+          "options": [
+            { "value": "fill", "label": "Stretch to fill the line" },
+            { "value": "stretch", "label": "Fixed stretch" }
+          ],
+          "default": "fill"
+        },
+        {
+          "type": "range",
+          "id": "stretch",
+          "label": "Fixed stretch",
+          "min": 50,
+          "max": 400,
+          "step": 10,
+          "unit": "%",
+          "default": 200,
+          "visible_if": "{{ block.settings.width_mode == 'stretch' }}"
+        },
+        {
+          "type": "range",
+          "id": "gap",
+          "label": "Gap between groups",
+          "info": "Percentage of the banner width.",
+          "min": 0,
+          "max": 80,
+          "step": 1,
+          "unit": "%",
+          "default": 11
+        },
+        {
+          "type": "range",
+          "id": "space_above",
+          "label": "Space above",
+          "info": "Percentage of the banner width.",
+          "min": 0,
+          "max": 5,
+          "step": 0.1,
+          "unit": "%",
+          "default": 0.9
+        }
+      ]
+    },
+    {
+      "type": "image_line",
+      "name": "Image line",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "E.g. your logo as a white transparent PNG or SVG."
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "label": "Width",
+          "min": 10,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "space_above",
+          "label": "Space above",
+          "info": "Percentage of the banner width.",
+          "min": 0,
+          "max": 5,
+          "step": 0.1,
+          "unit": "%",
+          "default": 0.9
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "info": "A heavy sans works best; lines are stretched horizontally.",
+      "default": "inter_n7"
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "label": "Side margin",
+      "min": 0,
+      "max": 25,
+      "step": 1,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Space between borders and text",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Borders"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_borders",
+      "label": "Show top and bottom lines",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Line thickness",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "border_offset",
+      "label": "Line distance from edge",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Line color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wordmark banner",
+      "blocks": [
+        {
+          "type": "text_line",
+          "settings": { "text": "colorfast", "size": 10, "width_mode": "fill", "gap": 0, "space_above": 0 }
+        },
+        {
+          "type": "text_line",
+          "settings": { "text": "BY|YOU", "size": 9, "width_mode": "fill", "gap": 11, "space_above": 0.9 }
+        },
+        {
+          "type": "text_line",
+          "settings": { "text": "OUR BLANKS|YOUR WAY", "size": 1.5, "width_mode": "fill", "gap": 47, "space_above": 1.5 }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
