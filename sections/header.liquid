@@ -1330,6 +1330,21 @@
     );
   }
 
+  /* Mobile: smaller cart bubble (position and bag cutout follow --cf-bub) */
+  @media screen and (max-width: 749px) {
+    .header .header-actions__cart-icon {
+      --cf-bub: 18px;
+    }
+
+    .header .header-actions__cart-icon .cart-bubble {
+      border-width: 1.5px;
+    }
+
+    .header .header-actions__cart-icon .cart-bubble__text {
+      font-size: 10px;
+    }
+  }
+
   /* ColorFast desktop header layout */
   @media screen and (min-width: 990px) {
     .header {
