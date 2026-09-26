@@ -25,19 +25,22 @@
         "media_1": {
           "type": "media",
           "settings": {
-            "overlay_width": 30
+            "overlay_width": 30,
+            "media_type": "image"
           }
         },
         "media_2": {
           "type": "media",
           "settings": {
-            "overlay_width": 30
+            "overlay_width": 30,
+            "media_type": "image"
           }
         },
         "media_3": {
           "type": "media",
           "settings": {
-            "overlay_width": 30
+            "overlay_width": 30,
+            "media_type": "image"
           }
         }
       },

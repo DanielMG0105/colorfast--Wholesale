@@ -37,7 +37,7 @@
         assign media_alt = block.settings.alt | default: block.settings.image.alt | escape
       -%}
       <figure class="media-text-stack__item" {{ block.shopify_attributes }}>
-        {%- if block.settings.video != blank -%}
+        {%- if block.settings.media_type == 'video' and block.settings.video != blank -%}
           {{
             block.settings.video
             | video_tag:
@@ -261,20 +261,39 @@
       "name": "Media",
       "settings": [
         {
+          "type": "select",
+          "id": "media_type",
+          "label": "Media type",
+          "options": [
+            {
+              "value": "image",
+              "label": "Image"
+            },
+            {
+              "value": "video",
+              "label": "Video"
+            }
+          ],
+          "default": "image"
+        },
+        {
           "type": "image_picker",
           "id": "image",
-          "label": "Image"
+          "label": "Image",
+          "visible_if": "{{ block.settings.media_type == 'image' }}"
         },
         {
           "type": "video",
           "id": "video",
           "label": "Video",
-          "info": "Replaces the image. Plays muted, looped and autoplayed."
+          "info": "Plays muted, looped and autoplayed.",
+          "visible_if": "{{ block.settings.media_type == 'video' }}"
         },
         {
           "type": "text",
           "id": "alt",
-          "label": "Image description (alt text)"
+          "label": "Image description (alt text)",
+          "visible_if": "{{ block.settings.media_type == 'image' }}"
         },
         {
           "type": "image_picker",
@@ -368,8 +387,14 @@
       "id": "media_position",
       "label": "Media position",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ],
       "default": "left"
     },
@@ -398,10 +423,22 @@
       "id": "media_ratio",
       "label": "Media ratio",
       "options": [
-        { "value": "16 / 9", "label": "Landscape (16:9)" },
-        { "value": "4 / 3", "label": "Landscape (4:3)" },
-        { "value": "1 / 1", "label": "Square" },
-        { "value": "4 / 5", "label": "Portrait (4:5)" }
+        {
+          "value": "16 / 9",
+          "label": "Landscape (16:9)"
+        },
+        {
+          "value": "4 / 3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "1 / 1",
+          "label": "Square"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait (4:5)"
+        }
       ],
       "default": "16 / 9"
     },
@@ -496,9 +533,15 @@
     {
       "name": "Media stack with text",
       "blocks": [
-        { "type": "media" },
-        { "type": "media" },
-        { "type": "media" }
+        {
+          "type": "media"
+        },
+        {
+          "type": "media"
+        },
+        {
+          "type": "media"
+        }
       ]
     }
   ]
