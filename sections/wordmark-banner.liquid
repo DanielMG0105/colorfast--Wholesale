@@ -20,6 +20,32 @@
   "
 >
   <div class="wordmark-banner__inner">
+    {%- if section.settings.content_mode == 'image' -%}
+      {%- liquid
+        assign banner_image = section.settings.image
+        assign banner_image_mobile = section.settings.image_mobile | default: banner_image
+        assign banner_alt = section.settings.image_alt | default: banner_image.alt | default: shop.name | escape
+      -%}
+      <div class="wordmark-banner__full-image" style="--wb-image-width: {{ section.settings.image_width }}%;">
+        {%- if banner_image != blank -%}
+          <picture>
+            {%- if banner_image_mobile != banner_image -%}
+              <source
+                media="(max-width: 749px)"
+                srcset="{{ banner_image_mobile | image_url: width: 750 }} 750w, {{ banner_image_mobile | image_url: width: 1500 }} 1500w"
+              >
+            {%- endif -%}
+            {{
+              banner_image
+              | image_url: width: 3000
+              | image_tag: widths: '800, 1200, 1600, 2000, 2400, 3000', sizes: '90vw', loading: 'lazy', alt: banner_alt
+            }}
+          </picture>
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'wordmark-banner__placeholder' }}
+        {%- endif -%}
+      </div>
+    {%- else -%}
     {%- for block in section.blocks -%}
       {%- case block.type -%}
         {%- when 'text_line' -%}
@@ -59,6 +85,7 @@
           </div>
       {%- endcase -%}
     {%- endfor -%}
+    {%- endif -%}
   </div>
 </wordmark-banner>
 
@@ -202,6 +229,16 @@
     }
   }
 
+  .wordmark-banner__full-image {
+    img,
+    svg {
+      display: block;
+      width: var(--wb-image-width);
+      height: auto;
+      margin: 0 auto;
+    }
+  }
+
   .wordmark-banner__placeholder {
     aspect-ratio: 6 / 1;
     fill: currentColor;
@@ -243,8 +280,14 @@
           "id": "width_mode",
           "label": "Width",
           "options": [
-            { "value": "fill", "label": "Stretch to fill the line" },
-            { "value": "stretch", "label": "Fixed stretch" }
+            {
+              "value": "fill",
+              "label": "Stretch to fill the line"
+            },
+            {
+              "value": "stretch",
+              "label": "Fixed stretch"
+            }
           ],
           "default": "fill"
         },
@@ -318,6 +361,52 @@
     }
   ],
   "settings": [
+    {
+      "type": "select",
+      "id": "content_mode",
+      "label": "Content",
+      "options": [
+        {
+          "value": "text",
+          "label": "Text lines (blocks)"
+        },
+        {
+          "value": "image",
+          "label": "Image"
+        }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Replaces all text lines, e.g. the full artwork as a transparent PNG or SVG.",
+      "visible_if": "{{ section.settings.content_mode == 'image' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile image (optional)",
+      "visible_if": "{{ section.settings.content_mode == 'image' }}"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description (alt text)",
+      "visible_if": "{{ section.settings.content_mode == 'image' }}"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Image width",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ section.settings.content_mode == 'image' }}"
+    },
     {
       "type": "font_picker",
       "id": "font",
@@ -404,15 +493,33 @@
       "blocks": [
         {
           "type": "text_line",
-          "settings": { "text": "colorfast", "size": 10, "width_mode": "fill", "gap": 0, "space_above": 0 }
+          "settings": {
+            "text": "colorfast",
+            "size": 10,
+            "width_mode": "fill",
+            "gap": 0,
+            "space_above": 0
+          }
         },
         {
           "type": "text_line",
-          "settings": { "text": "BY|YOU", "size": 9, "width_mode": "fill", "gap": 11, "space_above": 0.9 }
+          "settings": {
+            "text": "BY|YOU",
+            "size": 9,
+            "width_mode": "fill",
+            "gap": 11,
+            "space_above": 0.9
+          }
         },
         {
           "type": "text_line",
-          "settings": { "text": "OUR BLANKS|YOUR WAY", "size": 1.5, "width_mode": "fill", "gap": 47, "space_above": 1.5 }
+          "settings": {
+            "text": "OUR BLANKS|YOUR WAY",
+            "size": 1.5,
+            "width_mode": "fill",
+            "gap": 47,
+            "space_above": 1.5
+          }
         }
       ]
     }
