@@ -10,6 +10,7 @@
 
 <dye-color-preview
   class="dye-preview{% if section.settings.show_vignette %} dye-preview--vignette{% endif %}"
+  data-footer-bg="ignore"
   style="
     --dp-bg: {{ section.settings.background_color }};
     --dp-text: {{ section.settings.text_color }};
