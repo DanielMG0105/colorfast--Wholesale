@@ -128,7 +128,12 @@
         "line_tagline"
       ],
       "settings": {
+        "font": "inter_n7",
+        "side_padding": 10,
+        "padding": 60,
         "show_borders": true,
+        "border_width": 2,
+        "border_offset": 26,
         "background_color": "#000000",
         "text_color": "#ffffff",
         "border_color": "#ffffff"
@@ -137,7 +142,7 @@
   },
   "order": [
     "video_banner",
-    "wordmark_banner",
-    "dye_program"
+    "dye_program",
+    "wordmark_banner"
   ]
 }
