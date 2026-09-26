@@ -30,25 +30,28 @@
         "media_1": {
           "type": "media",
           "settings": {
+            "media_type": "video",
+            "video": "shopify://files/videos/f294cc78-85dee34a.mp4",
             "alt": "",
-            "overlay_width": 30,
-            "media_type": "image"
+            "overlay_width": 30
           }
         },
         "media_2": {
           "type": "media",
           "settings": {
+            "media_type": "video",
+            "video": "shopify://files/videos/f294cc78-85dee34a.mp4",
             "alt": "",
-            "overlay_width": 30,
-            "media_type": "image"
+            "overlay_width": 30
           }
         },
         "media_3": {
           "type": "media",
           "settings": {
+            "media_type": "video",
+            "video": "shopify://files/videos/f294cc78-85dee34a.mp4",
             "alt": "",
-            "overlay_width": 30,
-            "media_type": "image"
+            "overlay_width": 30
           }
         }
       },
