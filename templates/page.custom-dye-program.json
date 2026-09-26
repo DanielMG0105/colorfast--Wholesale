@@ -128,6 +128,9 @@
         "line_tagline"
       ],
       "settings": {
+        "content_mode": "text",
+        "image_alt": "",
+        "image_width": 100,
         "font": "inter_n7",
         "side_padding": 10,
         "padding": 60,
@@ -145,6 +148,7 @@
         "garment_1": {
           "type": "garment",
           "settings": {
+            "product": "mbh088-c380-380gsm-crop-zip-hoodie",
             "label": "470 GSM Zip Hoodie"
           }
         }
@@ -154,12 +158,20 @@
       ],
       "settings": {
         "selector_label": "Color selector",
+        "colors": "Natural: #EDE6D6\nBlack: #1C1C1C\nNavy: #1F2A44\nForest: #2F4A3A\nBurgundy: #6B1F2A\nSand: #C9B48F\nSage: #9AA98C\nSky: #8FB3D9\nRust: #B0532A\nLavender: #B7A6D3",
         "show_hex_input": false,
         "show_color_name": true,
         "show_reset": true,
+        "reset_label": "Original color",
+        "font": "figtree_n6",
+        "image_width": 430,
+        "wheel_size": 248,
+        "padding_top": 80,
+        "padding_bottom": 100,
         "background_color": "#000000",
         "text_color": "#ffffff",
-        "show_vignette": true
+        "show_vignette": true,
+        "vignette_color": "#252f32"
       }
     }
   },
