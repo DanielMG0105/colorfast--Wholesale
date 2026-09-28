@@ -1,0 +1,326 @@
+
+{{ 'form-wholesale.css' | asset_url | stylesheet_tag }}
+
+
+<div class="container--form">
+
+  <div class="header--forms">
+    <div class="wrapper--title">
+      <h2>WHOLESALE ACCOUNT FORM</h2>
+    </div>
+    {% comment %} <div class="progress-steps">
+      <div class="top">
+          <div class="progress"><span></span></div>
+          <div class="steps">
+              <div class="step active" data-step="1"><span>1</span></div>
+              <div class="step" data-step="2"><span>2</span></div>
+              <div class="step" data-step="3"><span>3</span></div>              
+          </div>
+      </div>
+    </div> 
+    {% endcomment %}
+  </div>
+  <div class="wrapper-form customer">    
+    <form id="form-data-wholesale">
+      <div class="module--1 module active">        
+        <h3>Profile Information</h3>
+        <div class="container-fields">
+          <div class="field">
+            <label for="name-mod-1">First Name *</label>
+            <input type="text" name="first_name" data-name="Name" id="name-mod-1">        
+          </div>
+          <div class="field">
+            <label for="last-name-mod-1">Last Name *</label>
+            <input type="text" name="last_name" data-name="Last Name" id="last-name-mod-1">
+          </div>
+        </div>
+
+        <div class="container-fields mobile-layout">
+          <div class="field full-mobile">
+            <label for="address-mod-1">Address *</label>
+            <input type="text" name="address" data-name="Address" id="address-mod-1">
+          </div>
+          <div class="field columns-2-mobile">
+            <div class="container-fields container-state">
+             <div class="field">
+              <label for="city-mod-1">City *</label>
+               <input type="text" name="city" data-name="City" id="city-mod-1">
+             </div>
+              <div class="field">
+              <label for="state">State *</label>              
+              <select name="state" data-name="State" id="state-mod-1">              
+                {% render 'states-select' %}
+              </select>
+             </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container-fields mobile-layout">        
+          <div class="field full-mobile">
+            <div class="container-fields">
+               <div class="field">
+                  <label for="zip-mode-1">Postal/Zip Code *</label>
+                  <input type="text" name="zip_code" data-name="Zip Code" id="zip-mode-1">
+                </div>
+               <div class="field">
+                  <label for="phone-mod-1">Phone Number *</label>
+                  <input type="tel" name="phone_number" data-name="Phone Number" id="phone-mod-1" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+               </div>
+            </div>            
+          </div>
+          <div class="field columns-2-mobile">
+            <label for="email-mod-1">Email *</label>
+            <input type="email" name="email" data-name="Email Invalid" id="email-mod-1">
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="module--2 module">
+        <h3>Contact Information
+        <div class="container-fields">
+            <div class="field-checkbox">
+              <input type="checkbox" name="copy" id="copy-fields_1">
+              <label for="copy-fields">Information is same as listed above.</label>
+            </div>          
+          </div>
+        </h3>
+      
+        <div class="container-fields column-3">
+          <div class="field">
+            <label for="accounting_contact_name">Accounting Name</label>
+            <input type="text" name="accounting_contact_name" data-name="Accounting contact name" id="accounting_contact_name">
+          </div> 
+          <div class="field">
+            <label for="phone-mod-2">Phone </label>
+            <input type="text" name="accounting_contact_phone" data-name="Accounting Contact Phone" id="accounting-phone-mod-2">
+          </div>
+          <div class="field">
+            <label for="">Email </label>            
+            <input type="text" name="accounting_contact_email" data-name="Accounting Contact Email" id="accounting-name-mod-2">
+          </div>
+        </div>
+
+        <div class="container-fields column-3">
+          <div class="field">
+            <label for="sales-name-mod-2">Sales Name</label>
+            <input type="text" name="main_sales_contact_name" data-name="Sales Contact Name" id="sales-name-mod-2">
+          </div>
+          <div class="field">
+            <label for="sales-phone-mod-2">Phone</label>
+            <input type="text" name="main_sales_contact_phone" data-name="Sales Contact Phone" id="sales-phone-mod-2">
+          </div>
+          <div class="field">
+            <label for="main_sales_contact_email">Email </label>
+            <input type="text" name="main_sales_contact_email" data-name="main_sales_contact_email" id="main_sales_contact_email">
+          </div>
+        </div>
+
+        
+        <h3>Company Information 
+          <div class="container-fields">
+            <div class="field-checkbox">
+              <input type="checkbox" name="copy" id="copy-fields">
+              <label for="copy-fields">Information is same as listed above.</label>
+            </div>          
+          </div>
+        </h3>
+
+       <div class="container-fields">
+          <div class="field">
+            <label for="company-mod-3">Company name (if applicable)</label>
+            <input type="text" name="company_name" data-name="Company Name" id="company-mod-3">
+          </div>
+          <div class="field">
+            <label for="website-mod-3">Website URL (if applicable)</label>
+            <input type="text" name="company_website" data-name="Website" id="website-mod-3">
+          </div>
+        </div>
+        
+       <div class="container-fields mobile-layout">
+          <div class="field full-mobile">
+            <label for="address-mod-3">Address</label>
+            <input autocomplete="address" type="text" name="address" data-name="Address" id="address-mod-3">
+          </div>
+          <div class="field columns-2-mobile">
+            <div class="container-fields container-state">
+             <div class="field">
+              <label for="city-mod-3">City</label>             
+               <input type="text" name="company_city" data-name="city" id="city-mod-3">
+             </div>
+              <div class="field">
+              <label for="state-mod-3">State</label>              
+              <select name="company_state" data-name="State" id="state-mod-3">              
+                {% render 'states-select' %}
+              </select>
+              <input type="hidden" name="company_country" value="" />
+              <input type="hidden" name="company_fax" value="" />
+             </div>
+            </div>
+          </div>
+        </div>
+     
+        <div class="container-fields mobile-layout">
+          <div class="field full-mobile">
+            <div class="container-fields">
+               <div class="field">
+                  <label for="zip-mode-3">Zip Code</label>
+                  <input type="text" name="company_zip_code" data-name="Zip Code" id="zip-mode-3">
+                </div>
+               <div class="field">
+                  <label for="company-phone-mod-2">Phone</label>
+                  <input type="text" name="main_sales_contact_phone" data-name="Main company Contact Phone" id="company-phone-mod-2">
+               </div>
+            </div>            
+          </div>
+          <div class="field columns-2-mobile">
+            <label for="sales-email-mod-2">Email</label>
+            <input type="text" name="company_email" data-name="Main Sales Contact Email" id="sales-email-mod-2">
+          </div>
+         </div>
+
+        <div class="container-fields mobile-layout">
+          <div class="field columns-2-mobile">
+            <label for="federal-employer-mod-3">FEIN # *</label>
+            <input type="text" name="fein" data-name="FEIN" id="federal-employer-mod-3">
+          </div>
+          <div class="field columns-2-mobile mt-15">
+            <label for="reseller-number-mod-3">Reseller # *</label>
+            <input type="text" name="reseller_number" data-name="Reseller Number" id="reseller-number-mod-3">
+          </div>
+        </div>
+
+        <!-- ******************************** -->
+
+        <div class="container-fields">
+          <div class="field full field-select">           
+            <label for="about-company-mod-3">Briefly tell us about your company *</label>
+            <textarea id="about-company-mod-3" name="about_your_company" data-name="About your company" rows="5" cols="33"></textarea>
+          </div>          
+        </div>
+
+        <div class="container-fields">
+          <div class="field field-select">
+            <label for="company-sales-mod-3">Annual Sales Volume</label>
+            <select name="company_annual_sales" data-name="Company Annual Sales" id="company-sales-mod-3">
+              <option value="Less than $50,000">Less than $50,000</option>
+              <option value="$50,000 - $500,000">$50,000 - $500,000</option>
+              <option value="$500,000 - $1,000,000">$500,000 - $1,000,000</option>
+              <option value="$1,000,000 - $5,000,000">$1,000,000 - $5,000,000</option>      
+              <option value="$5,000,000 - $25,000,000">$5,000,000 - $25,000,000</option>
+              <option value="More than $25,000,000">More than $25,000,000</option>      
+            </select>
+          </div>  
+          <div class="field field-select">
+            <label for="employees-mod-3">Number of Employees *</label>
+            <select name="number_of_employees" data-name="Number of Employees " id="employees-mod-3">
+              <option value="1-9">1-9</option>
+              <option value="10-19">10-19</option>
+              <option value="20-49">20-49</option>
+              <option value="50+">50+</option>                   
+            </select>
+          </div>        
+        </div>
+
+        <div class="container-fields">
+          <div class="field full field-select">
+            <label for="about-color-fast-mod-3">How did you hear about us?*</label>
+            <textarea name="hear_about_colorfast" data-name="Hear About Color fast" id="about-color-fast-mod-3" cols="33" rows="5"></textarea>          
+          </div>
+        </div>
+
+        <div class="container-fields">
+          <div class="field full field-select">
+            <label for="company-goals-mod-3">How can we help you?*</label>
+            <textarea name="help_us_understand" data-name="Company Goals" id="company-goals-mod-3" cols="33" rows="5"></textarea>          
+          </div>
+        </div>
+
+      </div>
+
+      <div class="module--3 module">
+        <div class="container-fields">
+          <div class="field-checkbox">
+            <input type="checkbox" name="accept_terms_and_conditions" data-name="Acept Terms and Conditions" id="accept-mod-3">
+            <label for="accept-mod-3">I have read and agree to the <a id="terms-popup" href="/pages/terms-and-conditions-wholesale-customers">Terms and Conditions & Privacy Policy</a> </label>
+          </div>          
+        </div>
+
+        <div class="container-fields">
+          <div class="field-checkbox">
+            <input type="checkbox" name="consent_to_colorfast_contacting" data-name="I consent to Colorfast Contacting" id="accept-color-mod-3" >
+            <label for="accept-color-mod-3">I consent to Colorfast Apparel contacting me about products, services, promotions, and coupons.</label>
+          </div>          
+        </div>        
+      </div>
+
+     <div class="wrapper-hidden">
+        <input type="hidden" name="company_country" value="Us" />
+        <input type="hidden" name="company_fax" value="" />
+       
+        <input type="hidden" name="account_number" value="" />
+       
+        <!--<input id="hidd-contact-name" type="hidden" name="accounting_contact_name" value="none" />-->
+        <input type="hidden" name="company_address" value="" />
+        <input type="hidden" name="company_phone" value="" />
+        <input type="hidden" name="country" value="US" />       
+        <input type="hidden" name="email_for_shipping_notifications" value="" />
+        
+        <input type="hidden" name="shipping_method" value="" />
+        <input type="hidden" name="website" value="" />
+     </div> 
+
+      <div class="wrapper-msg">
+        <span id="view-msg"></span>
+      </div>
+      <div class="wrapper-btns">
+        <a class="hide" href="/">
+          <span>Cancel</span>      
+        </a>
+        <!-- <button type="button" class="frm--btn frm-prev hide">
+          <span>Prev</span>      
+        </button> -->
+        <button type="button" data-current="3" class="frm--btn next-form" id="send-frm-progress">
+          <span>Submit</span>      
+        </button>
+        <!-- <button data-current="1" type="button" class="frm--btn frm-next next-form">
+          <span>Next</span>      
+        </button> -->
+      </div>
+    </form>
+    <span>For more information, look up our policy page or email us service@colorfastapparel.com</span>
+  </div>
+</div>
+
+
+<div id="terms-wholesale">
+  <div class="overlay close--popup-terms"></div>
+  <div class="container-text">
+    <span class="close--popup-terms"> {{ 'icon-close.svg' | inline_asset_content }} Close</span>
+    {{ pages.terms-and-conditions-wholesale-customers.content }}
+  </div>
+</div>
+
+ <div id="request-send">
+  <div class="overlay close--popup-success"></div>
+  <div class="container-text">
+    <p>Thank you for your request!</p>
+    <p>Thank you for submitting an application for a Wholesale Account with Colorfast. We appreciate your interest in partnering with us.</p>
+    <p>Our team will carefully review your information, and we aim to get back to you promptly. We look forward to the opportunity to work with you and provide exceptional products and service. <br><br>Best Regards, <br>ColorFast </p>
+    <button type="button" id="reload-page" class="close--popup-success">
+      <span>Ok</span>
+    </button>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Section name",
+    "settings": []
+  }
+{% endschema %}
+
+
+
+<script src="{{ 'form-wholesale.js' | asset_url }}" defer="defer"></script>

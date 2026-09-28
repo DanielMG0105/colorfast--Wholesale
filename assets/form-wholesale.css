@@ -1,0 +1,574 @@
+@keyframes scroll-in {
+  0% {
+    top: 0;
+  }
+  49% {
+    top: -10px;
+  }
+  50% {
+    top: 15px;
+  }
+  100% {
+    top: 0;
+  }
+}
+@keyframes scroll-in-big {
+  0% {
+    top: 20px;
+  }
+  49% {
+    top: -15px;
+  }
+  50% {
+    top: 35px;
+  }
+  100% {
+    top: 20px;
+  }
+} 
+.hide {
+    display: none !important;
+} 
+/* FORMS LOGIN */
+.container--form {
+  width: 100%;
+  max-width: 1000px;
+  margin: 70px auto;
+  padding: 0 20px;
+}
+.container--form > .header--forms > .wrapper--title {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 50px;
+  
+}
+.container--form > .header--forms > .wrapper--title > h2 {
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  font-size: 40px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-top:0;
+}
+.container--form > .header--forms > .wrapper--title > h2:after {
+  content: "";
+  background: #000;
+  width: 65px;
+  height: 3px;
+  display: none;
+  margin-top: 10px;
+  position: absolute;
+}
+.container--form > .header--forms > span {
+  display: block;
+  opacity: 0.6;
+  font-size: 12px;
+}
+.wrapper-form.customer{
+  width: 100%;
+  max-width: 750px;
+  margin: auto;
+}
+.container--form > .wrapper-form > form > div.module {
+  
+}
+.container--form > .wrapper-form > span{
+  display: block;
+  text-align: center;
+  margin-top: 40px;
+  font-size: 11px;
+  padding:0 20px;
+}
+.container--form > .wrapper-form > form > div.module > h3 {
+  border-bottom: 1px solid #000;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+}
+.container--form > .wrapper-form > form > div.module > h3 > .container-fields {
+  font-weight: 100;
+  font-size: 10px;
+  display: inline-block;
+  margin-left: 20px;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+}
+.container--form > .wrapper-form > form > div.module > h3 > .container-fields > .field-checkbox {
+  display: flex;
+  align-items: center;
+}
+.container--form > .wrapper-form > form > div.module > h3 > .container-fields > .field-checkbox > input {
+  margin: 0;
+  margin-right: 5px;
+  font-family: inherit;
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+  border: 3px solid #D9D9D9;
+  appearance: none;
+  border-radius: 3px;
+}
+.container--form > .wrapper-form > form > div.module > h3 > .container-fields > .field-checkbox > input:checked{
+  background:#D9D9D9;
+}
+.container--form > .wrapper-form > form > div.module > h3 > .container-fields > .field-checkbox > label{
+  font-size: 14px;
+  color: #000;
+  font-family: 'sf_pro_displayregular';
+  font-weight: 500;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields,
+.container--form > .wrapper-form > form > div.module > .container-fields .field .container-fields{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  gap:10px;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field .container-fields > .field{
+  flex-basis: 48.5%;
+  flex-direction:column;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields.column-3 > .field,
+.container--form > .wrapper-form > form > div.module > .container-fields.column-3 > .field .container-fields > .field{
+  flex-basis: calc(100% / 3 - 10px);
+  flex-direction:column;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field:last-of-type .container-fields.container-state > .field:first-of-type{
+  flex-basis: 70%;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field:last-of-type .container-fields.container-state > .field:last-of-type{
+  flex-basis: 28%;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field label,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field .container-fields > .field > label{
+  position: initial;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color:#000;
+  font-family: 'sf_pro_displayregular';
+  font-weight: 500;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field:before,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field:after,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field .container-fields > .field:before,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field .container-fields > .field:after{
+  display: none;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field > input,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field > select,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field .container-fields > .field > input,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field .container-fields > .field > select{
+  border-radius: 0;
+  font-family: inherit;
+  box-shadow: 0 0 0 1px #D9D9D9;
+  border-radius: 10px;
+  padding:20px 15px;
+  height: auto;
+  flex-grow:0;
+  font-size: 14px;
+  font-family: 'sf_pro_displayregular';
+  font-weight: 500;
+  border:0;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field > textarea {
+  width: 100%;
+  font-family: 'sf_pro_displayregular';
+  font-weight: 500;
+  box-shadow: 0 0 0 1px #D9D9D9;
+  border:0;
+}
+
+.container--form > .wrapper-form > form > div.module > .container-fields > .field > textarea:focus-visible{
+  outline:0;
+  //box-shadow:none;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field:before,
+.container--form > .wrapper-form > form > div.module > .container-fields > .field:after {
+  border-radius: 0 !important;
+  box-shadow: 0 0 0 1px #c1c1c1;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field input[type=file] {
+  font-size: 13px;
+  color: gray;
+  padding-top: 15px;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field.full {
+  flex-basis: 100%;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field.field-select:before, .container--form > .wrapper-form > form > div.module > .container-fields > .field.field-select:after {
+  border-radius: 0;
+}
+
+.container--form > .wrapper-form > form > div.module > .container-fields > .field.field-select > select {
+  color: gray;
+  font-size: 14px;  
+  appearance: auto; 
+  border-radius:10px;
+  font-family: 'sf_pro_displayregular';
+  font-weight: 500;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field.field-select > textarea {
+  width: 100%;
+  padding: 2.2rem 1.5rem 0.8rem 2rem;
+  font-family: inherit;
+  border-radius:10px;
+  font-family: 'sf_pro_displayregular';
+  font-weight: 500;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field-checkbox > label {
+  color: rgba(var(--color-foreground), .75);
+  color:#000;
+  font-size: 14px;
+  font-family: 'sf_pro_displayregular';
+  font-weight: 500;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field-checkbox{
+  display: flex;
+  align-items: center;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field-checkbox > input{
+  width: 25px;
+  height: 25px;
+  margin-right:10px;
+  border: 3px solid #D9D9D9;
+  appearance: none;
+  border-radius: 3px;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field-checkbox > input:checked{
+  background: #D9D9D9;
+}
+.container--form > .wrapper-form > form > div.module > .container-fields > .field-checkbox > label > a {
+  color: inherit;
+  font-size: inherit;
+}
+
+@media screen and (max-width:767px){
+  .container-fields.mobile-layout{
+    flex-wrap:wrap;
+  }
+  .container--form > .wrapper-form > form > div.module > .container-fields > .field.full-mobile{
+    flex-basis: 100%;
+  }
+  .container--form > .wrapper-form > form > div.module > .container-fields > .field.columns-2-mobile{
+    flex-basis:100%;    
+  }
+  .container--form > .wrapper-form > form > div.module > .container-fields > .field.columns-2-mobile.mt-15{
+    margin-top:15px;
+  }
+  .container--form > .wrapper-form > form > div.module > .container-fields > .field.columns-2-mobile > .container-fields{
+    margin-top: 15px;
+    margin-bottom: 0;
+  }
+}
+
+.container--form > .wrapper-form > form > div.module.module--1 .mobile-layout:last-of-type,
+.container--form > .wrapper-form > form > div.module.module--2 .container-fields:nth-of-type(2){
+  padding-bottom:50px;
+}
+
+.container--form > .wrapper-form > form > div.module.active {
+  display: initial;
+}
+.container--form > .wrapper-form > form > .wrapper-msg {
+  display: flex;
+  justify-content: flex-end;
+}
+.container--form > .wrapper-form > form > .wrapper-msg > span {
+  display: block;
+  font-size: 13px;
+}
+.container--form > .wrapper-form > form > .wrapper-btns {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+.container--form > .wrapper-form > form > .wrapper-btns > button, 
+.container--form > .wrapper-form > form > .wrapper-btns > a {
+  position: relative;
+  width: 100%;
+  max-width: 250px;
+  background: #000;
+  color: #fff;
+  padding: 0 30px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin: 0;
+  margin: 0 0;  
+  height: 55px; 
+  border-radius: 12px;
+}
+@media screen and (max-width: 749px) {
+  .container--form > .wrapper-form > form > .wrapper-btns > button, .container--form > .wrapper-form > form > .wrapper-btns > a {
+    padding: 0 20px;
+    margin: 0 5px;
+  }
+}
+.container--form > .wrapper-form > form > .wrapper-btns > button > span, .container--form > .wrapper-form > form > .wrapper-btns > a > span {
+  display: flex;
+  align-items: center;
+  animation-duration: 0.25s;
+  animation-timing-function: ease-in-out;
+  position: absolute;
+  pointer-events: none;
+}
+.container--form > .wrapper-form > form > .wrapper-btns > button:hover > span, .container--form > .wrapper-form > form > .wrapper-btns > a:hover > span {
+  animation-name: scroll-in-big;
+}
+.container--form > .wrapper-form > form > .wrapper-btns > button:before, 
+.container--form > .wrapper-form > form > .wrapper-btns > button:after, 
+.container--form > .wrapper-form > form > .wrapper-btns > a:before, 
+.container--form > .wrapper-form > form > .wrapper-btns > a:after {
+  display: none;
+}
+.container--form > .wrapper-form > form > .wrapper-btns > button:last-of-type {
+  margin-right: 0;
+}
+.container--form > .wrapper-form > form > .wrapper-btns > button.hide {
+  display: none;
+}
+.container--form > .wrapper-form > form > .wrapper-btns > a {
+  min-width: calc(12rem + var(--buttons-border-width) * 2);
+  min-height: calc(4.5rem + var(--buttons-border-width) * 2);
+  margin-left: 0;
+}
+
+#terms-wholesale {
+  position: fixed;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9;
+}
+#terms-wholesale > .overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.6784313725);
+  cursor: pointer;
+  display: flex;
+  pointer-events:auto!important;
+}
+#terms-wholesale > div.container-text {
+  width: 100%;
+  max-width: 800px;
+  min-height: 400px;
+  height: 90vh;
+  z-index: 2;
+  padding: 30px;
+  padding-top:45px;
+  background: #fff;
+  overflow: auto;
+  position:relative;
+}
+#terms-wholesale > div.container-text > span{
+    display: flex;
+    opacity: 1;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    align-items: center;
+}
+#terms-wholesale > div.container-text > span > svg{
+  margin-right:5px;
+}
+#terms-wholesale > div.container-text > .customer-wholesale > h3 {
+  font-size: 15px;
+}
+#terms-wholesale > div.container-text > .customer-wholesale > p {
+  opacity: 0.8;
+  font-size: 14px;
+}
+#terms-wholesale > div.container-text > .customer-wholesale > p > a {
+  color: inherit;
+}
+#terms-wholesale > div.container-text > .customer-wholesale > a {
+  color: inherit;
+}
+
+#terms-wholesale.open {
+  display: flex;
+}
+
+#request-send {
+  position: fixed;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9;
+}
+@media screen and (max-width: 749px) {
+  #request-send {
+    padding: 0 20px;
+  }
+}
+#request-send > .overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.6784313725);
+  cursor: pointer;
+  display: flex;
+}
+#request-send > div.container-text {
+  width: 100%;
+  max-width: 800px;
+  min-height: 400px;
+  height: auto;
+  z-index: 2;
+  padding: 30px;
+  background: #fff;
+  overflow: auto;
+}
+#request-send > div.container-text > p {
+  opacity: 0.8;
+  font-size: 14px;
+  text-align: center;
+}
+#request-send > div.container-text > button {
+  position: relative;
+  width: auto;
+  max-width: 100%;
+  background: #000;
+  color: #fff;
+  padding: 0 30px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  margin: 0;
+  margin: 0 15px;
+  text-transform: uppercase;
+  height: 55px;
+  border-radius: 30px;
+  min-width: 100px;
+  margin: auto;
+  margin-top: 30px;
+  cursor: pointer;
+}
+@media screen and (max-width: 749px) {
+  #request-send > div.container-text > button {
+    padding: 0 20px;
+    margin: 0 auto;
+    margin-top: 30px;
+  }
+}
+#request-send > div.container-text > button > span {
+  display: flex;
+  align-items: center;
+  animation-duration: 0.25s;
+  animation-timing-function: ease-in-out;
+  position: absolute;
+  pointer-events: none;
+}
+#request-send > div.container-text > button:hover > span {
+  animation-name: scroll-in-big;
+}
+#request-send > div.container-text > button:before, #request-send > div.container-text > button:after {
+  display: none;
+}
+
+#request-send.open {
+  display: flex;
+}
+
+.progress-steps {
+  width: 350px;
+  margin: auto;
+  display:none;
+}
+
+.progress-steps .top {
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.progress-steps .top .progress {
+  width: 98%;
+  height: 3px;
+  background-color: #e0e0e0;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.progress-steps .top .progress span {
+  position: absolute;
+  width: 0%;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  background: #3498db;
+  transition: 0.5s;
+}
+
+.progress-steps .top .steps {
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-steps .top .steps .step {
+  background-color: white;
+  border: 3px solid #e0e0e0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.progress-steps .top .steps .step.active {
+  border-color: #3498db;
+  transition: border 1s;
+}
+
+.progress-steps .buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0px 20px;
+}
+
+.progress-steps .buttons .btn {
+  outline: 0px;
+  border: 0px;
+  padding: 10px 25px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #3498db;
+  font-weight: bold;
+  color: white;
+  transition: color 0.5s;
+}
+
+.progress-steps .buttons .btn.disabled {
+  background-color: #e0e0e0;
+  color: #bdbdbd;
+  cursor: no-drop;
+}
