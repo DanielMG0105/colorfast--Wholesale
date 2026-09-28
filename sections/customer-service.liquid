@@ -1,0 +1,50 @@
+{{ 'customer-service.css' | asset_url | stylesheet_tag }}
+
+
+<div class="page-width customercare">
+  <div class="wrapper-grid">
+   
+    <div class="customer-nav">
+      <div class="sidebar sidebar-additional">
+        <div class="title-menu-care">CUSTOMER CARE</div>
+        <ul class="sidebar-customer-experience">
+          {% for link in linklists.footer.links %}
+          <li class="nav item" >{{ link.title | link_to: link.url }}</li>
+          {% endfor %}
+
+        </ul>
+      </div>          
+    </div>    
+
+    <div class="wrapper-container">
+        {% comment %} <h1 class="main-page-title page-title h0{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+        {{ page.title | escape }}
+      </h1> {% endcomment %}
+      <div class="wrapper-page">
+        {{ page.content }}          
+      </div>
+    </div> 
+
+  </div>      
+</div>
+
+
+
+
+<script>
+
+var paragraphs = document.querySelectorAll('.accordion-effect p');
+paragraphs.forEach(function(paragraph) {  
+  paragraph.addEventListener('click', function() {   
+    this.parentNode.classList.toggle('active-effect');
+  });
+});
+</script>
+
+
+{% schema %}
+  {
+    "name": "Customer Service",
+    "settings": []
+  }
+{% endschema %}
