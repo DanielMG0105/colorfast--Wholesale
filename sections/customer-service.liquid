@@ -8,7 +8,7 @@
       <div class="sidebar sidebar-additional">
         <div class="title-menu-care">CUSTOMER CARE</div>
         <ul class="sidebar-customer-experience">
-          {% for link in linklists.footer.links %}
+          {% for link in linklists.customer-care.links %}
           <li class="nav item" >{{ link.title | link_to: link.url }}</li>
           {% endfor %}
 
