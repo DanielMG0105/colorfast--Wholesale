@@ -1,7 +1,7 @@
 {%- style -%}
     .page-width--narrow{
         width:100%;
-        max-width:726px;
+        max-width:{{ section.settings.max_width | default: 1200 }}px;
         margin:0 auto;
         padding-left:15px;
         padding-right:15px;
@@ -48,6 +48,16 @@
   "tag": "section",
   "class": "section",
   "settings": [
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 700,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max width",
+      "default": 1200
+    },
     {
       "type": "header",
       "content": "t:content.padding"
