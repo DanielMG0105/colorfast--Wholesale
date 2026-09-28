@@ -30,7 +30,35 @@
   assign first_3d_model = selected_product.media | where: 'media_type', 'model' | first
 
   if block_settings.hide_variants
-    assign variant_images = selected_product.images | where: 'attached_to_variant?', true | map: 'src'
+    # Find the color option and collect all its values (lowercased)
+    assign color_option = nil
+    assign color_option_values_lower = '' | split: '|||'
+    assign selected_color_lower = ''
+
+    for product_opt in selected_product.options_with_values
+      assign opt_name_lower = product_opt.name | downcase
+      if opt_name_lower == 'color' or opt_name_lower == 'colour'
+        assign color_option = product_opt
+        assign selected_color_lower = product_opt.selected_value | downcase
+        assign cv_str = ''
+        for cv in product_opt.values
+          assign cv_str = cv_str | append: cv | downcase | append: '|||'
+        endfor
+        assign color_option_values_lower = cv_str | split: '|||'
+        break
+      endif
+    endfor
+
+    # When the selected size variant has no featured_media, find the first variant
+    # of the same color that does — so size changes don't alter the gallery
+    if selected_variant_media == blank and color_option != nil
+      for variant in selected_product.variants
+        if variant.options contains color_option.selected_value and variant.featured_media != blank
+          assign selected_variant_media = variant.featured_media
+          break
+        endif
+      endfor
+    endif
   endif
 
   if block_settings.slideshow_controls_style == 'thumbnails'
@@ -112,17 +140,56 @@
     assign sorted_media = sorted_media | concat: selected_product.media | where: 'id', selected_variant_media.id
 
     for media in selected_product.media
-      if block_settings.hide_variants and variant_images contains media.src and sorted_media.size > 0
+      if media.id == selected_variant_media.id
         continue
       endif
 
-      if media.id != selected_variant_media.id
-        assign found_media = selected_product.media | where: 'id', media.id
-        assign sorted_media = sorted_media | concat: found_media
+      # Hide images whose alt names a different color than the selected one
+      if block_settings.hide_variants and color_option != nil
+        assign media_alt_lower = media.alt | downcase | strip
+        assign alt_is_color_specific = false
+        assign alt_matches_selection = false
+
+        for cv in color_option_values_lower
+          if cv != '' and media_alt_lower contains cv
+            assign alt_is_color_specific = true
+            if cv == selected_color_lower
+              assign alt_matches_selection = true
+            endif
+          endif
+        endfor
+
+        if alt_is_color_specific and alt_matches_selection == false
+          continue
+        endif
       endif
+
+      assign found_media = selected_product.media | where: 'id', media.id
+      assign sorted_media = sorted_media | concat: found_media
     endfor
   else
-    assign sorted_media = selected_product.media
+    if block_settings.hide_variants and color_option != nil
+      for media in selected_product.media
+        assign media_alt_lower = media.alt | downcase | strip
+        assign alt_is_color_specific = false
+        assign alt_matches_selection = false
+        for cv in color_option_values_lower
+          if cv != '' and media_alt_lower contains cv
+            assign alt_is_color_specific = true
+            if cv == selected_color_lower
+              assign alt_matches_selection = true
+            endif
+          endif
+        endfor
+        if alt_is_color_specific and alt_matches_selection == false
+          continue
+        endif
+        assign found_media = selected_product.media | where: 'id', media.id
+        assign sorted_media = sorted_media | concat: found_media
+      endfor
+    else
+      assign sorted_media = selected_product.media
+    endif
   endif
   assign has_image_drop = sorted_media | has: 'media_type', 'image'
 
