@@ -639,6 +639,13 @@
     line-height: 1.2;
     max-width: 520px;
 
+    /* The theme sets its own line-height/weight on <p>; keep the description's typography */
+    :is(p, span, div, li) {
+      font-family: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+    }
+
     p {
       margin: 0 0 1.2em;
     }
@@ -1263,13 +1270,13 @@
       "type": "font_picker",
       "id": "heading_font",
       "label": "Title font",
-      "default": "figtree_n7"
+      "default": "montserrat_n5"
     },
     {
       "type": "font_picker",
       "id": "body_font",
       "label": "Body font",
-      "default": "figtree_n5"
+      "default": "montserrat_n4"
     },
     {
       "type": "range",
