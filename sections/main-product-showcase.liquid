@@ -19,6 +19,39 @@
     endif
   endfor
 
+  # Only show images whose alt text names the selected color.
+  # Each image belongs to the longest color value found in its alt ("jet black" wins over "black").
+  assign matched_media_ids = '|'
+  if color_option_position > 0
+    assign color_index = color_option_position | minus: 1
+    assign color_option = product.options_with_values[color_index]
+    assign selected_color_lower = color_option.selected_value | downcase | strip
+    assign color_values_str = ''
+    for color_value in color_option.values
+      assign color_values_str = color_values_str | append: color_value | downcase | strip | append: '|||'
+    endfor
+    assign color_values_lower = color_values_str | split: '|||'
+
+    for media in product.media
+      assign media_alt_lower = media.alt | downcase
+      assign media_color = ''
+      for color_value in color_values_lower
+        if color_value != blank and media_alt_lower contains color_value and color_value.size > media_color.size
+          assign media_color = color_value
+        endif
+      endfor
+      if media_color == selected_color_lower
+        assign matched_media_ids = matched_media_ids | append: media.id | append: '|'
+      endif
+    endfor
+  endif
+
+  # If no image matches the selected color, show every image instead of an empty gallery
+  assign filter_media = false
+  if matched_media_ids != '|'
+    assign filter_media = true
+  endif
+
   assign size_option_position = 0
   for option in product.options_with_values
     assign option_name = option.name | downcase | strip
@@ -65,7 +98,13 @@
   <div class="product-showcase__grid">
     <div class="product-showcase__media" data-media-list>
       {%- for media in product.media -%}
-        <figure class="product-showcase__figure" data-media-id="{{ media.id }}">
+        {%- assign media_needle = '|' | append: media.id | append: '|' -%}
+        <figure
+          class="product-showcase__figure"
+          data-media-id="{{ media.id }}"
+          data-media-alt="{{ media.alt | downcase | escape }}"
+          {% if filter_media %}{% unless matched_media_ids contains media_needle %}hidden{% endunless %}{% endif %}
+        >
           {%- case media.media_type -%}
             {%- when 'image' -%}
               {%- assign media_alt = media.alt | default: product.title | escape -%}
@@ -355,6 +394,8 @@
             if (label) label.textContent = options[i] ?? '';
           });
 
+          this.filterMediaByColor();
+
           const variant = this.findVariant(options);
           if (!variant) {
             this.setButton(false, this.defaultLabel);
@@ -375,6 +416,34 @@
           url.searchParams.set('variant', String(variant.id));
           window.history.replaceState({}, '', url.toString());
           this.updateAvailability();
+        }
+
+        // Show only images whose alt names the selected color; the longest color name found in the alt wins
+        // ("jet black" over "black"). If nothing matches, all images stay visible.
+        filterMediaByColor() {
+          const colorPosition = Number(this.dataset.colorPosition);
+          if (!colorPosition) return;
+
+          const fieldset = this.querySelector(`[data-option-position="${colorPosition}"]`);
+          const selected = fieldset?.querySelector('[data-option-input]:checked')?.value;
+          if (!selected) return;
+
+          const normalize = (value) => value.toLowerCase().trim();
+          const colors = [...fieldset.querySelectorAll('[data-option-input]')]
+            .map((input) => normalize(input.value))
+            .filter(Boolean)
+            .sort((a, b) => b.length - a.length);
+          const selectedColor = normalize(selected);
+
+          const figures = [...this.querySelectorAll('[data-media-list] [data-media-id]')];
+          const matches = figures.filter((figure) => {
+            const alt = normalize(figure.dataset.mediaAlt || '');
+            return colors.find((color) => alt.includes(color)) === selectedColor;
+          });
+
+          figures.forEach((figure) => {
+            figure.hidden = matches.length > 0 && !matches.includes(figure);
+          });
         }
 
         // Grey out sizes (and colors) that have no available variant with the other current selections
