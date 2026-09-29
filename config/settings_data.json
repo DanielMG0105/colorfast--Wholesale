@@ -110,12 +110,12 @@
         "type": "shopify://apps/wsh-wholesale-pricing/blocks/app-embed/94cbfa01-7191-4bb2-bcd8-b519b9b3bd06",
         "disabled": false,
         "settings": {
-          "showCrossOutPrice": false,
+          "showCrossOutPrice": true,
           "showCurrencyCodes": false,
           "showVDTableWithPrice": false,
           "vdBadgeLabel": "Volume Discounts",
           "priceColor": "#000000",
-          "crossOutPriceColor": "#E9330C",
+          "crossOutPriceColor": "#e9330c",
           "appProxy": "/apps/wpdapp"
         }
       }
