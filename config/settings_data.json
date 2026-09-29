@@ -105,6 +105,21 @@
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
     "content_for_index": [],
+    "blocks": {
+      "11989592277864780042": {
+        "type": "shopify://apps/wsh-wholesale-pricing/blocks/app-embed/94cbfa01-7191-4bb2-bcd8-b519b9b3bd06",
+        "disabled": false,
+        "settings": {
+          "showCrossOutPrice": false,
+          "showCurrencyCodes": false,
+          "showVDTableWithPrice": false,
+          "vdBadgeLabel": "Volume Discounts",
+          "priceColor": "#000000",
+          "crossOutPriceColor": "#E9330C",
+          "appProxy": "/apps/wpdapp"
+        }
+      }
+    },
     "color_palette": {
       "background": "#ffffff",
       "foreground": "#000000",
