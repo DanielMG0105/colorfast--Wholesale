@@ -9,6 +9,7 @@
 </style>
 
 <dye-color-preview
+  id="custom-dye"
   class="dye-preview{% if section.settings.show_vignette %} dye-preview--vignette{% endif %}"
   data-footer-bg="ignore"
   style="
@@ -51,11 +52,19 @@
       <div
         class="dye-preview__garment"
         data-garment
+        {% if block.settings.product != blank %}
+          data-product-handle="{{ block.settings.product.handle }}"
+        {% endif %}
         {% unless forloop.first %}
           hidden
         {% endunless %}
         {{ block.shopify_attributes }}
       >
+        {%- if block.settings.product != blank -%}
+          <script type="application/json" data-product>
+            {% render 'dye-product-data', product: block.settings.product %}
+          </script>
+        {%- endif -%}
         {%- if garment_label != blank -%}
           {%- if garment_url != blank -%}
             <a class="dye-preview__pill" href="{{ garment_url }}">{{ garment_label | escape }}</a>
@@ -110,6 +119,25 @@
     {%- endfor -%}
   </div>
 
+  {%- comment -%} Filled by the script for a product opened from its custom dye swatch (?product=handle) {%- endcomment -%}
+  <template data-garment-template>
+    <div class="dye-preview__garment" data-garment>
+      <a class="dye-preview__pill" data-garment-label></a>
+      <div class="dye-preview__row">
+        <button type="button" class="dye-preview__arrow" data-garment-step="-1" aria-label="Previous garment">
+          {%- render 'dye-preview-arrow', direction: 'left' -%}
+        </button>
+        <div class="dye-preview__image">
+          <img data-garment-image alt="" width="1200" height="1500">
+          <span class="dye-preview__tint" data-garment-tint aria-hidden="true"></span>
+        </div>
+        <button type="button" class="dye-preview__arrow" data-garment-step="1" aria-label="Next garment">
+          {%- render 'dye-preview-arrow', direction: 'right' -%}
+        </button>
+      </div>
+    </div>
+  </template>
+
   <div class="dye-preview__selector">
     {%- if section.settings.selector_label != blank -%}
       <p class="dye-preview__pill">{{ section.settings.selector_label | escape }}</p>
@@ -160,9 +188,27 @@
       <button type="button" class="dye-preview__reset" data-reset>{{ section.settings.reset_label | escape }}</button>
     {%- endif -%}
   </div>
+
+  {%- comment -%} Shown for garments whose product has custom.custom_dye = true {%- endcomment -%}
+  <div class="dye-preview__purchase" data-purchase hidden>
+    <p class="dye-preview__price" data-purchase-price></p>
+    <div class="dye-preview__options" data-purchase-options></div>
+    <div class="dye-preview__buy">
+      <label class="dye-preview__quantity">
+        <span class="visually-hidden">Quantity</span>
+        <input type="number" min="1" value="1" inputmode="numeric" data-purchase-quantity>
+      </label>
+      <button type="button" class="dye-preview__add" data-purchase-add disabled>
+        {{- section.settings.choose_color_label | default: 'Choose a color' | escape -}}
+      </button>
+    </div>
+    <p class="dye-preview__message" role="status" data-purchase-message hidden></p>
+  </div>
 </dye-color-preview>
 
 <script type="module">
+  import { CartLinesUpdateEvent, CartErrorEvent } from '@shopify/events';
+
   if (!customElements.get('dye-color-preview')) {
     customElements.define(
       'dye-color-preview',
@@ -211,14 +257,28 @@
             this.setColor((state.hue + dh + 360) % 360, Math.min(1, Math.max(0, state.sat + ds)));
           });
 
+          this.dye = null;
+          this.selection = null;
+          this.purchase = this.querySelector('[data-purchase]');
+          this.addButton = this.querySelector('[data-purchase-add]');
+          this.quantity = this.querySelector('[data-purchase-quantity]');
+          this.message = this.querySelector('[data-purchase-message]');
+          this.garments.forEach((garment) => {
+            const json = garment.querySelector('[data-product]')?.textContent;
+            if (json) garment.product = JSON.parse(json);
+          });
+          this.addButton?.addEventListener('click', () => this.addToCart());
+
           this.toggleArrows();
           this.placeHandle(0.5, 0.5);
+          this.updatePurchase();
+          this.loadRequestedProduct();
         }
 
         toggleArrows() {
-          if (this.garments.length < 2) {
-            this.querySelectorAll('[data-garment-step]').forEach((button) => (button.style.visibility = 'hidden'));
-          }
+          this.querySelectorAll('[data-garment-step]').forEach(
+            (button) => (button.style.visibility = this.garments.length < 2 ? 'hidden' : '')
+          );
           if (this.presets.length < 2) {
             this.querySelectorAll('[data-color-step]').forEach((button) => (button.style.visibility = 'hidden'));
           }
@@ -226,9 +286,225 @@
 
         stepGarment(step) {
           if (this.garments.length < 2) return;
+          this.showGarment((this.garmentIndex + step + this.garments.length) % this.garments.length);
+        }
+
+        showGarment(index) {
           this.garments[this.garmentIndex].hidden = true;
-          this.garmentIndex = (this.garmentIndex + step + this.garments.length) % this.garments.length;
+          this.garmentIndex = index;
           this.garments[this.garmentIndex].hidden = false;
+          this.selection = null;
+          this.updatePurchase();
+        }
+
+        // Opened from a product's custom dye swatch (?product=handle): show that product first,
+        // fetching it through the product.dye-data template when no garment block already has it
+        async loadRequestedProduct() {
+          const handle = new URLSearchParams(window.location.search).get('product');
+          if (!handle) return;
+
+          const existing = this.garments.findIndex((garment) => garment.dataset.productHandle === handle);
+          if (existing > -1) {
+            this.showGarment(existing);
+            return;
+          }
+
+          try {
+            const root = window.Shopify?.routes?.root ?? '/';
+            const response = await fetch(`${root}products/${encodeURIComponent(handle)}?view=dye-data`);
+            if (!response.ok) return;
+            const product = await response.json();
+            if (!product.image) return;
+
+            const garment = this.buildGarment(product);
+            // Drop the "Add a garment block" placeholder if the section has no real garments
+            this.garments = this.garments.filter((element) => element.product || element.querySelector('img'));
+            this.garments.forEach((element) => (element.hidden = true));
+            this.querySelector('.dye-preview__stage').prepend(garment);
+            this.querySelectorAll('.dye-preview__stage > [data-garment]').forEach((element) => {
+              if (!this.garments.includes(element) && element !== garment) element.remove();
+            });
+            this.garments.unshift(garment);
+            this.garmentIndex = 0;
+            this.selection = null;
+            this.toggleArrows();
+            this.updatePurchase();
+          } catch (error) {
+            console.error('Custom dye: could not load product', error);
+          }
+        }
+
+        buildGarment(product) {
+          const fragment = this.querySelector('[data-garment-template]').content.cloneNode(true);
+          const garment = fragment.querySelector('[data-garment]');
+          garment.dataset.productHandle = product.handle;
+          garment.product = product;
+
+          const label = garment.querySelector('[data-garment-label]');
+          label.textContent = product.title;
+          label.href = product.url;
+
+          const image = garment.querySelector('[data-garment-image]');
+          image.src = product.image;
+          image.alt = product.title;
+
+          const tint = garment.querySelector('[data-garment-tint]');
+          tint.style.setProperty('--dp-mask', `url('${product.image}')`);
+          if (product.protect) {
+            tint.style.setProperty('--dp-protect', `url('${product.protect}')`);
+            tint.classList.add('dye-preview__tint--protected');
+          }
+
+          garment.querySelectorAll('[data-garment-step]').forEach((button) =>
+            button.addEventListener('click', () => this.stepGarment(Number(button.dataset.garmentStep)))
+          );
+          return garment;
+        }
+
+        get product() {
+          return this.garments[this.garmentIndex]?.product;
+        }
+
+        // The dyed garment is always the undyed base color (PFD / White / Natural, else the first color)
+        baseColor() {
+          const colorIndex = this.product.colorPosition - 1;
+          if (colorIndex < 0) return null;
+          const values = this.product.options[colorIndex].values;
+          return values.find((value) => /pfd|white|natural/i.test(value)) ?? values[0];
+        }
+
+        findVariant(options) {
+          const colorIndex = this.product.colorPosition - 1;
+          const base = this.baseColor();
+          return this.product.variants.find((variant) =>
+            variant.options.every((value, i) => (i === colorIndex ? value === base : value === options[i]))
+          );
+        }
+
+        // Buttons for size and any other non-color option of the current garment's product
+        updatePurchase() {
+          if (!this.purchase) return;
+          const product = this.product;
+          this.purchase.hidden = !product?.dyeable;
+          this.message.hidden = true;
+          if (!product?.dyeable) return;
+
+          const colorIndex = product.colorPosition - 1;
+          if (!this.selection) {
+            const base = this.baseColor();
+            const first =
+              product.variants.find((variant) => variant.available && (colorIndex < 0 || variant.options[colorIndex] === base)) ??
+              product.variants[0];
+            this.selection = [...first.options];
+          }
+
+          const fieldsets = product.options
+            .map((option, index) => {
+              if (index === colorIndex || option.values.length < 2) return null;
+              const fieldset = document.createElement('fieldset');
+              fieldset.className = 'dye-preview__option';
+              const legend = document.createElement('legend');
+              legend.textContent = option.name;
+              fieldset.append(legend);
+
+              option.values.forEach((value) => {
+                const candidate = [...this.selection];
+                candidate[index] = value;
+                const variant = this.findVariant(candidate);
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'dye-preview__value';
+                button.textContent = value;
+                button.setAttribute('aria-pressed', String(this.selection[index] === value));
+                button.classList.toggle('is-unavailable', !variant?.available);
+                button.addEventListener('click', () => {
+                  this.selection[index] = value;
+                  this.updatePurchase();
+                });
+                fieldset.append(button);
+              });
+              return fieldset;
+            })
+            .filter(Boolean);
+          this.purchase.querySelector('[data-purchase-options]').replaceChildren(...fieldsets);
+
+          const variant = this.findVariant(this.selection);
+          this.purchase.querySelector('[data-purchase-price]').textContent = variant?.price ?? '';
+          this.updateAddButton();
+        }
+
+        updateAddButton() {
+          if (!this.addButton || !this.product?.dyeable || !this.selection) return;
+          const variant = this.findVariant(this.selection);
+          if (!variant || !variant.available) {
+            this.addButton.disabled = true;
+            this.addButton.textContent = {{ section.settings.sold_out_label | default: 'Sold out' | json }};
+          } else if (!this.dye) {
+            this.addButton.disabled = true;
+            this.addButton.textContent = {{ section.settings.choose_color_label | default: 'Choose a color' | json }};
+          } else {
+            this.addButton.disabled = false;
+            this.addButton.textContent = {{ section.settings.add_label | default: 'Add to cart' | json }};
+          }
+        }
+
+        // Adds the base variant with the chosen color as line item properties
+        async addToCart() {
+          const variant = this.findVariant(this.selection ?? []);
+          if (!variant || !this.dye) return;
+
+          const quantity = Math.max(1, parseInt(this.quantity.value, 10) || 1);
+          const properties = { 'Dye color': this.dye.name };
+          if (this.dye.name !== this.dye.hex) properties['Dye hex'] = this.dye.hex;
+          const items = [{ id: variant.id, quantity, properties }];
+
+          const sections = [...document.querySelectorAll('cart-items-component')]
+            .map((element) => element.dataset.sectionId)
+            .filter(Boolean);
+          const deferred = CartLinesUpdateEvent.createPromise();
+          this.dispatchEvent(
+            new CartLinesUpdateEvent({
+              action: 'add',
+              context: 'product',
+              lines: [{ merchandiseId: String(variant.id), quantity }],
+              promise: deferred.promise,
+            })
+          );
+
+          this.addButton.disabled = true;
+          this.message.hidden = true;
+
+          try {
+            const root = window.Shopify?.routes?.root ?? '/';
+            const response = await fetch(`${root}cart/add.js`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ items, sections: sections.join(',') }),
+            }).then((res) => res.json());
+            if (response.status) throw new Error(response.description || response.message || 'Add to cart failed');
+
+            const cart = await fetch(`${root}cart.js`).then((res) => res.json());
+            deferred.resolve({
+              cart: CartLinesUpdateEvent.createCartFromAjaxResponse(cart),
+              detail: {
+                items: cart.items,
+                source: 'dye-color-preview',
+                sourceId: this.closest('.shopify-section')?.id,
+                itemCount: quantity,
+                sections: response.sections,
+                didError: false,
+              },
+            });
+
+            this.addButton.textContent = {{ section.settings.added_label | default: 'Added' | json }};
+            setTimeout(() => this.updateAddButton(), 2000);
+          } catch (error) {
+            deferred.reject(error);
+            this.dispatchEvent(new CartErrorEvent({ error: error.message, code: 'INVALID' }));
+            this.message.textContent = error.message;
+            this.message.hidden = false;
+            this.updateAddButton();
+          }
         }
 
         // Wheel geometry: angle from the top, clockwise -> hue; distance from center -> saturation (white center)
@@ -255,11 +531,14 @@
         }
 
         applyColor(color, label) {
+          const hex = color.startsWith('#') ? color.toUpperCase() : this.currentHex();
+          this.dye = { name: label, hex };
+          this.updateAddButton();
           this.style.setProperty('--dp-color', color);
           this.classList.add('is-tinted');
           if (this.colorName) this.colorName.textContent = label;
           if (this.hexInput && document.activeElement !== this.hexInput) {
-            this.hexInput.value = color.startsWith('#') ? color.toUpperCase() : this.currentHex();
+            this.hexInput.value = hex;
           }
           this.wheel.setAttribute('aria-valuetext', label);
         }
@@ -287,6 +566,8 @@
           this.classList.remove('is-tinted');
           this.presetIndex = -1;
           this.state = null;
+          this.dye = null;
+          this.updateAddButton();
           this.placeHandle(0.5, 0.5);
           if (this.colorName) this.colorName.innerHTML = '&nbsp;';
           if (this.hexInput) this.hexInput.value = '';
@@ -599,6 +880,117 @@
     opacity: 0.7;
     cursor: pointer;
   }
+
+  .dye-preview__purchase {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    width: min(520px, 100%);
+  }
+
+  .dye-preview__purchase[hidden] {
+    display: none;
+  }
+
+  .dye-preview__price {
+    margin: 0;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+  }
+
+  .dye-preview__options {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .dye-preview__option {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    legend {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 0;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+  }
+
+  .dye-preview__value {
+    min-width: 52px;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--dp-text);
+    background: transparent;
+    color: var(--dp-text);
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .dye-preview__value[aria-pressed='true'] {
+    background-color: var(--dp-text);
+    color: var(--dp-bg);
+  }
+
+  .dye-preview__value.is-unavailable {
+    opacity: 0.35;
+  }
+
+  .dye-preview__buy {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+    width: 100%;
+  }
+
+  .dye-preview__quantity input {
+    width: 100%;
+    height: 56px;
+    border: 1px solid var(--dp-text);
+    background: transparent;
+    color: var(--dp-text);
+    font: inherit;
+    font-size: 17px;
+    text-align: center;
+  }
+
+  .dye-preview__add {
+    height: 56px;
+    border: 1px solid var(--dp-text);
+    background: var(--dp-text);
+    color: var(--dp-bg);
+    font: inherit;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .dye-preview__add[disabled] {
+    background: transparent;
+    color: var(--dp-text);
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .dye-preview__message {
+    margin: 0;
+    font-size: 14px;
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -680,6 +1072,38 @@
       "id": "reset_label",
       "label": "Reset label",
       "default": "Original color"
+    },
+    {
+      "type": "header",
+      "content": "Add to cart"
+    },
+    {
+      "type": "paragraph",
+      "content": "Shown for products with the custom.custom_dye metafield set to true. Adds the undyed (PFD / White) variant with the chosen color as a line item property."
+    },
+    {
+      "type": "text",
+      "id": "choose_color_label",
+      "label": "Button label before a color is chosen",
+      "default": "Choose a color"
+    },
+    {
+      "type": "text",
+      "id": "add_label",
+      "label": "Add to cart label",
+      "default": "Add to cart"
+    },
+    {
+      "type": "text",
+      "id": "added_label",
+      "label": "Added label",
+      "default": "Added"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_label",
+      "label": "Sold out label",
+      "default": "Sold out"
     },
     {
       "type": "header",

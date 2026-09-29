@@ -1,0 +1,51 @@
+{%- doc -%}
+  Outputs the JSON the dye color preview needs to show and sell a product in a custom color.
+  Used inline by the garment blocks and by the product.dye-data template, which the preview fetches
+  when the page is opened from a product's custom dye swatch (?product=handle).
+
+  @param {object} product - The product to describe.
+{%- enddoc -%}
+
+{%- liquid
+  assign dyeable = false
+  if product.metafields.custom.custom_dye.value == true
+    assign dyeable = true
+  endif
+
+  # A white garment on a transparent background tints cleanly; fall back to the featured image
+  assign dye_image = product.metafields.custom.dye_image.value | default: product.featured_image
+  assign protect_image = product.metafields.custom.dye_protect_image.value
+
+  assign color_position = 0
+  for option in product.options_with_values
+    assign option_name = option.name | downcase | strip
+    if option_name == 'color' or option_name == 'colour'
+      assign color_position = option.position
+      break
+    endif
+  endfor
+-%}
+{
+  "handle": {{ product.handle | json }},
+  "title": {{ product.title | json }},
+  "url": {{ product.url | json }},
+  "dyeable": {{ dyeable | json }},
+  "image": {% if dye_image != blank %}{{ dye_image | image_url: width: 1200 | json }}{% else %}null{% endif %},
+  "protect": {% if protect_image != blank %}{{ protect_image | image_url: width: 1200 | json }}{% else %}null{% endif %},
+  "colorPosition": {{ color_position }},
+  "options": [
+    {%- for option in product.options_with_values -%}
+      {"name": {{ option.name | json }}, "values": {{ option.values | json }}}{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ],
+  "variants": [
+    {%- for variant in product.variants -%}
+      {
+        "id": {{ variant.id }},
+        "options": {{ variant.options | json }},
+        "available": {{ variant.available | json }},
+        "price": {{ variant.price | money_with_currency | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+}
