@@ -70,7 +70,7 @@
   assign dye_enabled = false
   if product.metafields.custom.custom_dye.value == true and color_option_position > 0
     assign dye_enabled = true
-    assign dye_link = section.settings.dye_page.url | default: '/pages/custom-dye-program'
+    assign dye_link = section.settings.dye_page.url | default: '/pages/custom-dye'
     assign dye_link = dye_link | append: '?product=' | append: product.handle | append: '#custom-dye'
   endif
 -%}
@@ -1254,7 +1254,7 @@
       "type": "page",
       "id": "dye_page",
       "label": "Custom dye page",
-      "info": "Products with the custom.custom_dye metafield set to true show a dye swatch next to their colors that opens this page with the product loaded. Defaults to /pages/custom-dye-program."
+      "info": "Products with the custom.custom_dye metafield set to true show a dye swatch next to their colors that opens this page with the product loaded. Defaults to /pages/custom-dye."
     },
     {
       "type": "text",
