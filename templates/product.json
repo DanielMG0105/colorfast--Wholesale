@@ -50,6 +50,8 @@
         "added_label": "Added",
         "sold_out_label": "Sold out",
         "color_option_names": "Color,Colour",
+        "dye_page": "",
+        "dye_label": "Custom dye",
         "show_wholesale": true,
         "wholesale_heading": "Wholesale pricing",
         "wholesale_tiers": "1-99: 24.49\n100-299: 23.27\n300-999: 22.10\n1000+: 21.00",

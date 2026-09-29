@@ -150,6 +150,7 @@
           "type": "garment",
           "settings": {
             "product": "mbh088-c380-380gsm-crop-zip-hoodie",
+            "image": "shopify://shop_images/MERCHT-001_185GSM_MERCH_TEE.png",
             "label": "470 GSM Zip Hoodie"
           }
         }
@@ -164,6 +165,10 @@
         "show_color_name": true,
         "show_reset": true,
         "reset_label": "Original color",
+        "choose_color_label": "Choose a color",
+        "add_label": "Add to cart",
+        "added_label": "Added",
+        "sold_out_label": "Sold out",
         "font": "figtree_n6",
         "image_width": 430,
         "wheel_size": 248,
