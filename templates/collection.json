@@ -14,7 +14,7 @@
       "settings": {
         "show_title": false,
         "products_per_page": 24,
-        "top_line_source": "metafield",
+        "top_line_source": "none",
         "title_delimiter": "|",
         "show_swatches": true,
         "color_option_names": "Color,Colour",
