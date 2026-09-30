@@ -1420,8 +1420,12 @@
       justify-content: center;
     }
 
+    /* The inner svg-wrapper defaults to the fixed 44px touch target; it must scale with the box
+       or the cart bubble and bag cutout (computed from --cf-box) drift out of place */
     .header .search-action .header-actions__action,
-    .header .header-actions__action {
+    .header .header-actions__action,
+    .header .header-actions__action:not(.account-button) .svg-wrapper,
+    .header .search-action .svg-wrapper {
       width: calc(44 * var(--cf-u));
       height: calc(44 * var(--cf-u));
       padding: 0;
