@@ -20,6 +20,11 @@
     --wm-side: {{ section.settings.side_padding }}%;
     --wm-padding-top: {{ section.settings.padding_top }}px;
     --wm-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --wm-size-n: {{ section.settings.text_size }};
+    --wm-gap-n: {{ section.settings.gap }};
+    --wm-padding-top-n: {{ section.settings.padding_top }};
+    --wm-padding-bottom-n: {{ section.settings.padding_bottom }};
+    --wm-u: min(1px, calc(100vw / 1900));
   "
 >
   <wordmark-marquee
@@ -101,15 +106,16 @@
     color: var(--wm-text);
     padding: calc(var(--wm-padding-top) * 0.6) var(--wm-side) calc(var(--wm-padding-bottom) * 0.6);
 
+    /* Below 1900px sizes scale with the viewport (--wm-u) to keep the desktop proportions */
     @media screen and (min-width: 750px) {
-      padding: var(--wm-padding-top) var(--wm-side) var(--wm-padding-bottom);
+      padding: calc(var(--wm-padding-top-n) * var(--wm-u)) var(--wm-side) calc(var(--wm-padding-bottom-n) * var(--wm-u));
     }
   }
 
   .wordmark-marquee {
     display: block;
     overflow: hidden;
-    padding: calc(var(--wm-size) * 0.55) 0;
+    padding: 0.55em 0;
     font-family: var(--wm-font-family);
     font-weight: var(--wm-font-weight);
     font-style: var(--wm-font-style);
@@ -118,7 +124,8 @@
     white-space: nowrap;
 
     @media screen and (min-width: 750px) {
-      font-size: var(--wm-size);
+      --wm-gap: calc(var(--wm-gap-n) * var(--wm-u));
+      font-size: max(14px, calc(var(--wm-size-n) * var(--wm-u)));
     }
   }
 

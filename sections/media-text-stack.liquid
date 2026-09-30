@@ -39,6 +39,15 @@
     --mts-button-height: {{ section.settings.button_height }}px;
     --mts-button-size: {{ section.settings.button_text_size }}px;
     --mts-button-spacing: {{ section.settings.button_spacing }}px;
+    --mts-heading-size-n: {{ section.settings.heading_size }};
+    --mts-body-size-n: {{ section.settings.body_size }};
+    --mts-text-spacing-n: {{ section.settings.text_spacing }};
+    --mts-text-max-n: {{ section.settings.text_max_width }};
+    --mts-button-width-n: {{ section.settings.button_width }};
+    --mts-button-height-n: {{ section.settings.button_height }};
+    --mts-button-size-n: {{ section.settings.button_text_size }};
+    --mts-button-spacing-n: {{ section.settings.button_spacing }};
+    --mts-u: min(1px, calc(100vw / 1900));
   "
 >
   <div class="media-text-stack__media">
@@ -186,6 +195,10 @@
 
   .media-text-stack__content {
     max-width: var(--mts-text-max);
+
+    @media screen and (min-width: 990px) {
+      max-width: calc(var(--mts-text-max-n) * var(--mts-u));
+    }
     font-family: var(--mts-body-family);
     font-weight: var(--mts-body-weight);
 
@@ -207,7 +220,7 @@
     color: inherit;
 
     @media screen and (min-width: 750px) {
-      font-size: var(--mts-heading-size);
+      font-size: max(18px, calc(var(--mts-heading-size-n) * var(--mts-u)));
     }
   }
 
@@ -217,8 +230,8 @@
     line-height: var(--mts-line-height);
 
     @media screen and (min-width: 750px) {
-      margin-top: var(--mts-text-spacing);
-      font-size: var(--mts-body-size);
+      margin-top: calc(var(--mts-text-spacing-n) * var(--mts-u));
+      font-size: max(12px, calc(var(--mts-body-size-n) * var(--mts-u)));
     }
 
     p {
@@ -248,7 +261,10 @@
     transition: background-color 0.25s ease, color 0.25s ease;
 
     @media screen and (min-width: 990px) {
-      margin-top: var(--mts-button-spacing);
+      min-width: calc(var(--mts-button-width-n) * var(--mts-u));
+      min-height: max(40px, calc(var(--mts-button-height-n) * var(--mts-u)));
+      margin-top: calc(var(--mts-button-spacing-n) * var(--mts-u));
+      font-size: max(11px, calc(var(--mts-button-size-n) * var(--mts-u)));
     }
   }
 

@@ -60,6 +60,8 @@
     --vb-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
     --vb-logo-width: {{ section.settings.overlay_logo_width }}%;
     --vb-text-size: {{ section.settings.overlay_text_size }}px;
+    --vb-text-size-n: {{ section.settings.overlay_text_size }};
+    --vb-u: min(1px, calc(100vw / 1900));
     --vb-text-spacing: {{ section.settings.overlay_letter_spacing | divided_by: 100.0 }}em;
     --vb-text-color: {{ section.settings.overlay_text_color }};
     --vb-font-family: {{ overlay_font.family }}, {{ overlay_font.fallback_families }};
@@ -207,7 +209,7 @@
     font-size: max(9px, calc(var(--vb-text-size) * 0.6));
 
     @media screen and (min-width: 750px) {
-      font-size: var(--vb-text-size);
+      font-size: max(10px, calc(var(--vb-text-size-n) * var(--vb-u)));
     }
   }
 

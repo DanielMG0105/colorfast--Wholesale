@@ -25,6 +25,11 @@
     --pl-card-width-n: {{ section.settings.card_width }};
     --pl-card-height-n: {{ section.settings.card_height }};
     --pl-card-min: {{ section.settings.card_min_width }}px;
+    --pl-heading-size-n: {{ section.settings.heading_size }};
+    --pl-card-gap-n: {{ section.settings.card_gap }};
+    --pl-padding-top-n: {{ section.settings.padding_top }};
+    --pl-padding-bottom-n: {{ section.settings.padding_bottom }};
+    --pl-u: min(1px, calc(100vw / 1900));
     --pl-card-gap: {{ section.settings.card_gap }}px;
     --pl-padding-top: {{ section.settings.padding_top }}px;
     --pl-padding-bottom: {{ section.settings.padding_bottom }}px;
@@ -61,13 +66,14 @@
     padding: calc(var(--pl-padding-top) * 0.6) 16px calc(var(--pl-padding-bottom) * 0.6);
     text-align: center;
 
+    /* Below 1900px sizes scale with the viewport (--pl-u) to keep the desktop proportions */
     @media screen and (min-width: 750px) {
-      padding: var(--pl-padding-top) 24px var(--pl-padding-bottom);
+      padding: calc(var(--pl-padding-top-n) * var(--pl-u)) 24px calc(var(--pl-padding-bottom-n) * var(--pl-u));
     }
   }
 
   .program-links__heading {
-    margin: 0 0 calc(var(--pl-heading-size) * 1.1);
+    margin: 0 0 1.1em;
     color: inherit;
     font-family: var(--pl-heading-family);
     font-weight: var(--pl-heading-weight);
@@ -76,7 +82,7 @@
     text-transform: uppercase;
 
     @media screen and (min-width: 750px) {
-      font-size: var(--pl-heading-size);
+      font-size: max(24px, calc(var(--pl-heading-size-n) * var(--pl-u)));
     }
   }
 
@@ -87,7 +93,7 @@
     gap: calc(var(--pl-card-gap) * 0.6);
 
     @media screen and (min-width: 750px) {
-      gap: var(--pl-card-gap);
+      gap: calc(var(--pl-card-gap-n) * var(--pl-u));
     }
   }
 
@@ -110,6 +116,10 @@
     text-decoration: none;
     text-transform: uppercase;
     transition: background-color 0.2s ease, color 0.2s ease;
+
+    @media screen and (min-width: 750px) {
+      max-width: calc(var(--pl-card-width-n) * var(--pl-u));
+    }
   }
 
   .program-links__content {

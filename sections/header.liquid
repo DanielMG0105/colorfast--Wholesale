@@ -348,6 +348,9 @@
     --cf-menu-font-weight: {{ cf_menu_font.weight }};
     --cf-menu-font-size: {{ section.settings.cf_menu_font_size }}px;
     --cf-menu-letter-spacing: {{ section.settings.cf_menu_letter_spacing | divided_by: 100.0 }}em;
+    --cf-menu-font-size-n: {{ section.settings.cf_menu_font_size }};
+    --cf-logo-height-n: {{ settings.logo_height }};
+    --cf-u: min(1px, calc(100vw / 1900));
   }
 </style>
 
@@ -1346,23 +1349,30 @@
   }
 
   /* ColorFast desktop header layout */
+  /* Below 1900px every size in the desktop header scales with the viewport (var(--cf-u)),
+     so the layout keeps the same proportions on smaller screens. */
   @media screen and (min-width: 990px) {
     .header {
-      --page-margin: 24px;
+      --page-margin: calc(24 * var(--cf-u));
     }
 
     .header:not(.header--compact) .header__row--top {
-      --header-padding: 18px;
+      --header-padding: calc(18 * var(--cf-u));
     }
 
     .header__row .header-logo {
-      margin-inline-end: 24px;
+      margin-inline-end: calc(24 * var(--cf-u));
+    }
+
+    .header .header-logo__image {
+      height: max(24px, calc(var(--cf-logo-height-n) * var(--cf-u)));
+      width: auto;
     }
 
     .header .menu-list__link {
       font-family: var(--cf-menu-font-family, inherit);
       font-style: var(--cf-menu-font-style, normal);
-      font-size: var(--cf-menu-font-size, 13.5px);
+      font-size: max(9px, calc(var(--cf-menu-font-size-n, 13.5) * var(--cf-u)));
       font-weight: var(--cf-menu-font-weight, 500);
       letter-spacing: var(--cf-menu-letter-spacing, 0.05em);
       text-transform: uppercase;
@@ -1376,12 +1386,12 @@
     }
 
     .header .menu-list__link-title {
-      padding-inline: 24px;
+      padding-inline: calc(24 * var(--cf-u));
     }
 
     /* Search lives outside header-actions, so drive both gaps from one value */
     #header-component:not([data-menu-style='drawer']) .header__column--right {
-      --cf-icon-gap: 16px;
+      --cf-icon-gap: calc(16 * var(--cf-u));
     }
 
     #header-component:not([data-menu-style='drawer']) .header__column--right:has(header-actions) {
@@ -1412,26 +1422,32 @@
 
     .header .search-action .header-actions__action,
     .header .header-actions__action {
-      width: 44px;
-      height: 44px;
+      width: calc(44 * var(--cf-u));
+      height: calc(44 * var(--cf-u));
       padding: 0;
     }
 
     .header .header-actions__action:not(.account-button) svg,
     .header .search-action svg {
-      width: 32.5px;
-      height: 32.5px;
+      width: calc(32.5 * var(--cf-u));
+      height: calc(32.5 * var(--cf-u));
     }
 
     .header .header-actions__cart-icon {
-      --cf-bag: 32.5px;
+      --cf-bag: calc(32.5 * var(--cf-u));
+      --cf-box: calc(44 * var(--cf-u));
+      --cf-bub: max(16px, calc(24 * var(--cf-u)));
+    }
+
+    .header .header-actions__cart-icon .cart-bubble__text {
+      font-size: max(9px, calc(13 * var(--cf-u)));
     }
 
     /* The account SVG has no inner padding (15x17 viewBox) unlike the 20x20 icons,
        so size it to match their visible glyph height */
     .header .account-button__icon {
-      width: 20.75px;
-      height: 23px;
+      width: calc(20.75 * var(--cf-u));
+      height: calc(23 * var(--cf-u));
       overflow: visible;
     }
   }
