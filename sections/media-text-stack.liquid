@@ -32,6 +32,13 @@
     --mts-text-max: {{ section.settings.text_max_width }}px;
     --mts-pt: {{ section.settings.padding_top }}px;
     --mts-pb: {{ section.settings.padding_bottom }}px;
+    --mts-text-spacing: {{ section.settings.text_spacing }}px;
+    --mts-paragraph-spacing: {{ section.settings.paragraph_spacing | divided_by: 10.0 }}em;
+    --mts-line-height: {{ section.settings.body_line_height | divided_by: 100.0 }};
+    --mts-button-width: {{ section.settings.button_width }}px;
+    --mts-button-height: {{ section.settings.button_height }}px;
+    --mts-button-size: {{ section.settings.button_text_size }}px;
+    --mts-button-spacing: {{ section.settings.button_spacing }}px;
   "
 >
   <div class="media-text-stack__media">
@@ -205,17 +212,17 @@
   }
 
   .media-text-stack__text {
-    margin-top: 40px;
-    font-size: calc(var(--mts-body-size) * 0.85);
-    line-height: 1.25;
+    margin-top: calc(var(--mts-text-spacing) * 0.7);
+    font-size: max(14px, calc(var(--mts-body-size) * 0.9));
+    line-height: var(--mts-line-height);
 
     @media screen and (min-width: 750px) {
-      margin-top: 72px;
+      margin-top: var(--mts-text-spacing);
       font-size: var(--mts-body-size);
     }
 
     p {
-      margin: 0 0 1.9em;
+      margin: 0 0 var(--mts-paragraph-spacing);
     }
 
     p:last-child {
@@ -227,22 +234,21 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: min(100%, 360px);
-    min-height: 72px;
-    margin-top: 56px;
-    padding: 0 40px;
+    min-width: min(100%, var(--mts-button-width));
+    min-height: var(--mts-button-height);
+    margin-top: calc(var(--mts-button-spacing) * 0.6);
+    padding: 0 32px;
     border: 1px solid var(--mts-text);
     border-radius: 999px;
     color: var(--mts-text);
-    font-size: 20px;
+    font-size: var(--mts-button-size);
     letter-spacing: 0.04em;
     text-transform: uppercase;
     text-decoration: none;
     transition: background-color 0.25s ease, color 0.25s ease;
 
     @media screen and (min-width: 990px) {
-      min-height: 98px;
-      margin-top: 120px;
+      margin-top: var(--mts-button-spacing);
     }
   }
 
@@ -380,6 +386,80 @@
       "step": 1,
       "unit": "px",
       "default": 24
+    },
+    {
+      "type": "range",
+      "id": "body_line_height",
+      "label": "Text line height",
+      "min": 100,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "text_spacing",
+      "label": "Space between heading and text",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "paragraph_spacing",
+      "label": "Space between paragraphs",
+      "info": "In tenths of the text size (24 = 2.4 lines).",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "range",
+      "id": "button_width",
+      "label": "Button width",
+      "min": 120,
+      "max": 520,
+      "step": 4,
+      "unit": "px",
+      "default": 236
+    },
+    {
+      "type": "range",
+      "id": "button_height",
+      "label": "Button height",
+      "min": 32,
+      "max": 128,
+      "step": 2,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "button_text_size",
+      "label": "Button text size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_spacing",
+      "label": "Space above button",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 88
     },
     {
       "type": "header",
