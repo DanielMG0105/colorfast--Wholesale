@@ -17,7 +17,7 @@
         "announcement_BxgCk9": {
           "type": "_announcement",
           "settings": {
-            "text": "10% OFF YOUR FIRST ORDER",
+            "text": "&nbsp;The Best PFD in the Industry",
             "link": "",
             "font": "var(--font-subheading--family)",
             "font_size": "1.5rem",
@@ -128,6 +128,9 @@
         "enable_transparent_header_collection": true,
         "collection_inverse_logo": false,
         "text_color_transparent_collection": "",
+        "enable_transparent_header_custom_dye": true,
+        "custom_dye_inverse_logo": false,
+        "text_color_transparent_custom_dye": "",
         "cf_menu_font": "montserrat_n6",
         "cf_menu_font_size": 13.5,
         "cf_menu_letter_spacing": 5
