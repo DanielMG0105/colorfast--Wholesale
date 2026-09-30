@@ -297,10 +297,20 @@
         "show_poster": true,
         "poster_image": "shopify://shop_images/poster_da0ec461-b2ab-4a5f-90e7-5450f2dceb38.jpg",
         "link": "",
-        "link_label": "Custom dye program",
+        "link_label": "Embroidery & screen print program",
         "background_color": "#000000",
-        "custom_ratio": 6.8,
-        "custom_ratio_mobile": 3
+        "custom_ratio": 5.7,
+        "custom_ratio_mobile": 3,
+        "overlay_use_store_logo": true,
+        "overlay_logo_white": true,
+        "overlay_logo_width": 17,
+        "overlay_text": "Embroidery & Screen Print Program",
+        "overlay_font": "inter_n4",
+        "overlay_text_size": 16,
+        "overlay_letter_spacing": 3,
+        "overlay_text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 0
       }
     }
   },

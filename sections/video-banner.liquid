@@ -24,11 +24,27 @@
     assign ratio_mobile = video_mobile.aspect_ratio
   endif
 
+  assign overlay_font = section.settings.overlay_font
+  assign overlay_logo = section.settings.overlay_logo
+  if overlay_logo == blank and section.settings.overlay_use_store_logo
+    assign overlay_logo = settings.logo
+  endif
+  assign show_overlay = false
+  if overlay_logo != blank or section.settings.overlay_text != blank
+    assign show_overlay = true
+  endif
+
   if section.settings.height_mode == 'custom_ratio'
     assign ratio = section.settings.custom_ratio
     assign ratio_mobile = section.settings.custom_ratio_mobile
   endif
 -%}
+
+{%- if show_overlay and section.settings.overlay_text != blank -%}
+  <style>
+    {{ overlay_font | font_face: font_display: 'swap' }}
+  </style>
+{%- endif -%}
 
 <div
   class="video-banner video-banner--{% if section.settings.height_mode == 'custom' %}custom{% else %}ratio{% endif %}"
@@ -40,6 +56,14 @@
     --vb-height-mobile: {{ section.settings.height_mobile }}px;
     --vb-position: {{ section.settings.video_position }};
     --vb-bg: {{ section.settings.background_color }};
+    --vb-overlay-color: {{ section.settings.overlay_color }};
+    --vb-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --vb-logo-width: {{ section.settings.overlay_logo_width }}%;
+    --vb-text-size: {{ section.settings.overlay_text_size }}px;
+    --vb-text-spacing: {{ section.settings.overlay_letter_spacing | divided_by: 100.0 }}em;
+    --vb-text-color: {{ section.settings.overlay_text_color }};
+    --vb-font-family: {{ overlay_font.family }}, {{ overlay_font.fallback_families }};
+    --vb-font-weight: {{ overlay_font.weight }};
   "
 >
   {%- if video != blank -%}
@@ -76,6 +100,27 @@
   {%- else -%}
     <div class="video-banner__media">
       {{ 'hero-apparel-1' | placeholder_svg_tag: 'video-banner__placeholder' }}
+    </div>
+  {%- endif -%}
+
+  {%- if show_overlay -%}
+    <div class="video-banner__overlay">
+      {%- if overlay_logo != blank -%}
+        {%- capture logo_class -%}video-banner__logo{% if section.settings.overlay_logo_white %} video-banner__logo--white{% endif %}{%- endcapture -%}
+        {{
+          overlay_logo
+          | image_url: width: 1200
+          | image_tag:
+            widths: '300, 600, 900, 1200',
+            sizes: '(min-width: 750px) 30vw, 50vw',
+            loading: 'lazy',
+            alt: shop.name,
+            class: logo_class
+        }}
+      {%- endif -%}
+      {%- if section.settings.overlay_text != blank -%}
+        <p class="video-banner__text">{{ section.settings.overlay_text | escape }}</p>
+      {%- endif -%}
     </div>
   {%- endif -%}
 
@@ -145,10 +190,64 @@
     opacity: 0.3;
   }
 
-  .video-banner__link {
+  .video-banner__overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9em;
+    padding: 16px;
+    text-align: center;
+    pointer-events: none;
+    color: var(--vb-text-color);
+    font-size: max(9px, calc(var(--vb-text-size) * 0.6));
+
+    @media screen and (min-width: 750px) {
+      font-size: var(--vb-text-size);
+    }
+  }
+
+  .video-banner__overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--vb-overlay-color);
+    opacity: var(--vb-overlay-opacity);
+  }
+
+  .video-banner__logo {
+    display: block;
+    width: calc(var(--vb-logo-width) * 1.6);
+    max-width: 80%;
+    height: auto;
+
+    @media screen and (min-width: 750px) {
+      width: var(--vb-logo-width);
+    }
+  }
+
+  .video-banner__logo--white {
+    filter: brightness(0) invert(1);
+  }
+
+  .video-banner__text {
+    margin: 0;
+    font-family: var(--vb-font-family);
+    font-weight: var(--vb-font-weight);
+    letter-spacing: var(--vb-text-spacing);
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .video-banner__link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
   }
 {% endstylesheet %}
 
@@ -267,6 +366,92 @@
       "id": "poster_image_mobile",
       "label": "Custom mobile poster (optional)",
       "visible_if": "{{ section.settings.show_poster }}"
+    },
+    {
+      "type": "header",
+      "content": "Text overlay"
+    },
+    {
+      "type": "image_picker",
+      "id": "overlay_logo",
+      "label": "Logo (optional)",
+      "info": "Shown centered over the video."
+    },
+    {
+      "type": "checkbox",
+      "id": "overlay_use_store_logo",
+      "label": "Use store logo when no logo is selected",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "overlay_logo_white",
+      "label": "Make logo white",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "overlay_logo_width",
+      "label": "Logo width",
+      "min": 5,
+      "max": 80,
+      "step": 1,
+      "unit": "%",
+      "default": 17
+    },
+    {
+      "type": "text",
+      "id": "overlay_text",
+      "label": "Text",
+      "info": "Leave empty for no text."
+    },
+    {
+      "type": "font_picker",
+      "id": "overlay_font",
+      "label": "Text font",
+      "default": "inter_n4"
+    },
+    {
+      "type": "range",
+      "id": "overlay_text_size",
+      "label": "Text size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "overlay_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "overlay_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "info": "Darkens the video so the text is easier to read.",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 0
     },
     {
       "type": "header",
