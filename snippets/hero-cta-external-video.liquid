@@ -16,8 +16,27 @@
   assign poster_width = poster_width | default: 2400
   assign provider = 'file'
   assign video_id = ''
+  assign url_path = url_lower | split: '?' | first | split: '#' | first
 
-  if url_lower contains 'youtu.be/'
+  assign is_file = false
+  if url_lower contains 'progressive_redirect'
+    assign is_file = true
+  else
+    assign file_extensions = '.mp4,.webm,.mov,.m4v,.ogv,.ogg' | split: ','
+    for extension in file_extensions
+      assign extension_size = extension | size
+      assign slice_start = extension_size | times: -1
+      assign path_end = url_path | slice: slice_start, extension_size
+      if path_end == extension
+        assign is_file = true
+        break
+      endif
+    endfor
+  endif
+
+  if is_file
+    assign provider = 'file'
+  elsif url_lower contains 'youtu.be/'
     assign provider = 'youtube'
     assign video_id = url | split: 'youtu.be/' | last | split: '?' | first | split: '&' | first
   elsif url_lower contains 'youtube.com/shorts/'
