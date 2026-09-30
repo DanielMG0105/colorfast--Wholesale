@@ -174,12 +174,120 @@
         "show_vignette": true,
         "vignette_color": "#252f32"
       }
+    },
+    "by_you_wordmark": {
+      "type": "wordmark-banner",
+      "blocks": {
+        "line_logo": {
+          "type": "text_line",
+          "settings": {
+            "text": "colorfast",
+            "size": 10,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 0,
+            "space_above": 0
+          }
+        },
+        "line_by_you": {
+          "type": "text_line",
+          "settings": {
+            "text": "BY|YOU",
+            "size": 9,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 11,
+            "space_above": 0.9
+          }
+        }
+      },
+      "block_order": [
+        "line_logo",
+        "line_by_you"
+      ],
+      "settings": {
+        "content_mode": "text",
+        "image_alt": "",
+        "image_width": 100,
+        "font": "inter_n7",
+        "side_padding": 10,
+        "padding": 8,
+        "show_borders": true,
+        "border_style": "box",
+        "border_width": 1,
+        "border_offset": 40,
+        "background_color": "#c8c8c7",
+        "text_color": "#000000",
+        "border_color": "#000000"
+      }
+    },
+    "program_links": {
+      "type": "program-links",
+      "blocks": {
+        "program_dye": {
+          "type": "program",
+          "settings": {
+            "label": "Custom dye program",
+            "link": ""
+          }
+        },
+        "program_embroidery": {
+          "type": "program",
+          "settings": {
+            "label": "Embroidery & screen print",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "program_dye",
+        "program_embroidery"
+      ],
+      "settings": {
+        "heading": "Our programs",
+        "heading_font": "inter_n7",
+        "heading_size": 32,
+        "card_font": "inter_n4",
+        "card_text_size": 16,
+        "card_width": 420,
+        "card_height": 135,
+        "card_gap": 28,
+        "border_width": 1,
+        "background_color": "#c8c8c7",
+        "text_color": "#000000",
+        "border_color": "#000000",
+        "padding_top": 24,
+        "padding_bottom": 60
+      }
+    },
+    "blanks_marquee": {
+      "type": "wordmark-marquee",
+      "settings": {
+        "text": "OUR BLANKS|YOUR WAY",
+        "font": "inter_n7",
+        "text_size": 26,
+        "stretch": 200,
+        "gap": 100,
+        "speed": 60,
+        "direction": "left",
+        "side_padding": 10,
+        "show_border": true,
+        "border_width": 1,
+        "background_color": "#c8c8c7",
+        "text_color": "#000000",
+        "border_color": "#000000",
+        "padding_top": 0,
+        "padding_bottom": 40
+      }
     }
   },
   "order": [
     "video_banner",
     "dye_program",
     "wordmark_banner",
-    "dye_color_preview"
+    "dye_color_preview",
+    "by_you_wordmark",
+    "program_links",
+    "blanks_marquee"
   ]
 }

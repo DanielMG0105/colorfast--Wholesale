@@ -1,0 +1,326 @@
+{%- assign font = section.settings.font -%}
+{%- assign items = section.settings.text | split: '|' -%}
+
+<style>
+  {{ font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="wordmark-marquee-section"
+  style="
+    --wm-bg: {{ section.settings.background_color }};
+    --wm-text: {{ section.settings.text_color }};
+    --wm-border: {{ section.settings.border_color }};
+    --wm-border-width: {{ section.settings.border_width }}px;
+    --wm-font-family: {{ font.family }}, {{ font.fallback_families }};
+    --wm-font-weight: {{ font.weight }};
+    --wm-font-style: {{ font.style }};
+    --wm-size: {{ section.settings.text_size }}px;
+    --wm-gap: {{ section.settings.gap }}px;
+    --wm-side: {{ section.settings.side_padding }}%;
+    --wm-padding-top: {{ section.settings.padding_top }}px;
+    --wm-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <wordmark-marquee
+    class="wordmark-marquee{% if section.settings.show_border %} wordmark-marquee--border{% endif %}"
+    data-stretch="{{ section.settings.stretch }}"
+    data-speed="{{ section.settings.speed }}"
+    data-direction="{{ section.settings.direction }}"
+  >
+    <span class="visually-hidden">{{ section.settings.text | replace: '|', ' ' | escape }}</span>
+    <div class="wordmark-marquee__track" aria-hidden="true">
+      <div class="wordmark-marquee__set">
+        {%- for item in items -%}
+          {%- assign label = item | strip -%}
+          {%- if label != blank -%}
+            <span class="wordmark-marquee__item"><span class="wordmark-marquee__glyphs">{{ label | escape }}</span></span>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </wordmark-marquee>
+</div>
+
+<script type="module">
+  // Stretch each phrase horizontally (like the wordmark banner), then repeat the set enough
+  // times to cover the frame and scroll it by exactly one set width for a seamless loop.
+  if (!customElements.get('wordmark-marquee')) {
+    customElements.define(
+      'wordmark-marquee',
+      class WordmarkMarquee extends HTMLElement {
+        connectedCallback() {
+          this.track = this.querySelector('.wordmark-marquee__track');
+          this.set = this.querySelector('.wordmark-marquee__set');
+          this.observer = new ResizeObserver(() => this.layout());
+          this.observer.observe(this);
+          document.fonts?.ready.then(() => this.layout());
+          this.layout();
+        }
+
+        disconnectedCallback() {
+          this.observer?.disconnect();
+        }
+
+        layout() {
+          const stretch = parseFloat(this.dataset.stretch) / 100 || 1;
+          for (const item of this.set.children) {
+            const glyphs = item.firstElementChild;
+            item.style.width = '';
+            glyphs.style.transform = '';
+            item.style.width = `${glyphs.getBoundingClientRect().width * stretch}px`;
+            glyphs.style.transform = `scaleX(${stretch})`;
+          }
+
+          const setWidth = this.set.getBoundingClientRect().width;
+          const frameWidth = this.clientWidth;
+          if (!setWidth || !frameWidth) return;
+
+          this.track.querySelectorAll('.wordmark-marquee__set--clone').forEach((clone) => clone.remove());
+          const copies = Math.ceil(frameWidth / setWidth) + 1;
+          for (let i = 1; i < copies; i++) {
+            const clone = this.set.cloneNode(true);
+            clone.classList.add('wordmark-marquee__set--clone');
+            this.track.append(clone);
+          }
+
+          const speed = parseFloat(this.dataset.speed) || 60;
+          this.style.setProperty('--wm-distance', `${-setWidth}px`);
+          this.style.setProperty('--wm-duration', `${setWidth / speed}s`);
+          this.style.setProperty('--wm-direction', this.dataset.direction === 'right' ? 'reverse' : 'normal');
+          this.classList.add('is-ready');
+        }
+      }
+    );
+  }
+</script>
+
+{% stylesheet %}
+  .wordmark-marquee-section {
+    background-color: var(--wm-bg);
+    color: var(--wm-text);
+    padding: calc(var(--wm-padding-top) * 0.6) 16px calc(var(--wm-padding-bottom) * 0.6);
+
+    @media screen and (min-width: 750px) {
+      padding: var(--wm-padding-top) var(--wm-side) var(--wm-padding-bottom);
+    }
+  }
+
+  .wordmark-marquee {
+    display: block;
+    overflow: hidden;
+    padding: calc(var(--wm-size) * 0.55) 0;
+    font-family: var(--wm-font-family);
+    font-weight: var(--wm-font-weight);
+    font-style: var(--wm-font-style);
+    font-size: calc(var(--wm-size) * 0.7);
+    line-height: 1;
+    white-space: nowrap;
+
+    @media screen and (min-width: 750px) {
+      font-size: var(--wm-size);
+    }
+  }
+
+  .wordmark-marquee--border {
+    border: var(--wm-border-width) solid var(--wm-border);
+  }
+
+  .wordmark-marquee__track {
+    display: flex;
+    width: max-content;
+  }
+
+  .wordmark-marquee__set {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .wordmark-marquee__item {
+    display: inline-block;
+    margin-inline-end: var(--wm-gap);
+  }
+
+  .wordmark-marquee__glyphs {
+    display: inline-block;
+    transform-origin: left center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .wordmark-marquee.is-ready .wordmark-marquee__track {
+      animation: wordmark-marquee-scroll var(--wm-duration) linear infinite var(--wm-direction);
+    }
+
+    .wordmark-marquee.is-ready:hover .wordmark-marquee__track {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes wordmark-marquee-scroll {
+    to {
+      transform: translate3d(var(--wm-distance), 0, 0);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Wordmark marquee",
+  "tag": "section",
+  "class": "section-wordmark-marquee",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "info": "Separate phrases with |, e.g. OUR BLANKS|YOUR WAY.",
+      "default": "OUR BLANKS|YOUR WAY"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "info": "A heavy sans works best; text is stretched horizontally.",
+      "default": "inter_n7"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "stretch",
+      "label": "Horizontal stretch",
+      "min": 100,
+      "max": 300,
+      "step": 10,
+      "unit": "%",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Space between phrases",
+      "min": 0,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Speed",
+      "min": 10,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "info": "Pixels per second.",
+      "default": 60
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        {
+          "value": "left",
+          "label": "Right to left"
+        },
+        {
+          "value": "right",
+          "label": "Left to right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "label": "Side margin",
+      "min": 0,
+      "max": 25,
+      "step": 1,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Border"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show border",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border thickness",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#c8c8c7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wordmark marquee"
+    }
+  ]
+}
+{% endschema %}

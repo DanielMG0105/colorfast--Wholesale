@@ -1,0 +1,301 @@
+{%- assign heading_font = section.settings.heading_font -%}
+{%- assign card_font = section.settings.card_font -%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+  {{ card_font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="program-links"
+  style="
+    --pl-bg: {{ section.settings.background_color }};
+    --pl-text: {{ section.settings.text_color }};
+    --pl-border: {{ section.settings.border_color }};
+    --pl-border-width: {{ section.settings.border_width }}px;
+    --pl-heading-family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+    --pl-heading-weight: {{ heading_font.weight }};
+    --pl-heading-size: {{ section.settings.heading_size }}px;
+    --pl-card-family: {{ card_font.family }}, {{ card_font.fallback_families }};
+    --pl-card-weight: {{ card_font.weight }};
+    --pl-card-size: {{ section.settings.card_text_size }}px;
+    --pl-card-width: {{ section.settings.card_width }}px;
+    --pl-card-height: {{ section.settings.card_height }}px;
+    --pl-card-gap: {{ section.settings.card_gap }}px;
+    --pl-padding-top: {{ section.settings.padding_top }}px;
+    --pl-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  {%- if section.settings.heading != blank -%}
+    <h2 class="program-links__heading">{{ section.settings.heading | escape }}</h2>
+  {%- endif -%}
+
+  <div class="program-links__cards">
+    {%- for block in section.blocks -%}
+      {%- if block.settings.link != blank -%}
+        <a class="program-links__card" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+      {%- else -%}
+        <div class="program-links__card" {{ block.shopify_attributes }}>
+      {%- endif -%}
+          <span class="program-links__label">{{ block.settings.label | escape }}</span>
+          <span class="program-links__arrow" aria-hidden="true">&rarr;</span>
+      {%- if block.settings.link != blank -%}
+        </a>
+      {%- else -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .program-links {
+    background-color: var(--pl-bg);
+    color: var(--pl-text);
+    padding: calc(var(--pl-padding-top) * 0.6) 16px calc(var(--pl-padding-bottom) * 0.6);
+    text-align: center;
+
+    @media screen and (min-width: 750px) {
+      padding: var(--pl-padding-top) 24px var(--pl-padding-bottom);
+    }
+  }
+
+  .program-links__heading {
+    margin: 0 0 calc(var(--pl-heading-size) * 1.1);
+    color: inherit;
+    font-family: var(--pl-heading-family);
+    font-weight: var(--pl-heading-weight);
+    font-size: calc(var(--pl-heading-size) * 0.75);
+    line-height: 1.1;
+    text-transform: uppercase;
+
+    @media screen and (min-width: 750px) {
+      font-size: var(--pl-heading-size);
+    }
+  }
+
+  .program-links__cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: calc(var(--pl-card-gap) * 0.6);
+
+    @media screen and (min-width: 750px) {
+      gap: var(--pl-card-gap);
+    }
+  }
+
+  .program-links__card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2em;
+    width: 100%;
+    min-height: calc(var(--pl-card-height) * 0.6);
+    padding: 16px 24px;
+    border: var(--pl-border-width) solid var(--pl-border);
+    color: inherit;
+    font-family: var(--pl-card-family);
+    font-weight: var(--pl-card-weight);
+    font-size: var(--pl-card-size);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    @media screen and (min-width: 750px) {
+      width: var(--pl-card-width);
+      min-height: var(--pl-card-height);
+    }
+  }
+
+  a.program-links__card:hover,
+  a.program-links__card:focus-visible {
+    background-color: var(--pl-text);
+    color: var(--pl-bg);
+  }
+
+  .program-links__arrow {
+    transition: transform 0.2s ease;
+  }
+
+  a.program-links__card:hover .program-links__arrow {
+    transform: translateX(4px);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Program links",
+  "tag": "section",
+  "class": "section-program-links",
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "program",
+      "name": "Program",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Custom dye program"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our programs"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading font",
+      "default": "inter_n7"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "font_picker",
+      "id": "card_font",
+      "label": "Card font",
+      "default": "inter_n4"
+    },
+    {
+      "type": "range",
+      "id": "card_text_size",
+      "label": "Card text size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "Card width",
+      "min": 200,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "label": "Card height",
+      "min": 60,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "default": 135
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Space between cards",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border thickness",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#c8c8c7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Program links",
+      "blocks": [
+        {
+          "type": "program",
+          "settings": {
+            "label": "Custom dye program"
+          }
+        },
+        {
+          "type": "program",
+          "settings": {
+            "label": "Embroidery & screen print"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
