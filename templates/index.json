@@ -12,8 +12,11 @@
     "hero_cta_main": {
       "type": "hero-cta",
       "settings": {
-        "media_type": "image",
+        "media_type": "video",
         "image": "shopify://shop_images/45507939-0df6-450d-bfde-4a48818ad704.webp",
+        "video_source": "url",
+        "video_url": "https://download-video-ak.vimeocdn.com/v3-1/playback/1b7ad12b-60b2-47ed-adc9-ffaa36abd14d/3952fc6e-9ccb070c?__token__=st=1790799483~exp=1790803083~acl=%2Fv3-1%2Fplayback%2F1b7ad12b-60b2-47ed-adc9-ffaa36abd14d%2F3952fc6e-9ccb070c%2A~hmac=a81a3922736070d710962e58a6d07022591e6151ee1a78f3f7eae2aa93a46dde&r=dXMtZWFzdDE%3D",
+        "video_url_mobile": "https://player.vimeo.com/progressive_redirect/playback/1231790142/rendition/540p/file.mp4%20%28540p%29.mp4?loc=external&log_user=0&signature=b8fb6d632267af3830b565621bfeb7347b5e64f33a836cfb177b20337b066367",
         "media_position": "center center",
         "height": 110,
         "height_mobile": 100,
