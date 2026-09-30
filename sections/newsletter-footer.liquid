@@ -33,6 +33,18 @@
     --nf-links-spacing: {{ section.settings.links_spacing }}px;
     --nf-pt: {{ section.settings.padding_top }}px;
     --nf-pb: {{ section.settings.padding_bottom }}px;
+    --nf-heading-size-n: {{ section.settings.heading_size }};
+    --nf-subheading-size-n: {{ section.settings.subheading_size }};
+    --nf-input-size-n: {{ section.settings.input_font_size }};
+    --nf-link-size-n: {{ section.settings.link_size }};
+    --nf-input-width-n: {{ section.settings.input_width }};
+    --nf-input-height-n: {{ section.settings.input_height }};
+    --nf-links-width-n: {{ section.settings.links_width }};
+    --nf-link-gap-n: {{ section.settings.link_gap }};
+    --nf-links-spacing-n: {{ section.settings.links_spacing }};
+    --nf-pt-n: {{ section.settings.padding_top }};
+    --nf-pb-n: {{ section.settings.padding_bottom }};
+    --nf-u: min(1px, calc(100vw / 1500));
   "
 >
   <div class="newsletter-footer__signup">
@@ -193,8 +205,9 @@
     font-style: var(--nf-font-style);
     padding: calc(var(--nf-pt) * 0.6) 16px calc(var(--nf-pb) * 0.6);
 
+    /* Below 1500px sizes scale with the viewport (--nf-u), like the header */
     @media screen and (min-width: 750px) {
-      padding: var(--nf-pt) 24px var(--nf-pb);
+      padding: calc(var(--nf-pt-n) * var(--nf-u)) 24px calc(var(--nf-pb-n) * var(--nf-u));
     }
   }
 
@@ -211,6 +224,10 @@
     font-weight: inherit;
     font-size: clamp(36px, 10vw, var(--nf-heading-size));
     line-height: 1;
+
+    @media screen and (min-width: 750px) {
+      font-size: max(32px, calc(var(--nf-heading-size-n) * var(--nf-u)));
+    }
     letter-spacing: 0.015em;
     text-transform: uppercase;
     color: inherit;
@@ -224,7 +241,8 @@
     text-transform: uppercase;
 
     @media screen and (min-width: 750px) {
-      font-size: var(--nf-subheading-size);
+      margin-top: calc(36 * var(--nf-u));
+      font-size: max(11px, calc(var(--nf-subheading-size-n) * var(--nf-u)));
     }
   }
 
@@ -232,6 +250,11 @@
     width: 100%;
     max-width: var(--nf-input-width);
     margin-top: 26px;
+
+    @media screen and (min-width: 750px) {
+      max-width: calc(var(--nf-input-width-n) * var(--nf-u));
+      margin-top: calc(26 * var(--nf-u));
+    }
   }
 
   .newsletter-footer__field {
@@ -243,7 +266,7 @@
     border-radius: 999px;
 
     @media screen and (min-width: 750px) {
-      height: var(--nf-input-height);
+      height: max(48px, calc(var(--nf-input-height-n) * var(--nf-u)));
     }
   }
 
@@ -264,7 +287,8 @@
     outline: none;
 
     @media screen and (min-width: 750px) {
-      padding-left: 48px;
+      padding-left: calc(48 * var(--nf-u));
+      font-size: max(12px, calc(var(--nf-input-size-n) * var(--nf-u)));
     }
   }
 
@@ -305,13 +329,18 @@
     transition: color 0.2s ease, transform 0.2s ease;
 
     @media screen and (min-width: 750px) {
-      padding-right: 46px;
+      padding-right: calc(46 * var(--nf-u));
     }
   }
 
   .newsletter-footer__submit svg {
     width: 36px;
     height: 14px;
+
+    @media screen and (min-width: 750px) {
+      width: max(26px, calc(36 * var(--nf-u)));
+      height: max(10px, calc(14 * var(--nf-u)));
+    }
   }
 
   .newsletter-footer__submit:hover,
@@ -341,7 +370,8 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: flex-start;
-      margin-top: var(--nf-links-spacing);
+      max-width: calc(var(--nf-links-width-n) * var(--nf-u));
+      margin-top: calc(var(--nf-links-spacing-n) * var(--nf-u));
     }
   }
 
@@ -354,6 +384,7 @@
     text-align: center;
 
     @media screen and (min-width: 750px) {
+      gap: calc(var(--nf-link-gap-n) * var(--nf-u));
       text-align: start;
     }
   }
@@ -367,7 +398,7 @@
     text-decoration: none;
 
     @media screen and (min-width: 750px) {
-      font-size: var(--nf-link-size);
+      font-size: max(11px, calc(var(--nf-link-size-n) * var(--nf-u)));
     }
   }
 
