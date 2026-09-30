@@ -97,7 +97,7 @@
     color: inherit;
     font-family: var(--pl-card-family);
     font-weight: var(--pl-card-weight);
-    font-size: var(--pl-card-size);
+    font-size: max(14px, calc(var(--pl-card-size) * 0.65));
     text-decoration: none;
     text-transform: uppercase;
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -105,6 +105,7 @@
     @media screen and (min-width: 750px) {
       width: var(--pl-card-width);
       min-height: var(--pl-card-height);
+      font-size: var(--pl-card-size);
     }
   }
 
@@ -166,10 +167,10 @@
       "id": "heading_size",
       "label": "Heading size",
       "min": 16,
-      "max": 72,
+      "max": 96,
       "step": 2,
       "unit": "px",
-      "default": 32
+      "default": 56
     },
     {
       "type": "font_picker",
@@ -182,10 +183,10 @@
       "id": "card_text_size",
       "label": "Card text size",
       "min": 10,
-      "max": 32,
+      "max": 48,
       "step": 1,
       "unit": "px",
-      "default": 16
+      "default": 28
     },
     {
       "type": "header",
@@ -196,30 +197,30 @@
       "id": "card_width",
       "label": "Card width",
       "min": 200,
-      "max": 600,
-      "step": 10,
+      "max": 900,
+      "step": 2,
       "unit": "px",
-      "default": 420
+      "default": 674
     },
     {
       "type": "range",
       "id": "card_height",
       "label": "Card height",
       "min": 60,
-      "max": 300,
-      "step": 5,
+      "max": 400,
+      "step": 2,
       "unit": "px",
-      "default": 135
+      "default": 216
     },
     {
       "type": "range",
       "id": "card_gap",
       "label": "Space between cards",
       "min": 0,
-      "max": 80,
+      "max": 120,
       "step": 2,
       "unit": "px",
-      "default": 28
+      "default": 46
     },
     {
       "type": "range",

@@ -201,7 +201,7 @@
             "size": 9,
             "width_mode": "fill",
             "stretch": 200,
-            "gap": 11,
+            "gap": 28,
             "space_above": 0.9
           }
         }
@@ -215,12 +215,12 @@
         "image_alt": "",
         "image_width": 100,
         "font": "inter_n7",
-        "side_padding": 10,
-        "padding": 8,
+        "side_padding": 0,
+        "padding": 16,
         "show_borders": true,
         "border_style": "box",
         "border_width": 1,
-        "border_offset": 40,
+        "border_offset": 0,
         "background_color": "#c8c8c7",
         "text_color": "#000000",
         "border_color": "#000000"
@@ -251,18 +251,18 @@
       "settings": {
         "heading": "Our programs",
         "heading_font": "inter_n7",
-        "heading_size": 32,
+        "heading_size": 56,
         "card_font": "inter_n4",
-        "card_text_size": 16,
-        "card_width": 420,
-        "card_height": 135,
-        "card_gap": 28,
+        "card_text_size": 28,
+        "card_width": 674,
+        "card_height": 216,
+        "card_gap": 46,
         "border_width": 1,
         "background_color": "#c8c8c7",
         "text_color": "#000000",
         "border_color": "#000000",
-        "padding_top": 24,
-        "padding_bottom": 60
+        "padding_top": 88,
+        "padding_bottom": 100
       }
     },
     "blanks_marquee": {
@@ -270,29 +270,29 @@
       "settings": {
         "text": "OUR BLANKS|YOUR WAY",
         "font": "inter_n7",
-        "text_size": 26,
-        "stretch": 200,
-        "gap": 100,
+        "text_size": 30,
+        "stretch": 260,
+        "gap": 160,
         "speed": 60,
         "direction": "left",
-        "side_padding": 10,
+        "side_padding": 0,
         "show_border": true,
         "border_width": 1,
         "background_color": "#c8c8c7",
         "text_color": "#000000",
         "border_color": "#000000",
         "padding_top": 0,
-        "padding_bottom": 40
+        "padding_bottom": 60
       }
     }
   },
   "order": [
+    "by_you_wordmark",
+    "program_links",
+    "blanks_marquee",
     "video_banner",
     "dye_program",
     "wordmark_banner",
-    "dye_color_preview",
-    "by_you_wordmark",
-    "program_links",
-    "blanks_marquee"
+    "dye_color_preview"
   ]
 }
