@@ -129,21 +129,6 @@
         "background_color": "#000000"
       }
     },
-    "video_banner_NgCDCp": {
-      "type": "video-banner",
-      "settings": {
-        "video": "shopify://files/videos/custom-dye-program.mp4",
-        "video_position": "center center",
-        "height_mode": "ratio",
-        "height": 350,
-        "height_mobile": 200,
-        "show_poster": true,
-        "poster_image": "shopify://shop_images/poster.jpg",
-        "link": "",
-        "link_label": "Custom dye program",
-        "background_color": "#000000"
-      }
-    },
     "dye_program": {
       "type": "media-text-stack",
       "blocks": {
@@ -299,6 +284,21 @@
         "text_color": "#ffffff",
         "show_vignette": true,
         "vignette_color": "#252f32"
+      }
+    },
+    "video_banner_NgCDCp": {
+      "type": "video-banner",
+      "settings": {
+        "video": "shopify://files/videos/embroidery-screen-print.mp4",
+        "video_position": "center center",
+        "height_mode": "ratio",
+        "height": 350,
+        "height_mobile": 200,
+        "show_poster": true,
+        "poster_image": "shopify://shop_images/poster_da0ec461-b2ab-4a5f-90e7-5450f2dceb38.jpg",
+        "link": "",
+        "link_label": "Custom dye program",
+        "background_color": "#000000"
       }
     }
   },
