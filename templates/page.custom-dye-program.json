@@ -120,10 +120,22 @@
         "video": "shopify://files/videos/custom-dye-program.mp4",
         "video_position": "center center",
         "height_mode": "ratio",
+        "custom_ratio": 6.8,
+        "custom_ratio_mobile": 3,
         "height": 350,
         "height_mobile": 200,
         "show_poster": true,
         "poster_image": "shopify://shop_images/poster.jpg",
+        "overlay_use_store_logo": false,
+        "overlay_logo_white": true,
+        "overlay_logo_width": 17,
+        "overlay_text": "",
+        "overlay_font": "inter_n4",
+        "overlay_text_size": 16,
+        "overlay_letter_spacing": 3,
+        "overlay_text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 0,
         "link": "",
         "link_label": "Custom dye program",
         "background_color": "#000000"
@@ -292,15 +304,12 @@
         "video": "shopify://files/videos/embroidery-screen-print.mp4",
         "video_position": "center center",
         "height_mode": "custom_ratio",
+        "custom_ratio": 5.7,
+        "custom_ratio_mobile": 3,
         "height": 350,
         "height_mobile": 200,
         "show_poster": true,
         "poster_image": "shopify://shop_images/poster_da0ec461-b2ab-4a5f-90e7-5450f2dceb38.jpg",
-        "link": "",
-        "link_label": "Embroidery & screen print program",
-        "background_color": "#000000",
-        "custom_ratio": 5.7,
-        "custom_ratio_mobile": 3,
         "overlay_use_store_logo": true,
         "overlay_logo_white": true,
         "overlay_logo_width": 17,
@@ -310,7 +319,51 @@
         "overlay_letter_spacing": 3,
         "overlay_text_color": "#ffffff",
         "overlay_color": "#000000",
-        "overlay_opacity": 0
+        "overlay_opacity": 0,
+        "link": "",
+        "link_label": "Embroidery & screen print program",
+        "background_color": "#000000"
+      }
+    },
+    "media_text_stack_QFfJBH": {
+      "type": "media-text-stack",
+      "blocks": {
+        "media_RTUcGD": {
+          "type": "media",
+          "settings": {
+            "media_type": "video",
+            "video": "shopify://files/videos/f294cc78-85dee34a.mp4",
+            "alt": "",
+            "overlay_width": 30
+          }
+        }
+      },
+      "block_order": [
+        "media_RTUcGD"
+      ],
+      "settings": {
+        "heading": "Colorfast Apparel\nCustom Dye Program",
+        "text": "<p>Our Custom Dye Program is designed to give brands, creatives, and teams the freedom to make our blanks completely their own. Using our PFD (Prepared for Dye) garments as the starting point, we can develop custom colors, washes, and specialty finishes tailored to the look and feel of your project. Whether you're looking for a clean solid dye, a faded vintage treatment, a washed-down color, or something more unique, our process allows you to create a finish that feels intentional and specific to your brand.</p><p>Because each garment begins in a dye-ready state, the fabric is able to take color and treatment more naturally, helping achieve richer tones, softer character, and more dimensional finishes. Our goal is to maintain the quality, construction, fit, and hand feel of the original blank while giving it a completely new identity through color and wash. From small capsule collections to larger production runs, the Custom Dye Program offers a flexible way to create elevated, one-of-a-kind garments without having to develop a completely new body from the ground up.</p>",
+        "button_label": "Inquire now",
+        "button_link": "shopify://pages/contact",
+        "heading_font": "figtree_n6",
+        "body_font": "figtree_n4",
+        "heading_size": 42,
+        "body_size": 24,
+        "media_position": "left",
+        "media_width": 40,
+        "column_gap": 7,
+        "media_ratio": "16 / 9",
+        "media_gap": 36,
+        "media_margin": 8,
+        "text_margin": 24,
+        "text_offset": 112,
+        "text_max_width": 960,
+        "padding_top": 32,
+        "padding_bottom": 80,
+        "background_color": "#c8c8c7",
+        "text_color": "#000000",
+        "footer_uses_background": true
       }
     }
   },
@@ -322,6 +375,7 @@
     "dye_program",
     "wordmark_banner",
     "dye_color_preview",
-    "video_banner_NgCDCp"
+    "video_banner_NgCDCp",
+    "media_text_stack_QFfJBH"
   ]
 }
