@@ -23,10 +23,15 @@
   if video_mobile != blank and video_mobile.aspect_ratio
     assign ratio_mobile = video_mobile.aspect_ratio
   endif
+
+  if section.settings.height_mode == 'custom_ratio'
+    assign ratio = section.settings.custom_ratio
+    assign ratio_mobile = section.settings.custom_ratio_mobile
+  endif
 -%}
 
 <div
-  class="video-banner video-banner--{{ section.settings.height_mode }}"
+  class="video-banner video-banner--{% if section.settings.height_mode == 'custom' %}custom{% else %}ratio{% endif %}"
   data-footer-bg="ignore"
   style="
     --vb-ratio: {{ ratio }};
@@ -192,9 +197,31 @@
       "label": "Height mode",
       "options": [
         { "value": "ratio", "label": "Video aspect ratio" },
+        { "value": "custom_ratio", "label": "Custom aspect ratio" },
         { "value": "custom", "label": "Custom height" }
       ],
       "default": "ratio"
+    },
+    {
+      "type": "range",
+      "id": "custom_ratio",
+      "label": "Desktop aspect ratio (width / height)",
+      "info": "E.g. 6.8 = a wide strip, 1.8 = 16:9. The video is cropped to fit.",
+      "min": 1,
+      "max": 10,
+      "step": 0.1,
+      "default": 6.8,
+      "visible_if": "{{ section.settings.height_mode == 'custom_ratio' }}"
+    },
+    {
+      "type": "range",
+      "id": "custom_ratio_mobile",
+      "label": "Mobile aspect ratio (width / height)",
+      "min": 1,
+      "max": 10,
+      "step": 0.1,
+      "default": 3,
+      "visible_if": "{{ section.settings.height_mode == 'custom_ratio' }}"
     },
     {
       "type": "range",
