@@ -1,0 +1,73 @@
+{%- doc -%}
+  Renders a muted, looping background video from a URL.
+  Supports direct video files (.mp4, .webm, .mov, e.g. Shopify Files URLs), YouTube and Vimeo links.
+
+  @param {string} url - The video URL
+  @param {object} [poster] - Optional poster image (only used for direct video files)
+  @param {string} [poster_width] - Width of the poster image to request
+
+  @example
+  {% render 'hero-cta-external-video', url: section.settings.video_url, poster: section.settings.video_poster %}
+{%- enddoc -%}
+
+{%- liquid
+  assign url = url | strip
+  assign url_lower = url | downcase
+  assign poster_width = poster_width | default: 2400
+  assign provider = 'file'
+  assign video_id = ''
+
+  if url_lower contains 'youtu.be/'
+    assign provider = 'youtube'
+    assign video_id = url | split: 'youtu.be/' | last | split: '?' | first | split: '&' | first
+  elsif url_lower contains 'youtube.com/shorts/'
+    assign provider = 'youtube'
+    assign video_id = url | split: '/shorts/' | last | split: '?' | first
+  elsif url_lower contains 'youtube.com/embed/'
+    assign provider = 'youtube'
+    assign video_id = url | split: '/embed/' | last | split: '?' | first
+  elsif url_lower contains 'youtube.com/' and url contains 'v='
+    assign provider = 'youtube'
+    assign video_id = url | split: 'v=' | last | split: '&' | first | split: '#' | first
+  elsif url_lower contains 'vimeo.com/'
+    assign provider = 'vimeo'
+    assign video_id = url | split: 'vimeo.com/' | last | remove: 'video/' | split: '?' | first | split: '/' | first
+  endif
+-%}
+
+{%- case provider -%}
+  {%- when 'youtube' -%}
+    <div class="hero-cta__embed" aria-hidden="true">
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/{{ video_id }}?autoplay=1&mute=1&loop=1&playlist={{ video_id }}&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1"
+        title="Background video"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        tabindex="-1"
+        frameborder="0"
+      ></iframe>
+    </div>
+  {%- when 'vimeo' -%}
+    <div class="hero-cta__embed" aria-hidden="true">
+      <iframe
+        src="https://player.vimeo.com/video/{{ video_id }}?background=1&autoplay=1&muted=1&loop=1&playsinline=1&dnt=1"
+        title="Background video"
+        allow="autoplay; fullscreen; picture-in-picture"
+        tabindex="-1"
+        frameborder="0"
+      ></iframe>
+    </div>
+  {%- else -%}
+    <video
+      class="hero-cta__video"
+      src="{{ url | escape }}"
+      {% if poster != blank %}
+        poster="{{ poster | image_url: width: poster_width }}"
+      {% endif %}
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      aria-hidden="true"
+    ></video>
+{%- endcase -%}

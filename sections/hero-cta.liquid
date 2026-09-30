@@ -4,10 +4,18 @@
   assign image_mobile = section.settings.image_mobile | default: image
   assign video = section.settings.video
   assign video_mobile = section.settings.video_mobile | default: video
+  assign video_source = section.settings.video_source | default: 'upload'
+  assign video_url = section.settings.video_url | strip
+  assign video_url_mobile = section.settings.video_url_mobile | strip | default: video_url
 
   assign has_video = false
-  if media_type == 'video' and video != blank
-    assign has_video = true
+  assign has_video_url = false
+  if media_type == 'video'
+    if video_source == 'url' and video_url != blank
+      assign has_video_url = true
+    elsif video_source == 'upload' and video != blank
+      assign has_video = true
+    endif
   endif
 
   assign fetch_priority = 'auto'
@@ -37,7 +45,16 @@
   "
 >
   <div class="hero-cta__media">
-    {%- if has_video -%}
+    {%- if has_video_url -%}
+      <div class="hero-cta__media-item{% if video_url_mobile != video_url %} hero-cta__media-item--desktop{% endif %}">
+        {% render 'hero-cta-external-video', url: video_url, poster: section.settings.video_poster %}
+      </div>
+      {%- if video_url_mobile != video_url -%}
+        <div class="hero-cta__media-item hero-cta__media-item--mobile">
+          {% render 'hero-cta-external-video', url: video_url_mobile, poster: section.settings.video_poster, poster_width: 1200 %}
+        </div>
+      {%- endif -%}
+    {%- elsif has_video -%}
       <div class="hero-cta__media-item{% if video_mobile != video %} hero-cta__media-item--desktop{% endif %}">
         {{
           video
@@ -161,6 +178,24 @@
     object-position: var(--hero-cta-position);
   }
 
+  .hero-cta__embed {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: size;
+    pointer-events: none;
+  }
+
+  .hero-cta__embed iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100cqw, 177.78cqh);
+    height: max(100cqh, 56.25cqw);
+    transform: translate(-50%, -50%);
+    border: 0;
+  }
+
   .hero-cta__placeholder {
     background-color: rgb(var(--color-foreground-rgb, 0 0 0) / 0.05);
   }
@@ -269,17 +304,48 @@
       "visible_if": "{{ section.settings.media_type == 'image' }}"
     },
     {
+      "type": "select",
+      "id": "video_source",
+      "label": "Video source",
+      "options": [
+        { "value": "upload", "label": "Upload file" },
+        { "value": "url", "label": "Video URL" }
+      ],
+      "default": "upload",
+      "visible_if": "{{ section.settings.media_type == 'video' }}"
+    },
+    {
       "type": "video",
       "id": "video",
       "label": "Video",
       "info": "Plays muted, looped and autoplayed.",
-      "visible_if": "{{ section.settings.media_type == 'video' }}"
+      "visible_if": "{{ section.settings.media_type == 'video' and section.settings.video_source != 'url' }}"
     },
     {
       "type": "video",
       "id": "video_mobile",
       "label": "Mobile video (optional)",
-      "visible_if": "{{ section.settings.media_type == 'video' }}"
+      "visible_if": "{{ section.settings.media_type == 'video' and section.settings.video_source != 'url' }}"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL",
+      "info": "Direct link to an .mp4/.webm file (e.g. from Content > Files), or a YouTube / Vimeo link. Plays muted, looped and autoplayed.",
+      "visible_if": "{{ section.settings.media_type == 'video' and section.settings.video_source == 'url' }}"
+    },
+    {
+      "type": "text",
+      "id": "video_url_mobile",
+      "label": "Mobile video URL (optional)",
+      "visible_if": "{{ section.settings.media_type == 'video' and section.settings.video_source == 'url' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "video_poster",
+      "label": "Poster image (optional)",
+      "info": "Shown while a direct video file loads.",
+      "visible_if": "{{ section.settings.media_type == 'video' and section.settings.video_source == 'url' }}"
     },
     {
       "type": "select",
