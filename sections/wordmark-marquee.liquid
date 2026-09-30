@@ -99,7 +99,7 @@
   .wordmark-marquee-section {
     background-color: var(--wm-bg);
     color: var(--wm-text);
-    padding: calc(var(--wm-padding-top) * 0.6) 16px calc(var(--wm-padding-bottom) * 0.6);
+    padding: calc(var(--wm-padding-top) * 0.6) var(--wm-side) calc(var(--wm-padding-bottom) * 0.6);
 
     @media screen and (min-width: 750px) {
       padding: var(--wm-padding-top) var(--wm-side) var(--wm-padding-bottom);
@@ -188,7 +188,7 @@
       "id": "text_size",
       "label": "Text size",
       "min": 12,
-      "max": 80,
+      "max": 120,
       "step": 1,
       "unit": "px",
       "default": 26
@@ -198,7 +198,7 @@
       "id": "stretch",
       "label": "Horizontal stretch",
       "min": 100,
-      "max": 300,
+      "max": 400,
       "step": 10,
       "unit": "%",
       "default": 200
