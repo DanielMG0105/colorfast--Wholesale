@@ -21,6 +21,10 @@
     --pl-card-size: {{ section.settings.card_text_size }}px;
     --pl-card-width: {{ section.settings.card_width }}px;
     --pl-card-height: {{ section.settings.card_height }}px;
+    --pl-card-size-n: {{ section.settings.card_text_size }};
+    --pl-card-width-n: {{ section.settings.card_width }};
+    --pl-card-height-n: {{ section.settings.card_height }};
+    --pl-card-min: {{ section.settings.card_min_width }}px;
     --pl-card-gap: {{ section.settings.card_gap }}px;
     --pl-padding-top: {{ section.settings.padding_top }}px;
     --pl-padding-bottom: {{ section.settings.padding_bottom }}px;
@@ -37,8 +41,10 @@
       {%- else -%}
         <div class="program-links__card" {{ block.shopify_attributes }}>
       {%- endif -%}
-          <span class="program-links__label">{{ block.settings.label | escape }}</span>
-          <span class="program-links__arrow" aria-hidden="true">&rarr;</span>
+          <span class="program-links__content">
+            <span class="program-links__label">{{ block.settings.label | escape }}</span>
+            <span class="program-links__arrow" aria-hidden="true">&rarr;</span>
+          </span>
       {%- if block.settings.link != blank -%}
         </a>
       {%- else -%}
@@ -85,28 +91,36 @@
     }
   }
 
+  /* Cards shrink together keeping their proportions (width, height and text);
+     they only wrap onto separate rows once a card would get narrower than the minimum width. */
   .program-links__card {
+    container-type: inline-size;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1.2em;
-    width: 100%;
-    min-height: calc(var(--pl-card-height) * 0.6);
-    padding: 16px 24px;
+    flex: 1 1 0;
+    min-width: min(100%, var(--pl-card-min));
+    max-width: var(--pl-card-width);
+    aspect-ratio: var(--pl-card-width-n) / var(--pl-card-height-n);
+    min-height: 72px;
     border: var(--pl-border-width) solid var(--pl-border);
     color: inherit;
     font-family: var(--pl-card-family);
     font-weight: var(--pl-card-weight);
-    font-size: max(14px, calc(var(--pl-card-size) * 0.65));
     text-decoration: none;
     text-transform: uppercase;
     transition: background-color 0.2s ease, color 0.2s ease;
+  }
 
-    @media screen and (min-width: 750px) {
-      width: var(--pl-card-width);
-      min-height: var(--pl-card-height);
-      font-size: var(--pl-card-size);
-    }
+  .program-links__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2em;
+    padding-inline: 4cqw;
+    font-size: clamp(12px, calc(100cqw * var(--pl-card-size-n) / var(--pl-card-width-n)), var(--pl-card-size));
+    line-height: 1.2;
+    white-space: nowrap;
   }
 
   a.program-links__card:hover,
@@ -195,12 +209,23 @@
     {
       "type": "range",
       "id": "card_width",
-      "label": "Card width",
+      "label": "Card width (maximum)",
       "min": 200,
       "max": 900,
       "step": 10,
       "unit": "px",
       "default": 670
+    },
+    {
+      "type": "range",
+      "id": "card_min_width",
+      "label": "Minimum card width",
+      "info": "Cards shrink proportionally and only stack when they would get narrower than this.",
+      "min": 200,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 320
     },
     {
       "type": "range",
