@@ -27,6 +27,9 @@
   elsif section.settings.enable_transparent_header_collection and template.name == 'collection'
     assign transparent = 'always'
     assign transparent_text_color_setting = section.settings.text_color_transparent_collection
+  elsif section.settings.enable_transparent_header_custom_dye and template.name == 'page' and template.suffix == 'custom-dye-program'
+    assign transparent = 'always'
+    assign transparent_text_color_setting = section.settings.text_color_transparent_custom_dye
   endif
 
   if section.settings.enable_sticky_header == 'always'
@@ -2035,6 +2038,31 @@
       "label": "t:settings.text_color_transparent",
       "placeholder": "t:settings.default",
       "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
+    },
+    {
+      "type": "header",
+      "content": "Custom Dye Program page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_header_custom_dye",
+      "label": "t:settings.transparent_background",
+      "info": "Applies to pages using the page.custom-dye-program template.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_dye_inverse_logo",
+      "label": "t:settings.inverse_logo",
+      "default": false,
+      "visible_if": "{{ section.settings.enable_transparent_header_custom_dye }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color_transparent_custom_dye",
+      "label": "t:settings.text_color_transparent",
+      "placeholder": "t:settings.default",
+      "visible_if": "{{ section.settings.enable_transparent_header_custom_dye }}"
     },
     {
       "type": "header",
