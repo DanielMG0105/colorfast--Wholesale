@@ -550,14 +550,16 @@
 
   .cart-discount__codes:has(.cart-discount__pill) {
     display: flex;
+    padding-block-end: var(--padding-sm);
   }
 
   .cart-discount__button {
     height: 100%;
   }
 
+  /* Grows with the applied code pills so they don't overlap the divider below */
   .cart-discount__content {
-    height: calc(var(--button-size) + var(--padding-2xs) + var(--padding-sm));
+    height: auto;
   }
 
   .cart-discount__pill {
@@ -575,7 +577,7 @@
     display: flex;
     gap: var(--padding-md);
     align-items: center;
-    height: 100%;
+    height: calc(var(--button-size) + var(--padding-2xs) + var(--padding-sm));
     padding-block: var(--padding-2xs) var(--padding-sm);
   }
 
