@@ -16,7 +16,7 @@
           "type": "collapsible",
           "settings": {
             "heading": "Product Details",
-            "use_description": false,
+            "use_description": true,
             "content": "",
             "page": ""
           }
