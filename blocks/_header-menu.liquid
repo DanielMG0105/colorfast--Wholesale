@@ -656,6 +656,14 @@
     }
   }
 
+  /* Submenu links share the main header font size on desktop */
+  @media screen and (min-width: 750px) {
+    .mega-menu__link,
+    .mega-menu__link--parent {
+      font-size: var(--menu-top-level-font-size-desktop);
+    }
+  }
+
   @media screen and (max-width: 989px) {
     .mega-menu__content-list-item--hidden-tablet {
       display: none;

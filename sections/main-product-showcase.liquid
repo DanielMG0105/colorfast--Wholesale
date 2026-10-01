@@ -266,7 +266,8 @@ data-wpd-product-id="{{ product.id }}">
           </div>
 
           <p class="product-showcase__message" role="status" data-message hidden></p>
-          <div id='wcp_vd_table'></div>
+          {%- comment -%} Filled by the WCP app; kept hidden and mirrored into the wholesale table below {%- endcomment -%}
+          <div id='wcp_vd_table' data-app-tiers></div>
         {%- endform -%}
 
         {%- if section.blocks.size > 0 -%}
@@ -299,11 +300,18 @@ data-wpd-product-id="{{ product.id }}">
               <span class="product-showcase__circle-plus" aria-hidden="true"></span>
             </summary>
             <table class="product-showcase__table product-showcase__tiers">
-              <tbody>
+              <tbody data-tiers>
                 {%- for line in tier_lines -%}
                   {%- assign parts = line | strip | split: ':' -%}
                   {%- if parts.size > 1 -%}
-                    {%- assign tier_price = parts[1] | strip | remove: '$' | times: 100 -%}
+                    {%- liquid
+                      # The first tier (1-99) is always the product's own price
+                      if forloop.first
+                        assign tier_price = current_variant.price
+                      else
+                        assign tier_price = parts[1] | strip | remove: '$' | times: 100
+                      endif
+                    -%}
                     <tr>
                       <td>{{ parts[0] | strip | escape }}</td>
                       <td>{{ tier_price | money }}</td>
@@ -355,30 +363,12 @@ data-wpd-product-id="{{ product.id }}">
       </div>
     </div>
   </div>
-  <style type="text/css">
-#wcp_vd_table table {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 1px;
-	border-color: #666666;
-	border-collapse: collapse;
-}
-#wcp_vd_table table th {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #dedede;
-}
-#wcp_vd_table table td {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #ffffff;
-}
-</style>
+  <style>
+    /* The app's volume table is only a data source for the wholesale table; never show it */
+    #wcp_vd_table {
+      display: none !important;
+    }
+  </style>
 
   <script type="application/json" data-variants>
     [
@@ -423,6 +413,100 @@ data-wpd-product-id="{{ product.id }}">
           );
           this.form?.addEventListener('submit', (event) => this.onSubmit(event));
           this.updateAvailability();
+          this.watchAppTiers();
+        }
+
+        disconnectedCallback() {
+          this.tiersObserver?.disconnect();
+        }
+
+        // The WCP app injects its volume table asynchronously (and re-renders it on variant change),
+        // so watch for it and rebuild the wholesale table whenever the app's table appears or changes.
+        watchAppTiers() {
+          this.tiersBody = this.querySelector('[data-tiers]');
+          if (!this.tiersBody) return;
+
+          let scheduled = false;
+          const schedule = () => {
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(() => {
+              scheduled = false;
+              this.syncTiers();
+            });
+          };
+
+          this.tiersObserver = new MutationObserver(schedule);
+          // Observe the whole section: the app may rewrite the price too. Rewriting our own table is a no-op
+          // the second time thanks to the signature check in syncTiers.
+          this.tiersObserver.observe(this, { childList: true, subtree: true, characterData: true });
+          schedule();
+        }
+
+        // Reads the app's table (Quantity / Discount / Price) into [range, price] pairs
+        readAppTiers() {
+          const table = this.querySelector('[data-app-tiers] table, #wcp_vd_table table');
+          if (!table) return [];
+
+          const headers = [...table.querySelectorAll('tr:first-child th, thead th')].map((th) =>
+            th.textContent.trim().toLowerCase()
+          );
+          const quantityIndex = Math.max(0, headers.findIndex((text) => text.includes('quantity')));
+          const priceIndex = headers.findIndex((text) => text.includes('price'));
+
+          return [...table.querySelectorAll('tr')]
+            .map((row) => [...row.querySelectorAll('td')].map((cell) => cell.textContent.trim()))
+            .filter((cells) => cells.length > 1)
+            .map((cells) => ({
+              range: cells[quantityIndex].replace(/\s*-\s*/, '-'),
+              price: cells[priceIndex >= 0 ? priceIndex : cells.length - 1],
+            }))
+            .filter((tier) => tier.range && tier.price);
+        }
+
+        // Price shown for the product, formatted like the table ("$21.87", no currency code). The wholesale app
+        // rewrites [data-price] as <s>compare-at</s>price, so the struck-through amount is dropped; before the app
+        // runs (or for guests) this is the variant's own price.
+        basePrice() {
+          const price = this.querySelector('[data-price]')?.cloneNode(true);
+          if (!price) return '';
+          price.querySelectorAll('s, .wpd-ext-compare-at-price').forEach((element) => element.remove());
+          return price.textContent.trim().replace(/\s+[A-Z]{3}$/, '');
+        }
+
+        syncTiers() {
+          if (!this.tiersBody) return;
+          const basePrice = this.basePrice();
+          const tiers = this.readAppTiers();
+
+          // No app table (e.g. guests): keep the Liquid tiers, only refresh the base row's price
+          if (!tiers.length) {
+            const baseCell = this.tiersBody.querySelector('tr:first-child td:last-child');
+            if (baseCell && basePrice) baseCell.textContent = basePrice;
+            return;
+          }
+
+          // The app only lists discounted tiers; prepend the base tier (1 up to the first break) at the product's price
+          const firstMin = parseInt(tiers[0].range, 10);
+          if (firstMin > 1 && basePrice) {
+            tiers.unshift({ range: firstMin === 2 ? '1' : `1-${firstMin - 1}`, price: basePrice });
+          }
+
+          const signature = JSON.stringify(tiers);
+          if (signature === this.tiersSignature) return;
+          this.tiersSignature = signature;
+
+          this.tiersBody.replaceChildren(
+            ...tiers.map(({ range, price }) => {
+              const row = document.createElement('tr');
+              for (const text of [range, price]) {
+                const cell = document.createElement('td');
+                cell.textContent = text;
+                row.append(cell);
+              }
+              return row;
+            })
+          );
         }
 
         selectedOptions() {
@@ -452,6 +536,7 @@ data-wpd-product-id="{{ product.id }}">
 
           this.variantInput.value = String(variant.id);
           this.querySelector('[data-price]').textContent = variant.price;
+          this.syncTiers();
           this.setButton(variant.available, variant.available ? this.defaultLabel : '{{ section.settings.sold_out_label | escape }}');
 
           if (variant.mediaId) {
