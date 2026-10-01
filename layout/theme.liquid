@@ -174,22 +174,17 @@
       {% render 'quick-add-modal' %}
     {% endif %}
 
-  {% if template == 'product' %}
+ {% if template contains 'product' %}
 <script>
   (function () {
     var wpdProduct = {{ product | json }};
-
-    // Change these 3 lines to match the WPD price markup in your price snippet
-    var PRICE_SELECTOR     = '.wpd-price';         // the WPD price element(s)
-    var VARIANT_ATTR       = 'data-variant-id';    // attribute holding the variant ID
-    var PRICE_ATTR         = 'data-price';         // attribute holding the price (in cents)
-    var COMPARE_PRICE_ATTR = 'data-compare-price'; // remove if not used
+    var current = {{ product.selected_or_first_available_variant | json }};
 
     function getForm() {
       return document.querySelector('form[data-product-form], form[action*="/cart/add"]');
     }
 
-    // Find the variant that matches the currently checked options
+    // Find the variant that matches the currently selected options
     function getSelectedVariant() {
       var form = getForm();
       if (!form) return null;
@@ -198,49 +193,78 @@
         var el = form.querySelector('input[name="option' + i + '"]:checked, select[name="option' + i + '"]');
         if (el) selected.push(el.value);
       }
+      if (!selected.length) return null;
       return wpdProduct.variants.find(function (v) {
         return selected.every(function (val, idx) { return v.options[idx] === val; });
       }) || null;
     }
 
-    function wpdRefresh() {
-      document.querySelectorAll(".wpd-processed").forEach(function (el) {
-        el.classList.remove("wpd-processed");
+    // Swap old variant ID / price in any attribute WPD reads from
+    function swapAttributes(oldV, newV) {
+      var oldId = String(oldV.id), newId = String(newV.id);
+      var oldPrice = String(oldV.price), newPrice = String(newV.price);
+      var oldCmp = String(oldV.compare_at_price || ''), newCmp = String(newV.compare_at_price || '');
+
+      document.querySelectorAll('body *').forEach(function (el) {
+        if (el.matches('input[name^="option"]')) return;
+        Array.prototype.slice.call(el.attributes).forEach(function (a) {
+          var name = a.name.toLowerCase();
+          if (a.value === oldId) {
+            el.setAttribute(a.name, newId);
+          } else if (name.indexOf('compare') > -1 && oldCmp && a.value === oldCmp) {
+            el.setAttribute(a.name, newCmp);
+          } else if (name.indexOf('price') > -1 && a.value === oldPrice) {
+            el.setAttribute(a.name, newPrice);
+          }
+        });
       });
-      document.body.append(document.createElement("span"));
     }
 
-    var lastVariant = null;
+    // Make WPD process the page again
+    function wpdRefresh() {
+      document.querySelectorAll('.wpd-processed').forEach(function (el) {
+        el.classList.remove('wpd-processed');
+      });
+      document.body.append(document.createElement('span'));
+    }
 
     function onVariantChange() {
       setTimeout(function () {
         var variant = getSelectedVariant();
-        if (!variant || variant.id === lastVariant) return;
-        lastVariant = variant.id;
+        if (!variant || !current || variant.id === current.id) return;
 
-        // 1. Keep the hidden variant ID in sync
-        var idInput = getForm().querySelector('input[name="id"]');
-        if (idInput) idInput.value = variant.id;
+        var form = getForm();
 
-        // 2. Put the new variant's ID and price on every WPD price element
-        document.querySelectorAll(PRICE_SELECTOR).forEach(function (el) {
-          el.setAttribute(VARIANT_ATTR, variant.id);
-          el.setAttribute(PRICE_ATTR, variant.price);
-          if (COMPARE_PRICE_ATTR) el.setAttribute(COMPARE_PRICE_ATTR, variant.compare_at_price || '');
+        // 1. Hidden variant ID (what gets added to cart)
+        var idInput = form.querySelector('input[name="id"]');
+        if (idInput) {
+          idInput.value = variant.id;
+          idInput.setAttribute('value', variant.id);
+        }
+
+        // 2. URL ?variant=
+        var url = new URL(window.location.href);
+        url.searchParams.set('variant', variant.id);
+        window.history.replaceState({}, '', url.toString());
+
+        // 3. "checked" attribute on the selected pills
+        form.querySelectorAll('input[name^="option"]').forEach(function (r) {
+          if (r.checked) r.setAttribute('checked', 'checked');
+          else r.removeAttribute('checked');
         });
 
-        // 3. Make WPD re-read the price
+        // 4. Variant ID + price on WPD elements
+        swapAttributes(current, variant);
+        current = variant;
+
+        // 5. Re-run WPD
         wpdRefresh();
       }, 300);
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-      var v = getSelectedVariant();
-      lastVariant = v ? v.id : null;
-      wpdRefresh();
-    });
+    document.addEventListener('DOMContentLoaded', wpdRefresh);
 
-    document.addEventListener("change", function (e) {
+    document.addEventListener('change', function (e) {
       if (e.target.matches('.product-showcase__radio, input[name^="option"], select[name^="option"]')) {
         onVariantChange();
       }
