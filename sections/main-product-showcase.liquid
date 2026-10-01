@@ -143,7 +143,12 @@
       <div class="product-showcase__sticky">
         <h1 class="product-showcase__title">{{ product.title | escape }}</h1>
 
-        <p class="product-showcase__price" data-price>
+        <p class="product-showcase__price" data-price data-wpd-product-handle="{{ product.handle }}"
+data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
+data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
+data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
+data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
+data-wpd-product-id="{{ product.id }}">
           {{- current_variant.price | money_with_currency -}}
         </p>
 
@@ -261,6 +266,7 @@
           </div>
 
           <p class="product-showcase__message" role="status" data-message hidden></p>
+          <div id='wcp_vd_table'></div>
         {%- endform -%}
 
         {%- if section.blocks.size > 0 -%}
@@ -349,6 +355,30 @@
       </div>
     </div>
   </div>
+  <style type="text/css">
+#wcp_vd_table table {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+#wcp_vd_table table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+#wcp_vd_table table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+</style>
 
   <script type="application/json" data-variants>
     [
