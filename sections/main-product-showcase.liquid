@@ -144,9 +144,9 @@
         <h1 class="product-showcase__title">{{ product.title | escape }}</h1>
 
         <p class="product-showcase__price" data-price data-wpd-product-handle="{{ product.handle }}"
-data-wpd-variant-id="{{ current_variant.id }}"
-data-wpd-variant-price="{{ current_variant.price }}"
-data-wpd-variant-compare-at-price="{{ current_variant.compare_at_price }}"
+data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
+data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
+data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
 data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
 data-wpd-product-id="{{ product.id }}">
           {{- current_variant.price | money_with_currency -}}
