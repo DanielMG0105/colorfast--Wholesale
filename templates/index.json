@@ -54,7 +54,7 @@
         "gap": 64,
         "side_margin": 108,
         "button_label": "Shop our bestsellers",
-        "button_link": "",
+        "button_link": "shopify://collections/all",
         "button_font": "figtree_n4",
         "button_font_size": 20,
         "button_letter_spacing": 30,
