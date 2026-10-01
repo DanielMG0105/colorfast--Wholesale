@@ -358,7 +358,7 @@
   {%- if transparent and template.suffix == 'custom-dye-program' %}
   /* Push the first section below the transparent header. A transparent border
      keeps the section's own background painted behind the header. */
-  #MainContent > .shopify-section:first-child > :first-child {
+  #MainContent > .shopify-section:first-child > :not(style, script, link, template) {
     border-top: var(--header-height, 0px) solid transparent;
   }
   {%- endif %}
