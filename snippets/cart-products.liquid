@@ -305,14 +305,16 @@
                       {% if item.original_price != item.final_price %}
                         <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
                         <span
-                          ><bdi>{{ item.final_price | money }}</bdi></span
+                          ><bdi data-wpd-cart-variant-id="{{ item.variant.id }}"                                
+data-wpd-cart-item="{{ item.key }}">{{ item.final_price | money }}</bdi></span
                         >
                         <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
-                        <s class="compare-at-price">
+                        <s class="compare-at-price data-wpd-hide">
                           {% if item.variant.compare_at_price > item.original_price %}
                             <bdi>{{ item.variant.compare_at_price | money }}</bdi>
                           {% else %}
-                            <bdi>{{ item.original_price | money }}</bdi>
+                            <bdi data-wpd-cart-variant-id="{{ item.variant.id }}"                                
+data-wpd-cart-item="{{ item.key }}">{{ item.original_price | money }}</bdi>
                           {% endif %}
                         </s>
                       {% else %}
@@ -323,12 +325,13 @@
                         {% endif %}
 
                         <span
-                          ><bdi>{{ item.original_price | money }}</bdi></span
+                          ><bdi data-wpd-cart-variant-id="{{ item.variant.id }}"                                
+data-wpd-cart-item="{{ item.key }}">{{ item.original_price | money }}</bdi></span
                         >
 
                         {% if item.variant.compare_at_price > item.original_price %}
                           <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
-                          <s class="compare-at-price"
+                          <s class="compare-at-price data-wpd-hide"
                             ><bdi>{{ item.variant.compare_at_price | money }}</bdi></s
                           >
                         {% endif %}
@@ -410,7 +413,9 @@
                   headers="productTotal"
                 >
                   <text-component value="{{ price | strip_html }}"
-                    ><bdi>{{ price }}</bdi></text-component
+                    ><bdi data-wpd-cart-variant-id="{{ item.variant.id }}"   
+data-wpd-cart-item="{{ item.key }}"                                
+data-wpd-cart-line-price>{{ price }}</bdi></text-component
                   >
                   {%- if item.unit_price_measurement -%}
                     <div class="cart-items__price-unit cart-secondary-typography">
