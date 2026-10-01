@@ -198,6 +198,9 @@
     background-color: var(--cs-bg);
     color: var(--cs-text);
     padding: calc(var(--cs-pt) * 0.6) 16px calc(var(--cs-pb) * 0.6);
+    /* Contain the full-bleed slider track so it never causes page-level horizontal scroll */
+    overflow-x: hidden;
+    overflow-x: clip;
 
     @media screen and (min-width: 750px) {
       padding: var(--cs-pt) var(--cs-margin) var(--cs-pb);
@@ -226,6 +229,7 @@
   .collection-showcase__slider {
     position: relative;
     display: block;
+    min-width: 0;
   }
 
   /* Slider: horizontal track with scroll snap. Mobile shows a peek of the next item. */
