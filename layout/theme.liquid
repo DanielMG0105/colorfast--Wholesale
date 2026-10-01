@@ -173,5 +173,45 @@
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    {% if template == 'product' %}
+<script>
+  (function () {
+    function wpdRefresh() {
+      document.querySelectorAll(".wpd-processed").forEach(function (element) {
+        element.classList.remove("wpd-processed");
+      });
+      var wpd_emptyspan = document.createElement("span");
+      document.querySelector("body").append(wpd_emptyspan);
+    }
+
+    var lastVariant = null;
+    function onVariantChange() {
+      // wait for the theme to update price/variant before WPD re-processes
+      setTimeout(function () {
+        var idInput = document.querySelector('form[data-product-form] [data-variant-input], form[action*="/cart/add"] input[name="id"]');
+        var current = idInput ? idInput.value : null;
+        if (current && current === lastVariant) return;
+        lastVariant = current;
+        wpdRefresh();
+      }, 300);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      wpdRefresh();
+      var idInput = document.querySelector('form[data-product-form] [data-variant-input]');
+      lastVariant = idInput ? idInput.value : null;
+    });
+
+    // Size / colour pills (radio inputs: option1, option2, ...)
+    document.addEventListener("change", function (e) {
+      if (e.target.matches('.product-showcase__radio, form[data-product-form] input[name^="option"], form[data-product-form] select')) {
+        onVariantChange();
+      }
+    });
+  })();
+</script>
+{% endif %}
+
   </body>
 </html>
