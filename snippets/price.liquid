@@ -98,12 +98,12 @@ data-wpd-product-id="{{ product_resource.id }}">{{ price_min }} - {{ price_max }
       {% if show_sale_price_first %}
         <span class="price-item__group price">
           <span class="visually-hidden">{{ 'content.price_sale' | t }}&nbsp;</span>
-          <bdi data-wpd-product-handle="{{ product.handle }}"
-data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
-data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
-data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
-data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
-data-wpd-product-id="{{ product.id }}">{{ price | default: '&nbsp;' }}</bdi>
+          <bdi data-wpd-product-handle="{{ product_resource.handle }}"
+data-wpd-variant-id="{{ product_resource.selected_or_first_available_variant.id }}"
+data-wpd-variant-price="{{ product_resource.selected_or_first_available_variant.price }}"
+data-wpd-variant-compare-at-price="{{ product_resource.selected_or_first_available_variant.compare_at_price }}"
+data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product_resource.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
+data-wpd-product-id="{{ product_resource.id }}">{{ price | default: '&nbsp;' }}</bdi>
         </span>
         <span class="price-item__group price-item--regular compare-at-price data-wpd-hide">
           <span class="visually-hidden">{{ 'content.price_regular' | t }}&nbsp;</span>
@@ -116,22 +116,22 @@ data-wpd-product-id="{{ product.id }}">{{ price | default: '&nbsp;' }}</bdi>
         </span>
         <span class="price-item__group price">
           <span class="visually-hidden">{{ 'content.price_sale' | t }}&nbsp;</span>
-          <bdi data-wpd-product-handle="{{ product.handle }}"
-data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
-data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
-data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
-data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
-data-wpd-product-id="{{ product.id }}">{{ price | default: '&nbsp;' }}</bdi>
+          <bdi data-wpd-product-handle="{{ product_resource.handle }}"
+data-wpd-variant-id="{{ product_resource.selected_or_first_available_variant.id }}"
+data-wpd-variant-price="{{ product_resource.selected_or_first_available_variant.price }}"
+data-wpd-variant-compare-at-price="{{ product_resource.selected_or_first_available_variant.compare_at_price }}"
+data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product_resource.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
+data-wpd-product-id="{{ product_resource.id }}">{{ price | default: '&nbsp;' }}</bdi>
         </span>
       {% endif %}
     {% else %}
       <span class="price"
-        ><bdi data-wpd-product-handle="{{ product.handle }}"
-data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
-data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
-data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
-data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
-data-wpd-product-id="{{ product.id }}">{{ price | default: '&nbsp;' }}</bdi></span
+        ><bdi data-wpd-product-handle="{{ product_resource.handle }}"
+data-wpd-variant-id="{{ product_resource.selected_or_first_available_variant.id }}"
+data-wpd-variant-price="{{ product_resource.selected_or_first_available_variant.price }}"
+data-wpd-variant-compare-at-price="{{ product_resource.selected_or_first_available_variant.compare_at_price }}"
+data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product_resource.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
+data-wpd-product-id="{{ product_resource.id }}">{{ price | default: '&nbsp;' }}</bdi></span
       >
     {% endif %}
   {% endif %}
