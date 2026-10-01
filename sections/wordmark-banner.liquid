@@ -5,7 +5,7 @@
 </style>
 
 <wordmark-banner
-  class="wordmark-banner{% if section.settings.show_borders %} wordmark-banner--borders{% endif %}{% if section.settings.border_style == 'box' %} wordmark-banner--box{% endif %}"
+  class="wordmark-banner{% if section.settings.show_borders %} wordmark-banner--borders{% endif %}{% if section.settings.border_style == 'box' %} wordmark-banner--box{% unless section.settings.show_side_borders %} wordmark-banner--no-sides{% endunless %}{% endif %}"
   style="
     --wb-bg: {{ section.settings.background_color }};
     --wb-text: {{ section.settings.text_color }};
@@ -202,6 +202,10 @@
     @media screen and (min-width: 750px) {
       padding: var(--wb-padding);
     }
+  }
+
+  .wordmark-banner--no-sides .wordmark-banner__inner {
+    border-inline: none;
   }
 
   .wordmark-banner__line {
@@ -479,6 +483,13 @@
       ],
       "default": "lines",
       "visible_if": "{{ section.settings.show_borders }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_side_borders",
+      "label": "Show side borders",
+      "default": true,
+      "visible_if": "{{ section.settings.show_borders and section.settings.border_style == 'box' }}"
     },
     {
       "type": "range",

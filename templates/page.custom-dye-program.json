@@ -48,6 +48,7 @@
         "padding": 16,
         "show_borders": true,
         "border_style": "box",
+        "show_side_borders": false,
         "border_width": 1,
         "border_offset": 0,
         "background_color": "#c8c8c7",
