@@ -35,7 +35,7 @@
           "settings": {
             "heading": "Shipping & Returns",
             "use_description": false,
-            "content": "",
+            "content": "<p>We work quickly to ship your order as soon as possible. Once your order has shipped, you will receive an email with tracking and further details. Delivery times vary depending on your location.</p><p>Our products are manufactured both locally and globally. We carefully select our manufacturing partners to ensure every piece is high quality and a fair value.</p><p>If something isn't right, we're here to help. Reach out to our team and we'll work with you to make it right.</p>",
             "page": ""
           }
         }
