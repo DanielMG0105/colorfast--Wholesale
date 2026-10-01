@@ -359,7 +359,7 @@
   /* Push the first section below the transparent header. A transparent border
      keeps the section's own background painted behind the header. */
   #MainContent > .shopify-section:first-child > :not(style, script, link, template) {
-    border-top: var(--header-height, 0px) solid transparent;
+    border-top: calc(var(--header-height, 0px) * 2) solid transparent;
   }
   {%- endif %}
 </style>
