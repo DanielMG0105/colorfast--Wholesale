@@ -355,6 +355,13 @@
     --cf-logo-height-n: {{ settings.logo_height }};
     --cf-u: min(1px, calc(100vw / 1900));
   }
+  {%- if transparent and template.suffix == 'custom-dye-program' %}
+  /* Push the first section below the transparent header. A transparent border
+     keeps the section's own background painted behind the header. */
+  #MainContent > .shopify-section:first-child > :first-child {
+    border-top: var(--header-height, 0px) solid transparent;
+  }
+  {%- endif %}
 </style>
 
 <header-component
