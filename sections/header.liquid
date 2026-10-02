@@ -30,6 +30,9 @@
   elsif section.settings.enable_transparent_header_custom_dye and template.name == 'page' and template.suffix == 'custom-dye-program'
     assign transparent = 'always'
     assign transparent_text_color_setting = section.settings.text_color_transparent_custom_dye
+  elsif section.settings.enable_transparent_header_cart and template.name == 'cart'
+    assign transparent = 'always'
+    assign transparent_text_color_setting = section.settings.text_color_transparent_cart
   endif
 
   if section.settings.enable_sticky_header == 'always'
@@ -2070,6 +2073,30 @@
       "label": "t:settings.text_color_transparent",
       "placeholder": "t:settings.default",
       "visible_if": "{{ section.settings.enable_transparent_header_custom_dye }}"
+    },
+    {
+      "type": "header",
+      "content": "Cart page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_header_cart",
+      "label": "t:settings.transparent_background",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "cart_inverse_logo",
+      "label": "t:settings.inverse_logo",
+      "default": false,
+      "visible_if": "{{ section.settings.enable_transparent_header_cart }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color_transparent_cart",
+      "label": "t:settings.text_color_transparent",
+      "placeholder": "t:settings.default",
+      "visible_if": "{{ section.settings.enable_transparent_header_cart }}"
     },
     {
       "type": "header",

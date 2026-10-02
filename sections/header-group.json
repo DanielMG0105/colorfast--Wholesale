@@ -131,6 +131,9 @@
         "enable_transparent_header_custom_dye": true,
         "custom_dye_inverse_logo": false,
         "text_color_transparent_custom_dye": "",
+        "enable_transparent_header_cart": true,
+        "cart_inverse_logo": false,
+        "text_color_transparent_cart": "",
         "cf_menu_font": "montserrat_n6",
         "cf_menu_font_size": 13.5,
         "cf_menu_letter_spacing": 5
