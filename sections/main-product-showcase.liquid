@@ -326,6 +326,7 @@ data-wpd-product-id="{{ product.id }}">
         {%- if section.settings.show_bulk_grid and size_option_position > 0 -%}
           {%- assign size_index = size_option_position | minus: 1 -%}
           {%- assign size_option = product.options_with_values[size_index] -%}
+          {%- assign bulk_add_label = section.settings.bulk_add_label | default: section.settings.add_label | default: 'Add to cart' -%}
           <div class="product-showcase__bulk">
             {%- if section.settings.bulk_heading != blank -%}
               <p class="product-showcase__label">{{ section.settings.bulk_heading | escape }}</p>
@@ -358,6 +359,15 @@ data-wpd-product-id="{{ product.id }}">
             {%- if section.settings.bulk_hint != blank -%}
               <p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>
             {%- endif -%}
+            <button
+              type="button"
+              class="product-showcase__add product-showcase__bulk-add"
+              data-bulk-add-button
+              disabled
+            >
+              <span data-bulk-add-label>{{ bulk_add_label | escape }}</span>
+            </button>
+            <p class="product-showcase__message" role="status" data-bulk-message hidden></p>
           </div>
         {%- endif -%}
       </div>
@@ -378,7 +388,10 @@ data-wpd-product-id="{{ product.id }}">
           "options": {{ variant.options | json }},
           "available": {{ variant.available | json }},
           "price": {{ variant.price | money_with_currency | json }},
-          "mediaId": {{ variant.featured_media.id | default: 0 }}
+          "mediaId": {{ variant.featured_media.id | default: 0 }},
+          "inventoryQuantity": {{ variant.inventory_quantity | default: 0 }},
+          "inventoryManagement": {{ variant.inventory_management | json }},
+          "inventoryPolicy": {{ variant.inventory_policy | json }}
         }{% unless forloop.last %},{% endunless %}
       {%- endfor -%}
     ]
@@ -402,17 +415,50 @@ data-wpd-product-id="{{ product.id }}">
           this.message = this.querySelector('[data-message]');
           this.defaultLabel = this.addLabel?.textContent.trim();
 
+          this.bulkAddButton = this.querySelector('[data-bulk-add-button]');
+          this.bulkAddLabel = this.querySelector('[data-bulk-add-label]');
+          this.bulkMessage = this.querySelector('[data-bulk-message]');
+          this.bulkDefaultLabel = this.bulkAddLabel?.textContent.trim();
+
           this.querySelectorAll('[data-option-input]').forEach((input) =>
             input.addEventListener('change', () => this.onOptionChange())
           );
           this.querySelectorAll('[data-step]').forEach((button) =>
             button.addEventListener('click', () => {
-              const next = Math.max(1, (parseInt(this.quantity.value, 10) || 1) + Number(button.dataset.step));
+              const variant = this.variants.find((v) => v.id === Number(this.variantInput.value));
+              const limit = this.getVariantLimit(variant);
+              const current = parseInt(this.quantity.value, 10) || 1;
+              let next = current + Number(button.dataset.step);
+              if (limit !== null) next = Math.min(limit, next);
+              next = Math.max(1, next);
               this.quantity.value = String(next);
             })
           );
+          this.quantity?.addEventListener('input', () => this.onQuantityInput());
+          this.quantity?.addEventListener('change', () => this.onQuantityInput());
+          this.quantity?.addEventListener('blur', () => this.onQuantityBlur());
+          this.quantity?.addEventListener('keydown', (e) => {
+            if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+              e.preventDefault();
+            }
+          });
+
           this.form?.addEventListener('submit', (event) => this.onSubmit(event));
+          this.bulkAddButton?.addEventListener('click', (event) => this.onBulkSubmit(event));
+
+          this.querySelectorAll('[data-bulk-size]').forEach((input) => {
+            input.addEventListener('keydown', (e) => {
+              if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                e.preventDefault();
+              }
+            });
+            input.addEventListener('input', () => this.onBulkInput(input));
+            input.addEventListener('change', () => this.onBulkInput(input));
+            input.addEventListener('blur', () => this.onBulkBlur(input));
+          });
+
           this.updateAvailability();
+          this.updateBulkGrid();
           this.watchAppTiers();
         }
 
@@ -549,6 +595,17 @@ data-wpd-product-id="{{ product.id }}">
           url.searchParams.set('variant', String(variant.id));
           window.history.replaceState({}, '', url.toString());
           this.updateAvailability();
+          this.updateBulkGrid();
+
+          const limit = this.getVariantLimit(variant);
+          if (limit !== null) {
+            this.quantity.max = String(limit);
+            if (parseInt(this.quantity.value, 10) > limit) {
+              this.quantity.value = String(Math.max(1, limit));
+            }
+          } else {
+            this.quantity.removeAttribute('max');
+          }
         }
 
         // Show only images whose alt names the selected color; the longest color name found in the alt wins
@@ -597,8 +654,158 @@ data-wpd-product-id="{{ product.id }}">
           if (label) this.addLabel.textContent = label;
         }
 
-        // Size grid quantities for the selected color; falls back to the single selected variant
-        buildItems() {
+        getVariantLimit(variant) {
+          if (!variant || !variant.available) return 0;
+          if (variant.inventoryManagement) {
+            const qty = Number(variant.inventoryQuantity);
+            if (!isNaN(qty) && qty > 0) {
+              return qty;
+            }
+            if (variant.inventoryPolicy === 'continue') {
+              return null;
+            }
+            return 0;
+          }
+          if (typeof variant.inventoryQuantity === 'number' && variant.inventoryQuantity > 0) {
+            return variant.inventoryQuantity;
+          }
+          return null;
+        }
+
+        onQuantityInput() {
+          if (!this.quantity) return;
+          const raw = this.quantity.value;
+          if (raw === '') return;
+          let val = parseInt(raw, 10);
+          if (isNaN(val) || val < 1) {
+            this.quantity.value = '1';
+            return;
+          }
+          const variant = this.variants.find((v) => v.id === Number(this.variantInput.value));
+          const limit = this.getVariantLimit(variant);
+          if (limit !== null && val > limit) {
+            this.quantity.value = String(Math.max(1, limit));
+          }
+        }
+
+        onQuantityBlur() {
+          if (!this.quantity) return;
+          let val = parseInt(this.quantity.value, 10);
+          if (isNaN(val) || val < 1) {
+            this.quantity.value = '1';
+            return;
+          }
+          const variant = this.variants.find((v) => v.id === Number(this.variantInput.value));
+          const limit = this.getVariantLimit(variant);
+          if (limit !== null && val > limit) {
+            this.quantity.value = String(Math.max(1, limit));
+          } else {
+            this.quantity.value = String(val);
+          }
+        }
+
+        updateBulkGrid() {
+          const sizePosition = Number(this.dataset.sizePosition);
+          if (!sizePosition) return;
+
+          const options = this.selectedOptions();
+          this.querySelectorAll('[data-bulk-size]').forEach((input) => {
+            const size = input.dataset.bulkSize;
+            const candidate = [...options];
+            candidate[sizePosition - 1] = size;
+            const variant = this.findVariant(candidate);
+            const limit = this.getVariantLimit(variant);
+            const td = input.closest('td');
+
+            if (!variant || !variant.available || limit === 0) {
+              input.disabled = true;
+              input.value = '';
+              input.placeholder = '-';
+              input.removeAttribute('max');
+              delete input.dataset.max;
+              td?.classList.add('is-unavailable');
+              input.title = variant ? '{{ section.settings.sold_out_label | escape }}' : 'Unavailable';
+            } else {
+              input.disabled = false;
+              input.placeholder = '';
+              td?.classList.remove('is-unavailable');
+              if (limit !== null) {
+                input.max = String(limit);
+                input.dataset.max = String(limit);
+                input.title = `Max: ${limit}`;
+                const currentVal = parseInt(input.value, 10);
+                if (!isNaN(currentVal) && currentVal > limit) {
+                  input.value = String(limit);
+                }
+              } else {
+                input.removeAttribute('max');
+                delete input.dataset.max;
+                input.removeAttribute('title');
+              }
+            }
+          });
+
+          this.updateBulkButtonState();
+        }
+
+        onBulkInput(input) {
+          const raw = input.value;
+          if (raw === '') {
+            this.updateBulkButtonState();
+            return;
+          }
+
+          let val = parseInt(raw, 10);
+          if (isNaN(val) || val < 0) {
+            input.value = '';
+            this.updateBulkButtonState();
+            return;
+          }
+
+          const max = input.dataset.max ? parseInt(input.dataset.max, 10) : null;
+          if (max !== null && !isNaN(max) && val > max) {
+            input.value = String(max);
+          }
+
+          this.updateBulkButtonState();
+        }
+
+        onBulkBlur(input) {
+          const raw = input.value.trim();
+          if (raw === '') {
+            this.updateBulkButtonState();
+            return;
+          }
+
+          let val = parseInt(raw, 10);
+          if (isNaN(val) || val <= 0) {
+            input.value = '';
+          } else {
+            const max = input.dataset.max ? parseInt(input.dataset.max, 10) : null;
+            if (max !== null && !isNaN(max) && val > max) {
+              input.value = String(max);
+            } else {
+              input.value = String(val);
+            }
+          }
+          this.updateBulkButtonState();
+        }
+
+        clearBulkGrid() {
+          this.querySelectorAll('[data-bulk-size]').forEach((input) => {
+            input.value = '';
+          });
+          this.updateBulkButtonState();
+        }
+
+        updateBulkButtonState() {
+          if (!this.bulkAddButton) return;
+          const items = this.buildBulkItems();
+          const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
+          this.bulkAddButton.disabled = totalQty === 0;
+        }
+
+        buildBulkItems() {
           const sizePosition = Number(this.dataset.sizePosition);
           const items = [];
           if (sizePosition > 0) {
@@ -609,18 +816,32 @@ data-wpd-product-id="{{ product.id }}">
               const candidate = [...options];
               candidate[sizePosition - 1] = input.dataset.bulkSize;
               const variant = this.findVariant(candidate);
-              if (variant && variant.available) items.push({ id: variant.id, quantity });
+              if (variant && variant.available) {
+                const limit = this.getVariantLimit(variant);
+                const finalQty = limit !== null ? Math.min(limit, quantity) : quantity;
+                if (finalQty > 0) {
+                  items.push({ id: variant.id, quantity: finalQty });
+                }
+              }
             });
           }
-          if (items.length) return items;
-          return [{ id: Number(this.variantInput.value), quantity: Math.max(1, parseInt(this.quantity.value, 10) || 1) }];
+          return items;
         }
 
-        async onSubmit(event) {
-          event.preventDefault();
-          if (this.addButton.disabled) return;
+        buildSingleItem() {
+          const variant = this.variants.find((v) => v.id === Number(this.variantInput.value));
+          if (!variant || !variant.available) return [];
+          const limit = this.getVariantLimit(variant);
+          let quantity = Math.max(1, parseInt(this.quantity.value, 10) || 1);
+          if (limit !== null) {
+            quantity = Math.min(limit, quantity);
+          }
+          return [{ id: variant.id, quantity }];
+        }
 
-          const items = this.buildItems();
+        async executeAddToCart(items, button, labelElement, defaultLabel, messageElement, onSuccess) {
+          if (!items || !items.length) return;
+
           const sections = [...document.querySelectorAll('cart-items-component')]
             .map((element) => element.dataset.sectionId)
             .filter(Boolean);
@@ -635,8 +856,8 @@ data-wpd-product-id="{{ product.id }}">
             })
           );
 
-          this.addButton.disabled = true;
-          this.message.hidden = true;
+          if (button) button.disabled = true;
+          if (messageElement) messageElement.hidden = true;
 
           try {
             const response = await fetch(`${window.Shopify?.routes?.root ?? '/'}cart/add.js`, {
@@ -661,18 +882,72 @@ data-wpd-product-id="{{ product.id }}">
               },
             });
 
-            this.querySelectorAll('[data-bulk-size]').forEach((input) => (input.value = ''));
-            this.addLabel.textContent = '{{ section.settings.added_label | escape }}';
-            setTimeout(() => (this.addLabel.textContent = this.defaultLabel), 2000);
+            if (labelElement) {
+              labelElement.textContent = '{{ section.settings.added_label | escape }}';
+              setTimeout(() => {
+                labelElement.textContent = defaultLabel;
+              }, 2000);
+            }
+
+            if (typeof onSuccess === 'function') {
+              onSuccess();
+            }
           } catch (error) {
             deferred.reject(error);
             this.dispatchEvent(new CartErrorEvent({ error: error.message, code: 'INVALID' }));
-            this.message.textContent = error.message;
-            this.message.hidden = false;
+            if (messageElement) {
+              messageElement.textContent = error.message;
+              messageElement.hidden = false;
+            }
           } finally {
-            const variant = this.variants.find((v) => v.id === Number(this.variantInput.value));
-            this.addButton.disabled = !(variant && variant.available);
+            if (button && button === this.addButton) {
+              const variant = this.variants.find((v) => v.id === Number(this.variantInput.value));
+              this.addButton.disabled = !(variant && variant.available);
+            } else if (button && button === this.bulkAddButton) {
+              this.updateBulkButtonState();
+            }
           }
+        }
+
+        async onSubmit(event) {
+          event.preventDefault();
+          if (this.addButton.disabled) return;
+
+          const bulkItems = this.buildBulkItems();
+          const items = bulkItems.length ? bulkItems : this.buildSingleItem();
+          if (!items.length) return;
+
+          await this.executeAddToCart(
+            items,
+            this.addButton,
+            this.addLabel,
+            this.defaultLabel,
+            this.message,
+            () => {
+              if (bulkItems.length) {
+                this.clearBulkGrid();
+              }
+            }
+          );
+        }
+
+        async onBulkSubmit(event) {
+          event?.preventDefault?.();
+          if (this.bulkAddButton?.disabled) return;
+
+          const items = this.buildBulkItems();
+          if (!items.length) return;
+
+          await this.executeAddToCart(
+            items,
+            this.bulkAddButton,
+            this.bulkAddLabel,
+            this.bulkDefaultLabel,
+            this.bulkMessage,
+            () => {
+              this.clearBulkGrid();
+            }
+          );
         }
       }
     );
@@ -1107,6 +1382,11 @@ data-wpd-product-id="{{ product.id }}">
       padding: 0;
     }
 
+    td.is-unavailable {
+      opacity: 0.35;
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
     input {
       width: 100%;
       height: 40px;
@@ -1116,6 +1396,15 @@ data-wpd-product-id="{{ product.id }}">
       font: inherit;
       text-align: center;
       -moz-appearance: textfield;
+    }
+
+    input:disabled {
+      cursor: not-allowed;
+    }
+
+    input:focus-visible {
+      outline: 2px solid var(--ps-text);
+      outline-offset: -2px;
     }
 
     input::-webkit-outer-spin-button,
@@ -1129,6 +1418,16 @@ data-wpd-product-id="{{ product.id }}">
     margin: 10px 0 0;
     font-size: 13px;
     opacity: 0.7;
+  }
+
+  .product-showcase__bulk-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 56px;
+    margin-top: 20px;
+    font-size: 16px;
   }
 
   /* Mobile: compact product info */
@@ -1291,6 +1590,12 @@ data-wpd-product-id="{{ product.id }}">
         font-size: 16px;
       }
     }
+
+    .product-showcase__bulk-add {
+      height: 48px;
+      margin-top: 16px;
+      font-size: 14px;
+    }
   }
 {% endstylesheet %}
 
@@ -1420,6 +1725,12 @@ data-wpd-product-id="{{ product.id }}">
       "type": "text",
       "id": "bulk_hint",
       "label": "Grid hint"
+    },
+    {
+      "type": "text",
+      "id": "bulk_add_label",
+      "label": "Grid add to cart label",
+      "default": "Add to cart"
     },
     {
       "type": "header",
