@@ -331,43 +331,45 @@ data-wpd-product-id="{{ product.id }}">
             {%- if section.settings.bulk_heading != blank -%}
               <p class="product-showcase__label">{{ section.settings.bulk_heading | escape }}</p>
             {%- endif -%}
-            <table class="product-showcase__table product-showcase__bulk-table">
-              <thead>
-                <tr>
-                  {%- for value in size_option.values -%}
-                    <th scope="col">{{ value | escape }}</th>
-                  {%- endfor -%}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {%- for value in size_option.values -%}
-                    <td>
-                      <input
-                        type="number"
-                        min="0"
-                        inputmode="numeric"
-                        placeholder=""
-                        aria-label="{{ value | escape }} quantity"
-                        data-bulk-size="{{ value | escape }}"
-                      >
-                    </td>
-                  {%- endfor -%}
-                </tr>
-              </tbody>
-            </table>
-            {%- if section.settings.bulk_hint != blank -%}
-              <p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>
-            {%- endif -%}
-            <button
-              type="button"
-              class="product-showcase__add product-showcase__bulk-add"
-              data-bulk-add-button
-              disabled
-            >
-              <span data-bulk-add-label>{{ bulk_add_label | escape }}</span>
-            </button>
-            <p class="product-showcase__message" role="status" data-bulk-message hidden></p>
+            <div class="product-showcase__bulk-wrap">
+              <table class="product-showcase__table product-showcase__bulk-table">
+                <thead>
+                  <tr>
+                    {%- for value in size_option.values -%}
+                      <th scope="col">{{ value | escape }}</th>
+                    {%- endfor -%}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    {%- for value in size_option.values -%}
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          inputmode="numeric"
+                          placeholder=""
+                          aria-label="{{ value | escape }} quantity"
+                          data-bulk-size="{{ value | escape }}"
+                        >
+                      </td>
+                    {%- endfor -%}
+                  </tr>
+                </tbody>
+              </table>
+              {%- if section.settings.bulk_hint != blank -%}
+                <p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>
+              {%- endif -%}
+              <button
+                type="button"
+                class="product-showcase__add product-showcase__bulk-add"
+                data-bulk-add-button
+                disabled
+              >
+                <span data-bulk-add-label>{{ bulk_add_label | escape }}</span>
+              </button>
+              <p class="product-showcase__message" role="status" data-bulk-message hidden></p>
+            </div>
           </div>
         {%- endif -%}
       </div>
@@ -457,13 +459,18 @@ data-wpd-product-id="{{ product.id }}">
             input.addEventListener('blur', () => this.onBulkBlur(input));
           });
 
+          this.onResize = () => this.syncBulkButtonWidth();
+          window.addEventListener('resize', this.onResize);
+
           this.updateAvailability();
           this.updateBulkGrid();
+          this.syncBulkButtonWidth();
           this.watchAppTiers();
         }
 
         disconnectedCallback() {
           this.tiersObserver?.disconnect();
+          if (this.onResize) window.removeEventListener('resize', this.onResize);
         }
 
         // The WCP app injects its volume table asynchronously (and re-renders it on variant change),
@@ -746,6 +753,20 @@ data-wpd-product-id="{{ product.id }}">
           });
 
           this.updateBulkButtonState();
+          this.syncBulkButtonWidth();
+        }
+
+        syncBulkButtonWidth() {
+          const table = this.querySelector('.product-showcase__bulk-table');
+          if (!table || !this.bulkAddButton) return;
+          if (window.innerWidth >= 750) {
+            const tableWidth = table.getBoundingClientRect().width;
+            if (tableWidth > 0) {
+              this.bulkAddButton.style.width = `${tableWidth}px`;
+            }
+          } else {
+            this.bulkAddButton.style.width = '100%';
+          }
         }
 
         onBulkInput(input) {
@@ -1372,6 +1393,11 @@ data-wpd-product-id="{{ product.id }}">
     margin-top: 72px;
   }
 
+  .product-showcase__bulk-wrap {
+    width: fit-content;
+    max-width: 100%;
+  }
+
   .product-showcase__bulk-table {
     font-size: 16px;
 
@@ -1425,6 +1451,8 @@ data-wpd-product-id="{{ product.id }}">
     align-items: center;
     justify-content: center;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     height: 56px;
     margin-top: 20px;
     font-size: 16px;
@@ -1574,6 +1602,10 @@ data-wpd-product-id="{{ product.id }}">
       margin-top: 36px;
     }
 
+    .product-showcase__bulk-wrap {
+      width: 100%;
+    }
+
     .product-showcase__bulk-table {
       width: 100%;
       table-layout: fixed;
@@ -1592,6 +1624,7 @@ data-wpd-product-id="{{ product.id }}">
     }
 
     .product-showcase__bulk-add {
+      width: 100% !important;
       height: 48px;
       margin-top: 16px;
       font-size: 14px;
