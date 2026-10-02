@@ -820,11 +820,12 @@ data-wpd-cart-drawer-quantity="{{ item.quantity }}">{{ price }}</bdi></span></te
     .cart-items__table-row {
       --cart-item-price-width: 6rem;
 
-      grid-template-columns: 7.5rem 1fr 1fr minmax(var(--cart-item-price-width), auto);
+      grid-template-columns: 7.5rem 1fr auto minmax(var(--cart-item-price-width), auto);
       grid-template-rows: min-content 1fr;
       grid-template-areas:
         'media details quantity price'
         'media details error error';
+      column-gap: var(--gap-lg);
     }
 
     .cart-items__quantity,
