@@ -65,6 +65,10 @@
 
 {% stylesheet %}
   .cart-page {
+    /* Outlined, transparent inputs (quantity, discount code) to match the product page on the grey background */
+    --color-input-background: transparent;
+    --color-input-border: rgb(var(--color-foreground-rgb) / 0.6);
+
     display: grid;
     grid-template-columns: 1fr;
     gap: 0 var(--padding-5xl);
