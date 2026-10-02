@@ -330,34 +330,40 @@ data-wpd-product-id="{{ product.id }}">
             {%- if section.settings.bulk_heading != blank -%}
               <p class="product-showcase__label">{{ section.settings.bulk_heading | escape }}</p>
             {%- endif -%}
-            <table class="product-showcase__table product-showcase__bulk-table">
-              <thead>
-                <tr>
-                  {%- for value in size_option.values -%}
-                    <th scope="col">{{ value | escape }}</th>
-                  {%- endfor -%}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {%- for value in size_option.values -%}
-                    <td>
-                      <input
-                        type="number"
-                        min="0"
-                        inputmode="numeric"
-                        placeholder=""
-                        aria-label="{{ value | escape }} quantity"
-                        data-bulk-size="{{ value | escape }}"
-                      >
-                    </td>
-                  {%- endfor -%}
-                </tr>
-              </tbody>
-            </table>
-            {%- if section.settings.bulk_hint != blank -%}
-              <p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>
-            {%- endif -%}
+            <div class="product-showcase__bulk-wrap">
+              <table class="product-showcase__table product-showcase__bulk-table">
+                <thead>
+                  <tr>
+                    {%- for value in size_option.values -%}
+                      <th scope="col">{{ value | escape }}</th>
+                    {%- endfor -%}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    {%- for value in size_option.values -%}
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          inputmode="numeric"
+                          placeholder=""
+                          aria-label="{{ value | escape }} quantity"
+                          data-bulk-size="{{ value | escape }}"
+                        >
+                      </td>
+                    {%- endfor -%}
+                  </tr>
+                </tbody>
+              </table>
+              {%- if section.settings.bulk_hint != blank -%}
+                <p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>
+              {%- endif -%}
+              <button type="button" class="product-showcase__add product-showcase__bulk-add" data-bulk-add-button disabled>
+                <span data-bulk-add-label>{{ section.settings.bulk_add_label | default: section.settings.add_label | default: 'Add to cart' | escape }}</span>
+              </button>
+              <p class="product-showcase__message" role="status" data-bulk-message hidden></p>
+            </div>
           </div>
         {%- endif -%}
       </div>
@@ -401,6 +407,11 @@ data-wpd-product-id="{{ product.id }}">
           this.addLabel = this.querySelector('[data-add-label]');
           this.message = this.querySelector('[data-message]');
           this.defaultLabel = this.addLabel?.textContent.trim();
+          this.bulkAddButton = this.querySelector('[data-bulk-add-button]');
+          this.bulkAddLabel = this.querySelector('[data-bulk-add-label]');
+          this.bulkMessage = this.querySelector('[data-bulk-message]');
+          this.bulkDefaultLabel = this.bulkAddLabel?.textContent.trim();
+          this.bulkRequestInProgress = false;
 
           this.querySelectorAll('[data-option-input]').forEach((input) =>
             input.addEventListener('change', () => this.onOptionChange())
@@ -412,7 +423,13 @@ data-wpd-product-id="{{ product.id }}">
             })
           );
           this.form?.addEventListener('submit', (event) => this.onSubmit(event));
+          this.bulkAddButton?.addEventListener('click', (event) => this.onBulkSubmit(event));
+          this.querySelectorAll('[data-bulk-size]').forEach((input) => {
+            input.addEventListener('input', () => this.updateBulkButtonState());
+            input.addEventListener('change', () => this.updateBulkButtonState());
+          });
           this.updateAvailability();
+          this.updateBulkButtonState();
           this.watchAppTiers();
         }
 
@@ -549,6 +566,7 @@ data-wpd-product-id="{{ product.id }}">
           url.searchParams.set('variant', String(variant.id));
           window.history.replaceState({}, '', url.toString());
           this.updateAvailability();
+          this.updateBulkButtonState();
         }
 
         // Show only images whose alt names the selected color; the longest color name found in the alt wins
@@ -597,23 +615,104 @@ data-wpd-product-id="{{ product.id }}">
           if (label) this.addLabel.textContent = label;
         }
 
-        // Size grid quantities for the selected color; falls back to the single selected variant
+        // The regular product button always adds only the selected variant and quantity.
         buildItems() {
+          const id = Number(this.variantInput.value);
+          const quantity = Math.max(1, parseInt(this.quantity.value, 10) || 1);
+          return [{ id, quantity }];
+        }
+
+        // The table button adds only the valid sizes entered in the grid. It does not
+        // change the selected variant, the regular quantity, or the regular button state.
+        buildBulkItems() {
           const sizePosition = Number(this.dataset.sizePosition);
           const items = [];
-          if (sizePosition > 0) {
-            const options = this.selectedOptions();
-            this.querySelectorAll('[data-bulk-size]').forEach((input) => {
-              const quantity = parseInt(input.value, 10);
-              if (!quantity || quantity < 1) return;
-              const candidate = [...options];
-              candidate[sizePosition - 1] = input.dataset.bulkSize;
-              const variant = this.findVariant(candidate);
-              if (variant && variant.available) items.push({ id: variant.id, quantity });
+          if (!sizePosition) return items;
+
+          const options = this.selectedOptions();
+          this.querySelectorAll('[data-bulk-size]').forEach((input) => {
+            const quantity = Number(input.value);
+            if (!Number.isSafeInteger(quantity) || quantity < 1) return;
+
+            const candidate = [...options];
+            candidate[sizePosition - 1] = input.dataset.bulkSize;
+            const variant = this.findVariant(candidate);
+            if (variant?.available) items.push({ id: variant.id, quantity });
+          });
+
+          return items;
+        }
+
+        updateBulkButtonState() {
+          if (!this.bulkAddButton) return;
+          this.bulkAddButton.disabled = this.bulkRequestInProgress || this.buildBulkItems().length === 0;
+        }
+
+        async onBulkSubmit(event) {
+          event?.preventDefault?.();
+          if (!this.bulkAddButton || this.bulkRequestInProgress) return;
+
+          const items = this.buildBulkItems();
+          if (!items.length) return;
+
+          const sections = [...document.querySelectorAll('cart-items-component')]
+            .map((element) => element.dataset.sectionId)
+            .filter(Boolean);
+          const deferred = CartLinesUpdateEvent.createPromise();
+          this.dispatchEvent(
+            new CartLinesUpdateEvent({
+              action: 'add',
+              context: 'product',
+              lines: items.map((item) => ({ merchandiseId: String(item.id), quantity: item.quantity })),
+              promise: deferred.promise,
+            })
+          );
+
+          this.bulkRequestInProgress = true;
+          this.updateBulkButtonState();
+          if (this.bulkMessage) this.bulkMessage.hidden = true;
+
+          try {
+            const response = await fetch(`${window.Shopify?.routes?.root ?? '/'}cart/add.js`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ items, sections: sections.join(',') }),
+            }).then((res) => res.json());
+
+            if (response.status) throw new Error(response.description || response.message || 'Add to cart failed');
+
+            const cart = await fetch(`${window.Shopify?.routes?.root ?? '/'}cart.js`).then((res) => res.json());
+            deferred.resolve({
+              cart: CartLinesUpdateEvent.createCartFromAjaxResponse(cart),
+              detail: {
+                items: cart.items,
+                source: 'product-showcase-bulk',
+                sourceId: this.dataset.sectionId,
+                itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
+                productId: this.dataset.productId,
+                sections: response.sections,
+                didError: false,
+              },
             });
+
+            this.querySelectorAll('[data-bulk-size]').forEach((input) => (input.value = ''));
+            if (this.bulkAddLabel) {
+              this.bulkAddLabel.textContent = '{{ section.settings.added_label | escape }}';
+              setTimeout(() => {
+                if (this.bulkAddLabel) this.bulkAddLabel.textContent = this.bulkDefaultLabel;
+              }, 2000);
+            }
+          } catch (error) {
+            deferred.reject(error);
+            this.dispatchEvent(new CartErrorEvent({ error: error.message, code: 'INVALID' }));
+            if (this.bulkMessage) {
+              this.bulkMessage.textContent = error.message;
+              this.bulkMessage.hidden = false;
+            }
+          } finally {
+            this.bulkRequestInProgress = false;
+            this.updateBulkButtonState();
           }
-          if (items.length) return items;
-          return [{ id: Number(this.variantInput.value), quantity: Math.max(1, parseInt(this.quantity.value, 10) || 1) }];
         }
 
         async onSubmit(event) {
@@ -1097,6 +1196,11 @@ data-wpd-product-id="{{ product.id }}">
     margin-top: 72px;
   }
 
+  .product-showcase__bulk-wrap {
+    width: fit-content;
+    max-width: 100%;
+  }
+
   .product-showcase__bulk-table {
     font-size: 16px;
 
@@ -1129,6 +1233,16 @@ data-wpd-product-id="{{ product.id }}">
     margin: 10px 0 0;
     font-size: 13px;
     opacity: 0.7;
+  }
+
+  .product-showcase__bulk-add {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    height: 56px;
+    margin-top: 18px;
+    font-size: 16px;
   }
 
   /* Mobile: compact product info */
@@ -1275,6 +1389,10 @@ data-wpd-product-id="{{ product.id }}">
       margin-top: 36px;
     }
 
+    .product-showcase__bulk-wrap {
+      width: 100%;
+    }
+
     .product-showcase__bulk-table {
       width: 100%;
       table-layout: fixed;
@@ -1290,6 +1408,12 @@ data-wpd-product-id="{{ product.id }}">
         height: 34px;
         font-size: 16px;
       }
+    }
+
+    .product-showcase__bulk-add {
+      height: 48px;
+      margin-top: 14px;
+      font-size: 14px;
     }
   }
 {% endstylesheet %}
@@ -1420,6 +1544,12 @@ data-wpd-product-id="{{ product.id }}">
       "type": "text",
       "id": "bulk_hint",
       "label": "Grid hint"
+    },
+    {
+      "type": "text",
+      "id": "bulk_add_label",
+      "label": "Grid add to cart label",
+      "default": "Add to cart"
     },
     {
       "type": "header",
