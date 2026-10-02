@@ -737,7 +737,15 @@ data-wpd-product-id="{{ product.id }}">
               body: JSON.stringify({ items, sections: sections.join(',') }),
             }).then((res) => res.json());
 
-            if (response.status) throw new Error(response.description || response.message || 'Add to cart failed');
+            const partialAvailabilityMessage = response.description || response.message || '';
+            const wasPartiallyAdded =
+              response.status &&
+              /only\s+\d+\s+items?\s+were\s+added\s+to\s+your\s+cart\s+due\s+to\s+availability/i.test(
+                partialAvailabilityMessage
+              );
+            if (response.status && !wasPartiallyAdded) {
+              throw new Error(partialAvailabilityMessage || 'Add to cart failed');
+            }
 
             const cart = await fetch(`${window.Shopify?.routes?.root ?? '/'}cart.js`).then((res) => res.json());
             deferred.resolve({
@@ -753,7 +761,15 @@ data-wpd-product-id="{{ product.id }}">
             });
 
             this.querySelectorAll('[data-bulk-size]').forEach((input) => (input.value = ''));
-            if (this.bulkAddLabel) {
+            if (wasPartiallyAdded) {
+              if (this.bulkMessage) {
+                this.bulkMessage.textContent = partialAvailabilityMessage;
+                this.bulkMessage.hidden = false;
+              }
+            } else if (this.bulkMessage) {
+              this.bulkMessage.hidden = true;
+            }
+            if (this.bulkAddLabel && !wasPartiallyAdded) {
               this.bulkAddLabel.textContent = '{{ section.settings.added_label | escape }}';
               setTimeout(() => {
                 if (this.bulkAddLabel) this.bulkAddLabel.textContent = this.bulkDefaultLabel;
