@@ -480,7 +480,7 @@
       {% if custom_color_styles %}
         {% render 'contrast-override', background_color: section.settings[row_setting], text_color: section.settings[text_setting], section_id: row_class_id %}
       {% endif %}
-  {% render 'header-row',
+      {% render 'header-row',
         row: row,
         order: order,
         settings: section.settings,
