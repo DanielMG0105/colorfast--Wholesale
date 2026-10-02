@@ -22,7 +22,7 @@
     >
       <div
         class="cart-page spacing-style{% if cart.empty? %} cart-page--empty{% endif %}"
-        style="{% render 'spacing-style', settings: section.settings %}"
+        style="{% render 'spacing-style', settings: section.settings %}{% if section.settings.max_width %} --cart-max-width: {{ section.settings.max_width }}px;{% endif %}"
       >
         <div class="cart-page__title">
           {%- content_for 'block', id: 'cart-page-title', type: '_cart-title', force_empty: true %}
@@ -41,7 +41,7 @@
   >
     <div
       class="cart-page spacing-style{% if cart.empty? %} cart-page--empty{% endif %}"
-      style="{% render 'spacing-style', settings: section.settings %}"
+      style="{% render 'spacing-style', settings: section.settings %}{% if section.settings.max_width %} --cart-max-width: {{ section.settings.max_width }}px;{% endif %}"
     >
       <div class="cart-page__title">
         {%- content_for 'block', id: 'cart-page-title', type: '_cart-title' %}
@@ -72,6 +72,9 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 0 var(--padding-5xl);
+    max-width: var(--cart-max-width, 1200px);
+    margin-inline: auto;
+    width: 100%;
   }
 
   .cart-page--empty {
@@ -99,7 +102,9 @@
   }
 
   .cart-page__summary {
-    padding-top: var(--padding-xl);
+    padding-top: var(--padding-2xl);
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / 0.2);
+    margin-block-start: var(--margin-xl);
   }
 
   .cart-page__title + .cart-page__items {
@@ -120,17 +125,21 @@
       align-self: stretch;
       grid-template-rows: subgrid;
       padding-top: 0;
+      margin-block-start: 0;
+      border-block-start: none;
+      border-inline-start: 1px solid rgb(var(--color-foreground-rgb) / 0.2);
 
       /* needed to support blurred effect from hero section */
       position: relative;
     }
 
+    .section--page-width .cart-page {
+      grid-column: 2;
+    }
+
     .section--page-width .cart-page:has(.cart-summary--extend) {
-      grid-column: 2 / 4;
-      grid-template-columns: 1fr minmax(
-          var(--sidebar-width),
-          calc((100vw - var(--page-width)) / 2 + var(--sidebar-width))
-        );
+      grid-column: 2;
+      grid-template-columns: 1fr var(--sidebar-width);
     }
   }
 
@@ -192,6 +201,16 @@
         }
       ],
       "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width",
+      "min": 800,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1200
     },
     {
       "type": "color",
