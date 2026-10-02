@@ -668,10 +668,10 @@ data-wpd-product-id="{{ product.id }}">
             if (!isNaN(qty) && qty > 0) {
               return qty;
             }
-            if (variant.inventoryPolicy === 'continue') {
-              return null;
-            }
-            return 0;
+            // `variant.available` is Shopify's source of truth for purchase availability.
+            // Liquid inventory_quantity can be unavailable/zero even when Shopify marks
+            // the variant as available, so only apply a quantity cap when it is positive.
+            return null;
           }
           if (typeof variant.inventoryQuantity === 'number' && variant.inventoryQuantity > 0) {
             return variant.inventoryQuantity;
