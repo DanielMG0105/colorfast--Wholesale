@@ -428,13 +428,17 @@ data-wpd-product-id="{{ product.id }}">
             input.addEventListener('input', () => this.updateBulkButtonState());
             input.addEventListener('change', () => this.updateBulkButtonState());
           });
+          this.onBulkResize = () => this.syncBulkButtonWidth();
+          window.addEventListener('resize', this.onBulkResize);
           this.updateAvailability();
           this.updateBulkButtonState();
+          requestAnimationFrame(() => this.syncBulkButtonWidth());
           this.watchAppTiers();
         }
 
         disconnectedCallback() {
           this.tiersObserver?.disconnect();
+          if (this.onBulkResize) window.removeEventListener('resize', this.onBulkResize);
         }
 
         // The WCP app injects its volume table asynchronously (and re-renders it on variant change),
@@ -646,6 +650,13 @@ data-wpd-product-id="{{ product.id }}">
         updateBulkButtonState() {
           if (!this.bulkAddButton) return;
           this.bulkAddButton.disabled = this.bulkRequestInProgress || this.buildBulkItems().length === 0;
+        }
+
+        syncBulkButtonWidth() {
+          const table = this.querySelector('.product-showcase__bulk-table');
+          if (!table || !this.bulkAddButton) return;
+          const tableWidth = table.getBoundingClientRect().width;
+          if (tableWidth > 0) this.bulkAddButton.style.width = `${tableWidth}px`;
         }
 
         async onBulkSubmit(event) {
