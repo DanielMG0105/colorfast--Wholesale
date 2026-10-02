@@ -63,7 +63,7 @@
           "type": "program",
           "settings": {
             "label": "Custom dye program",
-            "link": ""
+            "link": "#shopify-section-template--30868711473233__dye_color_preview"
           }
         },
         "program_embroidery": {
@@ -85,6 +85,7 @@
         "card_font": "inter_n4",
         "card_text_size": 28,
         "card_width": 670,
+        "card_min_width": 320,
         "card_height": 216,
         "card_gap": 46,
         "border_width": 1,
@@ -188,6 +189,13 @@
         "body_font": "figtree_n4",
         "heading_size": 28,
         "body_size": 16,
+        "body_line_height": 120,
+        "text_spacing": 56,
+        "paragraph_spacing": 24,
+        "button_width": 236,
+        "button_height": 64,
+        "button_text_size": 13,
+        "button_spacing": 88,
         "media_position": "left",
         "media_width": 42,
         "column_gap": 7,
@@ -201,14 +209,7 @@
         "padding_bottom": 80,
         "background_color": "#c8c8c7",
         "text_color": "#000000",
-        "footer_uses_background": true,
-        "body_line_height": 120,
-        "text_spacing": 56,
-        "paragraph_spacing": 24,
-        "button_width": 236,
-        "button_height": 64,
-        "button_text_size": 13,
-        "button_spacing": 88
+        "footer_uses_background": true
       }
     },
     "wordmark_banner": {
@@ -262,6 +263,7 @@
         "padding": 60,
         "show_borders": true,
         "border_style": "lines",
+        "show_side_borders": true,
         "border_width": 2,
         "border_offset": 26,
         "background_color": "#000000",
@@ -358,6 +360,13 @@
         "body_font": "figtree_n4",
         "heading_size": 28,
         "body_size": 16,
+        "body_line_height": 120,
+        "text_spacing": 56,
+        "paragraph_spacing": 24,
+        "button_width": 236,
+        "button_height": 64,
+        "button_text_size": 13,
+        "button_spacing": 88,
         "media_position": "left",
         "media_width": 42,
         "column_gap": 7,
@@ -371,14 +380,7 @@
         "padding_bottom": 80,
         "background_color": "#c8c8c7",
         "text_color": "#000000",
-        "footer_uses_background": true,
-        "body_line_height": 120,
-        "text_spacing": 56,
-        "paragraph_spacing": 24,
-        "button_width": 236,
-        "button_height": 64,
-        "button_text_size": 13,
-        "button_spacing": 88
+        "footer_uses_background": true
       }
     }
   },
