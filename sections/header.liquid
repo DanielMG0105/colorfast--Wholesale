@@ -490,7 +490,8 @@
         actions: actions,
         localization: localization_markup,
         search: search,
-        audience_links: '<a class="header-audience-link header-audience-link--wholesale" href="/pages/create-wholesale-account">Apply for Wholesale</a><a class="header-audience-link header-audience-link--retail" href="/collections/d2c-all-styles">Shop as Retails</a>',
+        audience_links: '<a class="header-audience-link header-audience-link--wholesale" href="/pages/create-wholesale-account">Apply for Wholesale</a>
+        <a class="header-audience-link header-audience-link--retail" target="_blank" href="https://colorfastapparel.com/">Shop as Retails</a>',
         drawer_search: drawer_search
       %}
     {% endcapture %}
@@ -1424,6 +1425,7 @@
       align-items: center;
       gap: calc(8 * var(--cf-u));
       white-space: nowrap;
+      padding-right:10px;
     }
 
     .header__mobile-audience-links { display: none; }
