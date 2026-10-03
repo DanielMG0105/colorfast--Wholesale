@@ -68,7 +68,9 @@
         }
 
         layout() {
-          const stretch = parseFloat(this.dataset.stretch) / 100 || 1;
+          // Keep the typeface at its natural width; values saved by older page settings
+          // must not horizontally flatten the lettering beyond 100%.
+          const stretch = Math.min(1, parseFloat(this.dataset.stretch) / 100 || 1);
           for (const item of this.set.children) {
             const glyphs = item.firstElementChild;
             item.style.width = '';
@@ -204,11 +206,11 @@
       "type": "range",
       "id": "stretch",
       "label": "Horizontal stretch",
-      "min": 100,
-      "max": 400,
+      "min": 50,
+      "max": 100,
       "step": 10,
       "unit": "%",
-      "default": 200
+      "default": 100
     },
     {
       "type": "range",
