@@ -4,7 +4,7 @@
   {{ font | font_face: font_display: 'swap' }}
 </style>
 
-<wordmark-banner-v3
+<wordmark-banner
   class="wordmark-banner{% if section.settings.show_borders %} wordmark-banner--borders{% endif %}{% if section.settings.border_style == 'box' %} wordmark-banner--box{% unless section.settings.show_side_borders %} wordmark-banner--no-sides{% endunless %}{% endif %}"
   style="
     --wb-bg: {{ section.settings.background_color }};
@@ -87,14 +87,14 @@
     {%- endfor -%}
     {%- endif -%}
   </div>
-</wordmark-banner-v3>
+</wordmark-banner>
 
 <script type="module">
   // Size each text line from the container width and stretch its glyphs horizontally so the
   // groups (split with "|") fill the line edge to edge, like an extended display typeface.
-  if (!customElements.get('wordmark-banner-v3')) {
+  if (!customElements.get('wordmark-banner')) {
     customElements.define(
-      'wordmark-banner-v3',
+      'wordmark-banner',
       class WordmarkBanner extends HTMLElement {
         connectedCallback() {
           this.lines = [...this.querySelectorAll('.wordmark-banner__line')];
@@ -125,16 +125,11 @@
             if (!total) continue;
 
             const gap = groups.length > 1 ? (parseFloat(line.dataset.gap) / 100) * width : 0;
-            const isColorfastWordmark =
-              groups.length === 1 && groups[0].textContent.trim().toLowerCase() === 'colorfast';
             let stretch =
               line.dataset.mode === 'fill' ? (width - gap) / total : parseFloat(line.dataset.stretch) / 100;
-            if (isColorfastWordmark) {
-              stretch = 2.406;
-            } else {
-              // Never overflow the line
-              stretch = Math.min(stretch, (width - gap) / total);
-            }
+            // Never overflow the line
+            stretch = Math.min(stretch, (width - gap) / total);
+
             groups.forEach((group, i) => {
               group.style.width = `${natural[i] * stretch}px`;
               group.firstElementChild.style.transform = `scaleX(${stretch})`;
