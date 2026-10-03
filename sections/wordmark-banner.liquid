@@ -133,7 +133,13 @@
             stretch = Math.min(stretch, 1);
 
             groups.forEach((group, i) => {
-              group.style.width = `${natural[i] * stretch}px`;
+              if (line.dataset.mode === 'fill' && groups.length === 1) {
+                group.style.width = `${width}px`;
+                group.style.textAlign = 'center';
+              } else {
+                group.style.width = `${natural[i] * stretch}px`;
+                group.style.textAlign = '';
+              }
               group.firstElementChild.style.transform = `scaleX(${stretch})`;
             });
             line.classList.add('is-fitted');
@@ -220,10 +226,6 @@
     font-style: var(--wb-font-style);
     line-height: 0.74;
     white-space: nowrap;
-  }
-
-  .wordmark-banner__line:has(.wordmark-banner__group):not(:has(.wordmark-banner__group ~ .wordmark-banner__group)) {
-    justify-content: center;
   }
 
   .wordmark-banner__line:first-child,
