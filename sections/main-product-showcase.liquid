@@ -275,15 +275,13 @@ data-wpd-product-id="{{ product.id }}">
           {%- assign color_index = color_option_position | minus: 1 -%}
           {%- assign size_option = product.options_with_values[size_index] -%}
           {%- assign color_option = product.options_with_values[color_index] -%}
-          {%- assign grid_column_count = size_option.values.size | plus: 1 -%}
-          {%- assign grid_min_width = size_option.values.size | times: 80 | plus: 160 -%}
           <details class="product-showcase__bulk-grid">
-            <summary><span class="product-showcase__plus" aria-hidden="true"></span>{{ section.settings.bulk_heading | default: 'View Bulk Order Grid' | escape }}</summary>
+            <summary><span class="product-showcase__plus" aria-hidden="true"></span>View Bulk Order Grid</summary>
             <div class="product-showcase__accordion-body product-showcase__bulk-content">
             {%- if section.settings.bulk_hint != blank -%}<p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>{%- endif -%}
             <div class="product-showcase__bulk-wrap vbog__scroll-wrapper">
               <div class="vbog__table-clip">
-              <table class="product-showcase__table product-showcase__bulk-table vbog__table" role="table" aria-label="VIEW BULK ORDER GRID" style="--vbog-table-min-width:{{ grid_min_width }}px">
+              <table class="product-showcase__table product-showcase__bulk-table vbog__table" role="table" aria-label="View Bulk Order Grid">
                 <thead class="vbog__thead"><tr class="vbog__row vbog__row--header" role="row"><th class="vbog__cell vbog__cell--label" scope="col" role="columnheader">COLOR</th>
                   {%- for value in size_option.values -%}<th class="vbog__cell vbog__cell--size-header" scope="col" role="columnheader">{% render 'variant-option-label', value: value.name, option_name: size_option.name %}</th>{%- endfor -%}
                 </tr></thead>
@@ -309,7 +307,7 @@ data-wpd-product-id="{{ product.id }}">
                     </tr>
                   {%- endfor -%}
                 </tbody>
-                <tfoot class="vbog__tfoot"><tr class="vbog__total-divider" aria-hidden="true"><td colspan="{{ grid_column_count }}"></td></tr><tr class="vbog__row vbog__row--total" role="row"><td class="vbog__cell vbog__cell--total-label" role="rowheader">TOTAL</td>{%- for size in size_option.values -%}<td class="vbog__cell vbog__cell--total-value" data-grid-total="{{ size | escape }}" role="gridcell" aria-label="{{ size | escape }} total"><span>—</span></td>{%- endfor -%}</tr></tfoot>
+                <tfoot class="vbog__tfoot"><tr class="vbog__total-divider" aria-hidden="true"><td colspan="{{ size_option.values.size | plus: 1 }}"></td></tr><tr class="vbog__row vbog__row--total" role="row"><td class="vbog__cell vbog__cell--total-label" role="rowheader">TOTAL</td>{%- for size in size_option.values -%}<td class="vbog__cell vbog__cell--total-value" data-grid-total="{{ size | escape }}" role="gridcell" aria-label="{{ size | escape }} total"><span>—</span></td>{%- endfor -%}</tr></tfoot>
               </table>
               </div>
             </div>
