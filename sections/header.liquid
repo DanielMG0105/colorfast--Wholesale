@@ -511,6 +511,11 @@
     {% endif %}
   {% endfor %}
 
+  <div class="header__mobile-audience-links" aria-label="Shop by account type">
+    <a class="header-audience-link header-audience-link--wholesale" href="/pages/create-wholesale-account">Apply for Wholesale</a>
+    <a class="header-audience-link header-audience-link--retail" href="/collections/d2c-all-styles">Shop as Retails</a>
+  </div>
+
   {% if has_navigation_bar %}
     <div class="header__row header__navigation-bar-row">
       {{ navigation_bar }}
@@ -1421,14 +1426,16 @@
       white-space: nowrap;
     }
 
+    .header__mobile-audience-links { display: none; }
+
     .header-audience-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: calc(38 * var(--cf-u));
-      padding: 0 calc(14 * var(--cf-u));
+      min-height: calc(34 * var(--cf-u));
+      padding: calc(3 * var(--cf-u)) calc(14 * var(--cf-u));
       border: 1px solid currentColor;
-      border-radius: var(--style-border-radius-buttons-primary, 10px);
+      border-radius: 999px;
       color: inherit;
       font: inherit;
       font-size: max(10px, calc(12 * var(--cf-u)));
@@ -1444,6 +1451,24 @@
 
     @media screen and (max-width: 989px) {
       .header-audience-links { display: none; }
+    }
+
+    @media screen and (max-width: 989px) {
+      .header__mobile-audience-links {
+        display: flex;
+        gap: 8px;
+        padding: 0 var(--page-margin) 10px;
+      }
+
+      .header__mobile-audience-links .header-audience-link {
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: 36px;
+        padding: 4px 8px;
+        font-size: 11px;
+        white-space: normal;
+        text-align: center;
+      }
     }
 
     #header-component:not([data-menu-style='drawer']) .header__column--right:has(header-actions) {
