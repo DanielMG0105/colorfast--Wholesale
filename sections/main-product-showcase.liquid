@@ -275,13 +275,15 @@ data-wpd-product-id="{{ product.id }}">
           {%- assign color_index = color_option_position | minus: 1 -%}
           {%- assign size_option = product.options_with_values[size_index] -%}
           {%- assign color_option = product.options_with_values[color_index] -%}
+          {%- assign grid_column_count = size_option.values.size | plus: 1 -%}
+          {%- assign grid_min_width = size_option.values.size | times: 80 | plus: 160 -%}
           <details class="product-showcase__bulk-grid">
             <summary>{{ section.settings.bulk_heading | default: 'VIEW BULK ORDER GRID' | upcase | escape }}<span class="product-showcase__bulk-chevron" aria-hidden="true"></span></summary>
             <div class="product-showcase__accordion-body product-showcase__bulk-content">
             {%- if section.settings.bulk_hint != blank -%}<p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>{%- endif -%}
             <div class="product-showcase__bulk-wrap vbog__scroll-wrapper">
               <div class="vbog__table-clip">
-              <table class="product-showcase__table product-showcase__bulk-table vbog__table" role="table" aria-label="VIEW BULK ORDER GRID">
+              <table class="product-showcase__table product-showcase__bulk-table vbog__table" role="table" aria-label="VIEW BULK ORDER GRID" style="--vbog-table-min-width:{{ grid_min_width }}px">
                 <thead class="vbog__thead"><tr class="vbog__row vbog__row--header" role="row"><th class="vbog__cell vbog__cell--label" scope="col" role="columnheader">COLOR</th>
                   {%- for value in size_option.values -%}<th class="vbog__cell vbog__cell--size-header" scope="col" role="columnheader">{% render 'variant-option-label', value: value.name, option_name: size_option.name %}</th>{%- endfor -%}
                 </tr></thead>
@@ -307,7 +309,7 @@ data-wpd-product-id="{{ product.id }}">
                     </tr>
                   {%- endfor -%}
                 </tbody>
-                <tfoot class="vbog__tfoot"><tr class="vbog__row vbog__row--total" role="row"><td class="vbog__cell vbog__cell--total-label" role="rowheader">TOTAL</td>{%- for size in size_option.values -%}<td class="vbog__cell vbog__cell--total-value" data-grid-total="{{ size | escape }}" role="gridcell" aria-label="{{ size | escape }} total"><span>—</span></td>{%- endfor -%}</tr></tfoot>
+                <tfoot class="vbog__tfoot"><tr class="vbog__total-divider" aria-hidden="true"><td colspan="{{ grid_column_count }}"></td></tr><tr class="vbog__row vbog__row--total" role="row"><td class="vbog__cell vbog__cell--total-label" role="rowheader">TOTAL</td>{%- for size in size_option.values -%}<td class="vbog__cell vbog__cell--total-value" data-grid-total="{{ size | escape }}" role="gridcell" aria-label="{{ size | escape }} total"><span>—</span></td>{%- endfor -%}</tr></tfoot>
               </table>
               </div>
             </div>
@@ -1424,9 +1426,9 @@ data-wpd-product-id="{{ product.id }}">
   .product-showcase__bulk-grid .product-showcase__bulk-table tfoot td { background: #f0f0f0; text-align: right; }
   .product-showcase__bulk-grid .product-showcase__bulk-add { width: 100%; }
   .product-showcase__bulk-grid .product-showcase__bulk-add[hidden] { display: none !important; }
-  .product-showcase__bulk-grid .vbog__scroll-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .product-showcase__bulk-grid .vbog__table-clip { min-width: 500px; }
-  .product-showcase__bulk-grid .vbog__table { width: calc(100% + 20px); min-width: 520px; margin: -10px; border-collapse: separate; border-spacing: 10px; table-layout: fixed; background: transparent; }
+  .product-showcase__bulk-grid .vbog__scroll-wrapper { width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+  .product-showcase__bulk-grid .vbog__table-clip { min-width: 100%; }
+  .product-showcase__bulk-grid .vbog__table { width: 100%; min-width: var(--vbog-table-min-width, 520px); margin: 0; border-collapse: separate; border-spacing: 10px; table-layout: fixed; background: transparent; }
   .product-showcase__bulk-grid .vbog__cell { position: relative; height: 48px; padding: 0 4px; border: 0; background: transparent; font-size: 11px; letter-spacing: .04em; text-align: center; vertical-align: middle; white-space: nowrap; }
   .product-showcase__bulk-grid .vbog__cell--label,
   .product-showcase__bulk-grid .vbog__cell--total-label,
@@ -1456,8 +1458,7 @@ data-wpd-product-id="{{ product.id }}">
   .product-showcase__bulk-grid .vbog__cell--empty { opacity: .18; pointer-events: none; }
   .product-showcase__bulk-grid .vbog__row--total .vbog__cell { height: 48px; font-size: 12px; font-weight: 500; letter-spacing: .1em; }
   .product-showcase__bulk-grid .vbog__cell--total-value { background: #f0f0f0; text-align: right; vertical-align: bottom; padding: 0 6px 6px; }
-  .product-showcase__bulk-grid .vbog__tfoot { position: relative; }
-  .product-showcase__bulk-grid .vbog__tfoot::before { position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--ps-border); content: ''; }
+  .product-showcase__bulk-grid .vbog__total-divider td { height: 1px; padding: 0; border: 0; background: var(--ps-border); }
 
   /* Mobile: compact product info */
   @media screen and (max-width: 749px) {
