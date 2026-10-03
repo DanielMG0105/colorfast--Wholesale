@@ -270,6 +270,43 @@ data-wpd-product-id="{{ product.id }}">
           <div id='wcp_vd_table' data-app-tiers></div>
         {%- endform -%}
 
+        {%- if section.settings.show_bulk_grid and size_option_position > 0 and color_option_position > 0 -%}
+          {%- assign size_index = size_option_position | minus: 1 -%}
+          {%- assign color_index = color_option_position | minus: 1 -%}
+          {%- assign size_option = product.options_with_values[size_index] -%}
+          {%- assign color_option = product.options_with_values[color_index] -%}
+          <details class="product-showcase__bulk-grid">
+            <summary>{{ section.settings.bulk_heading | default: 'VIEW BULK ORDER GRID' | escape }}<span aria-hidden="true">+</span></summary>
+            {%- if section.settings.bulk_hint != blank -%}<p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>{%- endif -%}
+            <div class="product-showcase__bulk-wrap">
+              <table class="product-showcase__table product-showcase__bulk-table">
+                <thead><tr><th scope="col">{{ section.settings.color_option_names | split: ',' | first | upcase | default: 'COLOR' }}</th>
+                  {%- for value in size_option.values -%}<th scope="col">{% render 'variant-option-label', value: value.name, option_name: size_option.name %}</th>{%- endfor -%}
+                </tr></thead>
+                <tbody>
+                  {%- for color in color_option.values -%}
+                    <tr><th scope="row">{{ color.name | default: color | upcase }}</th>
+                      {%- for size in size_option.values -%}
+                        {%- assign grid_variant = nil -%}
+                        {%- for variant in product.variants -%}
+                          {%- if variant.options[color_index] == color and variant.options[size_index] == size -%}{%- assign grid_variant = variant -%}{%- break -%}{%- endif -%}
+                        {%- endfor -%}
+                        {%- if grid_variant -%}
+                          {%- assign grid_max = '' -%}
+                          {%- if grid_variant.inventory_management == 'shopify' and grid_variant.inventory_policy == 'deny' -%}{%- assign grid_max = grid_variant.inventory_quantity -%}{%- endif -%}
+                          <td class="product-showcase__bulk-cell{% unless grid_variant.available %} is-unavailable{% endunless %}"><span>{{ grid_variant.inventory_quantity | default: 0 }}</span><input type="number" min="0" step="1" inputmode="numeric"{% if grid_max != blank %} max="{{ grid_max }}"{% endif %} aria-label="{{ color | escape }} / {% render 'variant-option-label', value: size.name, option_name: size_option.name %} quantity" data-grid-qty data-variant-id="{{ grid_variant.id }}"{% unless grid_variant.available %} disabled{% endunless %}></td>
+                        {%- else -%}<td aria-hidden="true">—</td>{%- endif -%}
+                      {%- endfor -%}
+                    </tr>
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="product-showcase__add product-showcase__bulk-add" data-bulk-add-button disabled><span data-bulk-add-label>{{ section.settings.bulk_add_label | default: section.settings.add_label | default: 'Add to cart' | escape }}</span></button>
+            <p class="product-showcase__message" role="status" data-bulk-message hidden></p>
+          </details>
+        {%- endif -%}
+
         {%- if section.blocks.size > 0 -%}
           <div class="product-showcase__accordions">
             {%- for block in section.blocks -%}
@@ -323,50 +360,6 @@ data-wpd-product-id="{{ product.id }}">
           </details>
         {%- endif -%}
 
-        {%- if section.settings.show_bulk_grid and size_option_position > 0 -%}
-          {%- assign size_index = size_option_position | minus: 1 -%}
-          {%- assign size_option = product.options_with_values[size_index] -%}
-          <div class="product-showcase__bulk">
-            {%- if section.settings.bulk_heading != blank -%}
-              <p class="product-showcase__label">{{ section.settings.bulk_heading | escape }}</p>
-            {%- endif -%}
-            <div class="product-showcase__bulk-wrap">
-              <table class="product-showcase__table product-showcase__bulk-table">
-                <thead>
-                  <tr>
-                    {%- for value in size_option.values -%}
-                      <th scope="col">{% render 'variant-option-label', value: value.name, option_name: size_option.name %}</th>
-                    {%- endfor -%}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    {%- for value in size_option.values -%}
-                      <td>
-                        <input
-                          type="number"
-                          min="0"
-                          step="1"
-                          inputmode="numeric"
-                          placeholder=""
-                          aria-label="{% render 'variant-option-label', value: value.name, option_name: size_option.name %} quantity"
-                          data-bulk-size="{{ value | escape }}"
-                        >
-                      </td>
-                    {%- endfor -%}
-                  </tr>
-                </tbody>
-              </table>
-              {%- if section.settings.bulk_hint != blank -%}
-                <p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>
-              {%- endif -%}
-              <button type="button" class="product-showcase__add product-showcase__bulk-add" data-bulk-add-button disabled>
-                <span data-bulk-add-label>{{ section.settings.bulk_add_label | default: section.settings.add_label | default: 'Add to cart' | escape }}</span>
-              </button>
-              <p class="product-showcase__message" role="status" data-bulk-message hidden></p>
-            </div>
-          </div>
-        {%- endif -%}
       </div>
     </div>
   </div>
@@ -430,6 +423,10 @@ data-wpd-product-id="{{ product.id }}">
           this.querySelectorAll('[data-bulk-size]').forEach((input) => {
             input.addEventListener('input', () => this.onBulkQuantityChange(input));
             input.addEventListener('change', () => this.onBulkQuantityChange(input));
+          });
+          this.querySelectorAll('[data-grid-qty]').forEach((input) => {
+            input.addEventListener('input', () => this.onGridQuantityChange(input));
+            input.addEventListener('change', () => this.onGridQuantityChange(input));
           });
           this.onBulkResize = () => this.syncBulkButtonWidth();
           window.addEventListener('resize', this.onBulkResize);
@@ -643,6 +640,18 @@ data-wpd-product-id="{{ product.id }}">
         // The table button adds only the valid sizes entered in the grid. It does not
         // change the selected variant, the regular quantity, or the regular button state.
         buildBulkItems() {
+          const gridInputs = this.querySelectorAll('[data-grid-qty]');
+          if (gridInputs.length) {
+            return [...gridInputs].flatMap((input) => {
+              const quantity = Math.max(0, parseInt(input.value, 10) || 0);
+              if (quantity < 1 || input.disabled) return [];
+              const variant = this.variants.find((item) => String(item.id) === input.dataset.variantId);
+              if (!variant?.available) return [];
+              const max = input.max === '' ? null : Number(input.max);
+              const availableQuantity = max !== null && Number.isFinite(max) ? Math.min(quantity, max) : quantity;
+              return availableQuantity > 0 ? [{ id: variant.id, quantity: availableQuantity }] : [];
+            });
+          }
           const sizePosition = Number(this.dataset.sizePosition);
           const items = [];
           if (!sizePosition) return items;
@@ -662,6 +671,16 @@ data-wpd-product-id="{{ product.id }}">
           });
 
           return items;
+        }
+
+        onGridQuantityChange(input) {
+          const quantity = parseInt(input.value, 10);
+          if (!Number.isFinite(quantity) || quantity < 0) {
+            input.value = '';
+          } else if (input.max !== '' && quantity > Number(input.max)) {
+            input.value = input.max;
+          }
+          this.updateBulkButtonState();
         }
 
         getVariantInventoryLimit(variant) {
@@ -769,7 +788,7 @@ data-wpd-product-id="{{ product.id }}">
               },
             });
 
-            this.querySelectorAll('[data-bulk-size]').forEach((input) => (input.value = ''));
+            this.querySelectorAll('[data-bulk-size], [data-grid-qty]').forEach((input) => (input.value = ''));
             if (wasPartiallyAdded) {
               if (this.bulkMessage) {
                 this.bulkMessage.textContent = partialAvailabilityMessage;
@@ -1326,6 +1345,37 @@ data-wpd-product-id="{{ product.id }}">
     margin-top: 18px;
     font-size: 16px;
   }
+
+  .product-showcase__bulk-grid {
+    margin-top: 20px;
+    border-bottom: 1px solid var(--ps-border);
+  }
+
+  .product-showcase__bulk-grid > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-top: 1px solid var(--ps-border);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    list-style: none;
+  }
+
+  .product-showcase__bulk-grid > summary::-webkit-details-marker { display: none; }
+  .product-showcase__bulk-grid > summary span { font-size: 20px; line-height: 1; }
+  .product-showcase__bulk-grid[open] > summary span { transform: rotate(45deg); }
+  .product-showcase__bulk-grid .product-showcase__bulk-wrap { width: 100%; overflow-x: auto; }
+  .product-showcase__bulk-grid .product-showcase__bulk-table { width: 100%; min-width: 520px; table-layout: fixed; }
+  .product-showcase__bulk-grid .product-showcase__bulk-table th:first-child { min-width: 130px; text-align: left; }
+  .product-showcase__bulk-grid .product-showcase__bulk-table th,
+  .product-showcase__bulk-grid .product-showcase__bulk-table td { padding: 8px; }
+  .product-showcase__bulk-grid .product-showcase__bulk-table td.product-showcase__bulk-cell { position: relative; padding: 0; }
+  .product-showcase__bulk-grid .product-showcase__bulk-cell span { display: block; padding: 6px 4px 0; font-size: 11px; opacity: .65; }
+  .product-showcase__bulk-grid .product-showcase__bulk-cell input { display: block; width: 100%; height: 34px; border: 1px solid var(--ps-border); background: transparent; color: inherit; font: inherit; text-align: center; }
+  .product-showcase__bulk-grid .product-showcase__bulk-cell.is-unavailable { opacity: .35; }
+  .product-showcase__bulk-grid .product-showcase__bulk-add { width: 100%; }
 
   /* Mobile: compact product info */
   @media screen and (max-width: 749px) {
