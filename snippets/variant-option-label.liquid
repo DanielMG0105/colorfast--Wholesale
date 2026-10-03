@@ -1,0 +1,25 @@
+{%- liquid
+  assign display_value = value | default: '' | strip
+  assign option_key = display_value | downcase
+  assign option_type = option_name | default: '' | downcase
+
+  if option_type contains 'size' or option_type contains 'talla'
+    case option_key
+      when 'xxs'
+        assign display_value = '2XS'
+      when 'xs'
+        assign display_value = 'XS'
+      when 'sm'
+        assign display_value = 'S'
+      when 'md'
+        assign display_value = 'M'
+      when 'lg'
+        assign display_value = 'G'
+      when 'xl'
+        assign display_value = 'XL'
+      else
+        assign display_value = display_value | upcase
+    endcase
+  endif
+-%}
+{{- display_value | escape -}}

@@ -161,9 +161,9 @@ data-wpd-product-id="{{ product.id }}">
 
           {%- unless product.has_only_default_variant -%}
             {%- for option in product.options_with_values -%}
-              <fieldset class="product-showcase__option" data-option-position="{{ option.position }}">
+              <fieldset class="product-showcase__option" data-option-position="{{ option.position }}" data-option-name="{{ option.name | escape }}">
                 <legend class="product-showcase__label">
-                  {{ option.name | escape }}: <span data-option-value>{{ option.selected_value | escape }}</span>
+                  {{ option.name | escape }}: <span data-option-value>{% render 'variant-option-label', value: option.selected_value, option_name: option.name %}</span>
                 </legend>
 
                 <div class="product-showcase__values{% if option.position == color_option_position %} product-showcase__values--swatches{% endif %}">
@@ -209,7 +209,7 @@ data-wpd-product-id="{{ product.id }}">
                         <span class="visually-hidden">{{ value | escape }}</span>
                       </label>
                     {%- else -%}
-                      <label for="{{ input_id }}" class="product-showcase__pill">{{ value | escape }}</label>
+                      <label for="{{ input_id }}" class="product-showcase__pill">{% render 'variant-option-label', value: value.name, option_name: option.name %}</label>
                     {%- endif -%}
                   {%- endfor -%}
 
@@ -335,7 +335,7 @@ data-wpd-product-id="{{ product.id }}">
                 <thead>
                   <tr>
                     {%- for value in size_option.values -%}
-                      <th scope="col">{{ value | escape }}</th>
+                      <th scope="col">{% render 'variant-option-label', value: value.name, option_name: size_option.name %}</th>
                     {%- endfor -%}
                   </tr>
                 </thead>
@@ -349,7 +349,7 @@ data-wpd-product-id="{{ product.id }}">
                           step="1"
                           inputmode="numeric"
                           placeholder=""
-                          aria-label="{{ value | escape }} quantity"
+                          aria-label="{% render 'variant-option-label', value: value.name, option_name: size_option.name %} quantity"
                           data-bulk-size="{{ value | escape }}"
                         >
                       </td>
@@ -544,11 +544,20 @@ data-wpd-product-id="{{ product.id }}">
           return this.variants.find((variant) => variant.options.every((value, i) => value === options[i]));
         }
 
+        displayOptionValue(optionName, value) {
+          const label = String(value ?? '').trim();
+          if (!/size|talla/i.test(optionName ?? '')) return label;
+
+          const normalized = label.toLowerCase();
+          const sizeLabels = { xxs: '2XS', xs: 'XS', sm: 'S', md: 'M', lg: 'G', xl: 'XL' };
+          return sizeLabels[normalized] ?? label.toUpperCase();
+        }
+
         onOptionChange() {
           const options = this.selectedOptions();
           this.querySelectorAll('[data-option-position]').forEach((fieldset, i) => {
             const label = fieldset.querySelector('[data-option-value]');
-            if (label) label.textContent = options[i] ?? '';
+            if (label) label.textContent = this.displayOptionValue(fieldset.dataset.optionName, options[i]);
           });
 
           this.filterMediaByColor();
