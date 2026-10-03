@@ -17,8 +17,8 @@
           "settings": {
             "text": "colorfast",
             "size": 10,
-            "width_mode": "fill",
-            "stretch": 200,
+            "width_mode": "stretch",
+            "stretch": 100,
             "gap": 0,
             "space_above": 0
           }
@@ -28,8 +28,8 @@
           "settings": {
             "text": "BY|YOU",
             "size": 9,
-            "width_mode": "fill",
-            "stretch": 200,
+            "width_mode": "stretch",
+            "stretch": 100,
             "gap": 28,
             "space_above": 0.9
           }
@@ -63,7 +63,7 @@
           "type": "program",
           "settings": {
             "label": "Custom dye program",
-            "link": "#shopify-section-template--30868711473233__dye_color_preview"
+            "link": "#shopify-section-template--30868711473233__dye_program"
           }
         },
         "program_embroidery": {
@@ -102,7 +102,7 @@
         "text": "OUR BLANKS|YOUR WAY",
         "font": "inter_n7",
         "text_size": 30,
-        "stretch": 260,
+        "stretch": 100,
         "gap": 160,
         "speed": 60,
         "direction": "left",
