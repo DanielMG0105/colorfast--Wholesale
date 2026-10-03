@@ -40,7 +40,7 @@
     "collection_showcase_main": {
       "type": "collection-showcase",
       "settings": {
-        "collection": "demo",
+        "collection": "shop-all",
         "heading": "",
         "products_to_show": 4,
         "layout": "slider",
