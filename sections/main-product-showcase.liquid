@@ -275,7 +275,7 @@ data-wpd-product-id="{{ product.id }}">
           {%- assign color_index = color_option_position | minus: 1 -%}
           {%- assign size_option = product.options_with_values[size_index] -%}
           {%- assign color_option = product.options_with_values[color_index] -%}
-          <details class="product-showcase__bulk-grid">
+          <details class="product-showcase__bulk-grid" open>
             <summary><span class="product-showcase__plus" aria-hidden="true"></span>View Bulk Order Grid</summary>
             <div class="product-showcase__accordion-body product-showcase__bulk-content">
             {%- if section.settings.bulk_hint != blank -%}<p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>{%- endif -%}
