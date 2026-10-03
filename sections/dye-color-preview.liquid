@@ -39,6 +39,22 @@
     ]
   </script>
 
+  {%- paginate collections.all.products by 250 -%}
+    <script type="application/json" data-dyeable-products>
+      [
+        {%- assign first_dyeable_product = true -%}
+        {%- for candidate in collections.all.products -%}
+          {%- if candidate.metafields.custom.custom_dye.value == true -%}
+            {%- unless first_dyeable_product -%},{%- endunless -%}
+            {%- assign candidate_image = candidate.metafields.custom.dye_image.value | default: candidate.featured_image -%}
+            {"handle":{{ candidate.handle | json }},"title":{{ candidate.title | json }},"image":{% if candidate_image != blank %}{{ candidate_image | image_url: width: 320 | json }}{% else %}null{% endif %}}
+            {%- assign first_dyeable_product = false -%}
+          {%- endif -%}
+        {%- endfor -%}
+      ]
+    </script>
+  {%- endpaginate -%}
+
   <div class="dye-preview__stage">
     {%- for block in garments -%}
       {%- liquid
@@ -66,11 +82,9 @@
           </script>
         {%- endif -%}
         {%- if garment_label != blank -%}
-          {%- if garment_url != blank -%}
-            <a class="dye-preview__pill" href="{{ garment_url }}">{{ garment_label | escape }}</a>
-          {%- else -%}
-            <p class="dye-preview__pill">{{ garment_label | escape }}</p>
-          {%- endif -%}
+          <button type="button" class="dye-preview__pill dye-preview__product-trigger" data-open-product-picker aria-haspopup="dialog">
+            {{ garment_label | escape }}
+          </button>
         {%- endif -%}
 
         <div class="dye-preview__row">
@@ -122,7 +136,7 @@
   {%- comment -%} Filled by the script for a product opened from its custom dye swatch (?product=handle) {%- endcomment -%}
   <template data-garment-template>
     <div class="dye-preview__garment" data-garment>
-      <a class="dye-preview__pill" data-garment-label></a>
+      <button type="button" class="dye-preview__pill dye-preview__product-trigger" data-garment-label data-open-product-picker aria-haspopup="dialog"></button>
       <div class="dye-preview__row">
         <button type="button" class="dye-preview__arrow" data-garment-step="-1" aria-label="Previous garment">
           {%- render 'dye-preview-arrow', direction: 'left' -%}
@@ -137,6 +151,14 @@
       </div>
     </div>
   </template>
+
+  <dialog class="dye-preview__picker" data-product-picker aria-labelledby="dye-preview-picker-title">
+    <div class="dye-preview__picker-header">
+      <h2 id="dye-preview-picker-title">Select a product</h2>
+      <button type="button" class="dye-preview__picker-close" data-close-product-picker aria-label="Close">&times;</button>
+    </div>
+    <div class="dye-preview__picker-list" data-product-picker-list></div>
+  </dialog>
 
   <div class="dye-preview__selector">
     {%- if section.settings.selector_label != blank -%}
@@ -263,6 +285,24 @@
           this.addButton = this.querySelector('[data-purchase-add]');
           this.quantity = this.querySelector('[data-purchase-quantity]');
           this.message = this.querySelector('[data-purchase-message]');
+          this.dyeableProducts = JSON.parse(this.querySelector('[data-dyeable-products]')?.textContent || '[]');
+          this.productPicker = this.querySelector('[data-product-picker]');
+          this.productPickerList = this.querySelector('[data-product-picker-list]');
+          this.renderProductPicker();
+          this.addEventListener('click', (event) => {
+            const trigger = event.target.closest('[data-open-product-picker]');
+            if (trigger) {
+              event.preventDefault();
+              this.productPicker?.showModal();
+              return;
+            }
+            const productButton = event.target.closest('[data-select-dye-product]');
+            if (productButton) this.selectDyeProduct(productButton.dataset.productHandle);
+          });
+          this.querySelector('[data-close-product-picker]')?.addEventListener('click', () => this.productPicker?.close());
+          this.productPicker?.addEventListener('click', (event) => {
+            if (event.target === this.productPicker) this.productPicker.close();
+          });
           this.garments.forEach((garment) => {
             const json = garment.querySelector('[data-product]')?.textContent;
             if (json) garment.product = JSON.parse(json);
@@ -287,6 +327,69 @@
         stepGarment(step) {
           if (this.garments.length < 2) return;
           this.showGarment((this.garmentIndex + step + this.garments.length) % this.garments.length);
+        }
+
+        renderProductPicker() {
+          if (!this.productPickerList) return;
+          if (!this.dyeableProducts.length) {
+            this.productPickerList.textContent = 'No custom dye products are available.';
+            return;
+          }
+
+          const cards = this.dyeableProducts.map((product) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'dye-preview__picker-product';
+            button.dataset.selectDyeProduct = '';
+            button.dataset.productHandle = product.handle;
+
+            if (product.image) {
+              const image = document.createElement('img');
+              image.src = product.image;
+              image.alt = '';
+              image.loading = 'lazy';
+              button.append(image);
+            }
+
+            const title = document.createElement('span');
+            title.textContent = product.title;
+            button.append(title);
+            return button;
+          });
+          this.productPickerList.replaceChildren(...cards);
+        }
+
+        async selectDyeProduct(handle) {
+          if (!this.dyeableProducts.some((item) => item.handle === handle)) return;
+          this.productPicker?.close();
+          try {
+            const root = window.Shopify?.routes?.root ?? '/';
+            const response = await fetch(`${root}products/${encodeURIComponent(handle)}?view=dye-data`);
+            if (!response.ok) throw new Error('Could not load the selected product.');
+            const product = await response.json();
+            if (!product.dyeable) throw new Error('This product is not available for custom dye.');
+            this.setProductInView(product);
+          } catch (error) {
+            this.message.textContent = error.message;
+            this.message.hidden = false;
+          }
+        }
+
+        setProductInView(product) {
+          const existing = this.garments.findIndex((garment) => garment.dataset.productHandle === product.handle);
+          if (existing > -1) {
+            this.showGarment(existing);
+            return;
+          }
+
+          const garment = this.buildGarment(product);
+          this.garments.forEach((item) => (item.hidden = true));
+          this.querySelector('.dye-preview__stage').prepend(garment);
+          this.garments.unshift(garment);
+          this.garmentIndex = 0;
+          this.selection = null;
+          this.toggleArrows();
+          this.updatePurchase();
         }
 
         showGarment(index) {
@@ -316,19 +419,7 @@
             const product = await response.json();
             if (!product.image) return;
 
-            const garment = this.buildGarment(product);
-            // Drop the "Add a garment block" placeholder if the section has no real garments
-            this.garments = this.garments.filter((element) => element.product || element.querySelector('img'));
-            this.garments.forEach((element) => (element.hidden = true));
-            this.querySelector('.dye-preview__stage').prepend(garment);
-            this.querySelectorAll('.dye-preview__stage > [data-garment]').forEach((element) => {
-              if (!this.garments.includes(element) && element !== garment) element.remove();
-            });
-            this.garments.unshift(garment);
-            this.garmentIndex = 0;
-            this.selection = null;
-            this.toggleArrows();
-            this.updatePurchase();
+            this.setProductInView(product);
           } catch (error) {
             console.error('Custom dye: could not load product', error);
           }
@@ -342,7 +433,6 @@
 
           const label = garment.querySelector('[data-garment-label]');
           label.textContent = product.title;
-          label.href = product.url;
 
           const image = garment.querySelector('[data-garment-image]');
           image.src = product.image;
@@ -699,6 +789,93 @@
     letter-spacing: 0.01em;
     text-transform: uppercase;
     text-decoration: none;
+  }
+
+  button.dye-preview__product-trigger {
+    background: transparent;
+    font-family: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+  }
+
+  .dye-preview__picker {
+    width: min(760px, calc(100vw - 32px));
+    max-width: none;
+    max-height: min(80vh, 760px);
+    padding: 24px;
+    overflow: auto;
+    border: 1px solid var(--dp-text);
+    background: var(--dp-bg);
+    color: var(--dp-text);
+  }
+
+  .dye-preview__picker::backdrop {
+    background: rgb(0 0 0 / 72%);
+  }
+
+  .dye-preview__picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .dye-preview__picker-header h2 {
+    margin: 0;
+    font: inherit;
+    font-size: 18px;
+    text-transform: uppercase;
+  }
+
+  .dye-preview__picker-close {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--dp-text);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .dye-preview__picker-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .dye-preview__picker-product {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid rgb(255 255 255 / 35%);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .dye-preview__picker-product:hover,
+  .dye-preview__picker-product:focus-visible {
+    border-color: var(--dp-text);
+  }
+
+  .dye-preview__picker-product img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+  }
+
+  .dye-preview__picker-product span {
+    font-size: 13px;
+    line-height: 1.3;
   }
 
   .dye-preview__row {
