@@ -276,7 +276,8 @@ data-wpd-product-id="{{ product.id }}">
           {%- assign size_option = product.options_with_values[size_index] -%}
           {%- assign color_option = product.options_with_values[color_index] -%}
           <details class="product-showcase__bulk-grid">
-            <summary>{{ section.settings.bulk_heading | default: 'VIEW BULK ORDER GRID' | escape }}<span aria-hidden="true">+</span></summary>
+            <summary><span class="product-showcase__plus" aria-hidden="true"></span>{{ section.settings.bulk_heading | default: 'VIEW BULK ORDER GRID' | escape }}</summary>
+            <div class="product-showcase__accordion-body product-showcase__bulk-content">
             {%- if section.settings.bulk_hint != blank -%}<p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>{%- endif -%}
             <div class="product-showcase__bulk-wrap">
               <table class="product-showcase__table product-showcase__bulk-table">
@@ -304,6 +305,7 @@ data-wpd-product-id="{{ product.id }}">
             </div>
             <button type="button" class="product-showcase__add product-showcase__bulk-add" data-bulk-add-button disabled><span data-bulk-add-label>{{ section.settings.bulk_add_label | default: section.settings.add_label | default: 'Add to cart' | escape }}</span></button>
             <p class="product-showcase__message" role="status" data-bulk-message hidden></p>
+            </div>
           </details>
         {%- endif -%}
 
@@ -1348,24 +1350,20 @@ data-wpd-product-id="{{ product.id }}">
 
   .product-showcase__bulk-grid {
     margin-top: 20px;
-    border-bottom: 1px solid var(--ps-border);
   }
 
   .product-showcase__bulk-grid > summary {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
-    border-top: 1px solid var(--ps-border);
+    gap: 14px;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
     list-style: none;
+    font-size: 17px;
   }
-
   .product-showcase__bulk-grid > summary::-webkit-details-marker { display: none; }
-  .product-showcase__bulk-grid > summary span { font-size: 20px; line-height: 1; }
-  .product-showcase__bulk-grid[open] > summary span { transform: rotate(45deg); }
+  .product-showcase__bulk-grid .product-showcase__plus::after { transition: transform 0.2s ease; }
+  .product-showcase__bulk-grid[open] .product-showcase__plus::after { transform: rotate(0deg); }
+  .product-showcase__bulk-content { padding-top: 16px; }
   .product-showcase__bulk-grid .product-showcase__bulk-wrap { width: 100%; overflow-x: auto; }
   .product-showcase__bulk-grid .product-showcase__bulk-table { width: 100%; min-width: 520px; table-layout: fixed; }
   .product-showcase__bulk-grid .product-showcase__bulk-table th:first-child { min-width: 130px; text-align: left; }
