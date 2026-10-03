@@ -512,11 +512,6 @@
     {% endif %}
   {% endfor %}
 
-  <div class="header__mobile-audience-links" aria-label="Shop by account type">
-    <a class="header-audience-link header-audience-link--wholesale" href="/pages/create-wholesale-account">Apply for Wholesale</a>
-    <a class="header-audience-link header-audience-link--retail" href="/collections/d2c-all-styles">Shop as Retails</a>
-  </div>
-
   {% if has_navigation_bar %}
     <div class="header__row header__navigation-bar-row">
       {{ navigation_bar }}
@@ -1515,30 +1510,6 @@
 
   @media screen and (max-width: 989px) {
     .header-audience-links { display: none !important; }
-
-    .header__mobile-audience-links {
-      display: flex;
-      gap: 8px;
-      padding: 0 var(--page-margin) 10px;
-    }
-
-    .header__mobile-audience-links .header-audience-link {
-      display: inline-flex;
-      flex: 1 1 0;
-      align-items: center;
-      justify-content: center;
-      min-width: 0;
-      min-height: 36px;
-      padding: 4px 8px;
-      border: 1px solid currentColor;
-      border-radius: 999px;
-      color: inherit;
-      font-size: 11px;
-      line-height: 1.1;
-      text-decoration: none;
-      text-align: center;
-      white-space: normal;
-    }
   }
 {% endstylesheet %}
 
