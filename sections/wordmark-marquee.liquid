@@ -27,7 +27,7 @@
     --wm-u: min(1px, calc(100vw / 1900));
   "
 >
-  <wordmark-marquee
+  <wordmark-marquee-v2
     class="wordmark-marquee{% if section.settings.show_border %} wordmark-marquee--border{% endif %}"
     data-stretch="{{ section.settings.stretch }}"
     data-speed="{{ section.settings.speed }}"
@@ -44,15 +44,15 @@
         {%- endfor -%}
       </div>
     </div>
-  </wordmark-marquee>
+  </wordmark-marquee-v2>
 </div>
 
 <script type="module">
   // Stretch each phrase horizontally (like the wordmark banner), then repeat the set enough
   // times to cover the frame and scroll it by exactly one set width for a seamless loop.
-  if (!customElements.get('wordmark-marquee')) {
+  if (!customElements.get('wordmark-marquee-v2')) {
     customElements.define(
-      'wordmark-marquee',
+      'wordmark-marquee-v2',
       class WordmarkMarquee extends HTMLElement {
         connectedCallback() {
           this.track = this.querySelector('.wordmark-marquee__track');

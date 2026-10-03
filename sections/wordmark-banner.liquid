@@ -4,7 +4,7 @@
   {{ font | font_face: font_display: 'swap' }}
 </style>
 
-<wordmark-banner
+<wordmark-banner-v2
   class="wordmark-banner{% if section.settings.show_borders %} wordmark-banner--borders{% endif %}{% if section.settings.border_style == 'box' %} wordmark-banner--box{% unless section.settings.show_side_borders %} wordmark-banner--no-sides{% endunless %}{% endif %}"
   style="
     --wb-bg: {{ section.settings.background_color }};
@@ -87,14 +87,14 @@
     {%- endfor -%}
     {%- endif -%}
   </div>
-</wordmark-banner>
+</wordmark-banner-v2>
 
 <script type="module">
   // Size each text line from the container width and stretch its glyphs horizontally so the
   // groups (split with "|") fill the line edge to edge, like an extended display typeface.
-  if (!customElements.get('wordmark-banner')) {
+  if (!customElements.get('wordmark-banner-v2')) {
     customElements.define(
-      'wordmark-banner',
+      'wordmark-banner-v2',
       class WordmarkBanner extends HTMLElement {
         connectedCallback() {
           this.lines = [...this.querySelectorAll('.wordmark-banner__line')];
