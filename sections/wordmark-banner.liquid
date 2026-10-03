@@ -222,7 +222,7 @@
     white-space: nowrap;
   }
 
-  .wordmark-banner__line:has(.wordmark-banner__group:only-child) {
+  .wordmark-banner__line:has(.wordmark-banner__group):not(:has(.wordmark-banner__group ~ .wordmark-banner__group)) {
     justify-content: center;
   }
 
