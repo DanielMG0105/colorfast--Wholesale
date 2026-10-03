@@ -523,6 +523,14 @@
           );
         }
 
+        formatOptionValue(optionName, value) {
+          const normalized = String(value ?? '').trim();
+          if (!/size|talla/i.test(optionName)) return normalized;
+
+          const sizeLabels = { xxs: '2XS', xs: 'XS', sm: 'S', md: 'M', lg: 'G', xl: 'XL' };
+          return sizeLabels[normalized.toLowerCase()] ?? normalized.toUpperCase();
+        }
+
         // Buttons for size and any other non-color option of the current garment's product
         updatePurchase() {
           if (!this.purchase) return;
@@ -556,7 +564,7 @@
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.className = 'dye-preview__value';
-                button.textContent = value;
+                button.textContent = this.formatOptionValue(option.name, value);
                 button.setAttribute('aria-pressed', String(this.selection[index] === value));
                 button.classList.toggle('is-unavailable', !variant?.available);
                 button.addEventListener('click', () => {
