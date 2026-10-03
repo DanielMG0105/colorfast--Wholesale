@@ -1399,6 +1399,12 @@
       text-transform: uppercase;
     }
 
+    .header .menu-list__list-item[slot='overflow'] .menu-list__link,
+    .header .menu-list__submenu .mega-menu__link,
+    .header .menu-list__submenu .mega-menu__link--parent {
+      font-size: max(9px, calc(var(--cf-menu-font-size-n, 13.5) * var(--cf-u)));
+    }
+
     /* Let the menu column take all free space so items don't collapse into "More"
        just because the column was sized to its own content */
     #header-component:not([data-menu-style='drawer'])
