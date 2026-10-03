@@ -17,8 +17,8 @@
           "settings": {
             "text": "colorfast",
             "size": 10,
-            "width_mode": "stretch",
-            "stretch": 100,
+            "width_mode": "fill",
+            "stretch": 200,
             "gap": 0,
             "space_above": 0
           }
@@ -28,8 +28,8 @@
           "settings": {
             "text": "BY|YOU",
             "size": 9,
-            "width_mode": "stretch",
-            "stretch": 100,
+            "width_mode": "fill",
+            "stretch": 200,
             "gap": 28,
             "space_above": 0.9
           }
@@ -102,7 +102,7 @@
         "text": "OUR BLANKS|YOUR WAY",
         "font": "inter_n7",
         "text_size": 30,
-        "stretch": 100,
+        "stretch": 260,
         "gap": 160,
         "speed": 60,
         "direction": "left",
