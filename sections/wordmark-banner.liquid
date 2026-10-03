@@ -129,6 +129,8 @@
               line.dataset.mode === 'fill' ? (width - gap) / total : parseFloat(line.dataset.stretch) / 100;
             // Never overflow the line
             stretch = Math.min(stretch, (width - gap) / total);
+            // Keep banner lettering proportional even when older saved settings use "fill".
+            stretch = Math.min(stretch, 1);
 
             groups.forEach((group, i) => {
               group.style.width = `${natural[i] * stretch}px`;
