@@ -278,7 +278,7 @@ data-wpd-product-id="{{ product.id }}">
           {%- assign grid_column_count = size_option.values.size | plus: 1 -%}
           {%- assign grid_min_width = size_option.values.size | times: 80 | plus: 160 -%}
           <details class="product-showcase__bulk-grid">
-            <summary>{{ section.settings.bulk_heading | default: 'VIEW BULK ORDER GRID' | upcase | escape }}<span class="product-showcase__bulk-chevron" aria-hidden="true"></span></summary>
+            <summary><span class="product-showcase__plus" aria-hidden="true"></span>{{ section.settings.bulk_heading | default: 'View Bulk Order Grid' | escape }}</summary>
             <div class="product-showcase__accordion-body product-showcase__bulk-content">
             {%- if section.settings.bulk_hint != blank -%}<p class="product-showcase__hint">{{ section.settings.bulk_hint | escape }}</p>{%- endif -%}
             <div class="product-showcase__bulk-wrap vbog__scroll-wrapper">
@@ -1391,18 +1391,16 @@ data-wpd-product-id="{{ product.id }}">
 
   .product-showcase__bulk-grid > summary {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0 0 14px;
-    border-bottom: 1px solid var(--ps-border);
+    gap: 14px;
     cursor: pointer;
     list-style: none;
-    font-size: 13px;
-    text-transform: uppercase;
+    font-size: 17px;
+    text-transform: none;
   }
   .product-showcase__bulk-grid > summary::-webkit-details-marker { display: none; }
-  .product-showcase__bulk-chevron { width: 8px; height: 8px; margin-right: 2px; border-top: 1px solid currentColor; border-left: 1px solid currentColor; transform: rotate(45deg) translateY(3px); transition: transform .2s ease; }
-  .product-showcase__bulk-grid[open] .product-showcase__bulk-chevron { transform: rotate(225deg) translateY(3px); }
+  .product-showcase__bulk-grid .product-showcase__plus { display: inline-block; }
+  .product-showcase__bulk-grid[open] .product-showcase__plus::after { transform: rotate(0deg); }
   .product-showcase__bulk-content { padding: 14px 0 0; font-size: 13px; }
   .product-showcase__bulk-grid .product-showcase__bulk-wrap { width: 100%; overflow-x: auto; }
   .product-showcase__bulk-grid .product-showcase__bulk-table { width: 100%; min-width: 520px; table-layout: fixed; border-collapse: separate; border-spacing: 10px; margin: -10px; font-size: 11px; }
