@@ -293,7 +293,7 @@ data-wpd-product-id="{{ product.id }}">
                     {%- if grid_color_label_lower == 'pfd' or grid_color_label_lower contains 'prepared for dye' -%}{%- assign grid_color_label = 'PFD' -%}{%- endif -%}
                     {%- assign grid_color_lower = grid_color_label_lower -%}
                     {%- assign grid_swatch = color.swatch.color | default: color -%}
-                    <tr class="vbog__row vbog__row--color" data-color="{{ color | escape }}" role="row"><td class="vbog__cell vbog__cell--swatch" scope="row" role="rowheader"><div class="vbog__swatch{% if grid_color_lower contains 'black' or grid_color_lower contains 'navy' %} vbog__swatch--dark{% endif %}" title="{{ color | escape }}" style="background-color:{{ grid_swatch }}"><span class="vbog__swatch-name">{{ grid_color_label | upcase }}</span></div></td>
+                    <tr class="vbog__row vbog__row--color" data-color="{{ color | escape }}" role="row"><td class="vbog__cell vbog__cell--swatch" scope="row" role="rowheader"><div class="vbog__swatch{% if grid_color_lower contains 'black' or grid_color_lower contains 'navy' %} vbog__swatch--dark{% endif %}" title="{{ color | escape }}" style="{% if color.swatch.image %}background-image: url({{ color.swatch.image | image_url: width: 72 }});{% else %}background-color: {{ grid_swatch }};{% endif %}"><span class="vbog__swatch-name">{{ grid_color_label | upcase }}</span></div></td>
                       {%- for size in size_option.values -%}
                         {%- assign grid_variant = nil -%}
                         {%- for variant in product.variants -%}
