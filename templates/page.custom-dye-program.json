@@ -16,7 +16,7 @@
           "type": "text_line",
           "settings": {
             "text": "colorfast",
-            "size": 14,
+            "size": 10,
             "width_mode": "stretch",
             "stretch": 100,
             "gap": 0,
