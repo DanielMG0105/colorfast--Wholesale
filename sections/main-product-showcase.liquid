@@ -78,6 +78,65 @@
 <style>
   {{ heading_font | font_face: font_display: 'swap' }}
   {{ body_font | font_face: font_display: 'swap' }}
+
+  /* Mobile product media is a real horizontal track; the showcase is a custom section. */
+  @media screen and (max-width: 749px) {
+    product-showcase.product-showcase {
+      display: block;
+      max-width: 100%;
+      overflow-x: clip;
+    }
+
+    product-showcase.product-showcase .product-showcase__grid,
+    product-showcase.product-showcase .product-showcase__info {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    product-showcase.product-showcase [data-media-list] {
+      display: flex !important;
+      flex-flow: row nowrap !important;
+      gap: 0 !important;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto !important;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    product-showcase.product-showcase [data-media-list]::-webkit-scrollbar {
+      display: none;
+    }
+
+    product-showcase.product-showcase [data-media-list] > .product-showcase__figure {
+      display: block;
+      flex: 0 0 100%;
+      width: 100%;
+      min-width: 100%;
+      scroll-snap-align: start;
+    }
+
+    product-showcase.product-showcase [data-media-list] > .product-showcase__figure[hidden] {
+      display: none !important;
+    }
+
+    product-showcase.product-showcase .product-showcase__bulk-grid,
+    product-showcase.product-showcase .product-showcase__bulk-content,
+    product-showcase.product-showcase .product-showcase__bulk-wrap,
+    product-showcase.product-showcase .vbog__scroll-wrapper {
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    product-showcase.product-showcase .vbog__scroll-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
 </style>
 
 <product-showcase
@@ -1464,26 +1523,6 @@ data-wpd-product-id="{{ product.id }}">
   @media screen and (max-width: 749px) {
     .product-showcase__grid {
       gap: 28px;
-    }
-
-    .product-showcase__media {
-      flex-direction: row;
-      gap: 0;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-
-    .product-showcase__media::-webkit-scrollbar {
-      display: none;
-    }
-
-    .product-showcase__figure {
-      flex: 0 0 100%;
-      width: 100%;
-      scroll-snap-align: start;
     }
 
     .product-showcase__title {
