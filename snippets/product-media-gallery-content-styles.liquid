@@ -31,28 +31,6 @@
     display: none;
   }
 
-  /* Keep the product gallery as a horizontal swipe track on mobile. */
-  @media screen and (max-width: 749px) {
-    media-gallery.media-gallery--grid slideshow-component {
-      display: flex;
-      width: 100%;
-    }
-
-    media-gallery.media-gallery--grid slideshow-slides {
-      display: flex;
-      width: 100%;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    media-gallery.media-gallery--grid slideshow-slide {
-      flex: 0 0 100%;
-      width: 100%;
-      scroll-snap-align: center;
-    }
-  }
-
   media-gallery.media-gallery--grid .media-gallery__grid .product-media-container {
     /* Needed for safari to stretch to full grid height */
     height: 100%;

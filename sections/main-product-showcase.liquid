@@ -1467,7 +1467,23 @@ data-wpd-product-id="{{ product.id }}">
     }
 
     .product-showcase__media {
-      gap: 16px;
+      flex-direction: row;
+      gap: 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .product-showcase__media::-webkit-scrollbar {
+      display: none;
+    }
+
+    .product-showcase__figure {
+      flex: 0 0 100%;
+      width: 100%;
+      scroll-snap-align: start;
     }
 
     .product-showcase__title {
