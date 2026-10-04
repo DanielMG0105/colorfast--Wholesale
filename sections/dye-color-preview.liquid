@@ -82,9 +82,12 @@
           </script>
         {%- endif -%}
         {%- if garment_label != blank -%}
-          <button type="button" class="dye-preview__pill dye-preview__product-trigger" data-open-product-picker aria-haspopup="dialog">
-            {{ garment_label | escape }}
-          </button>
+          <div class="dye-preview__product-choice">
+            <p class="dye-preview__product-hint">Select a product</p>
+            <button type="button" class="dye-preview__pill dye-preview__product-trigger" data-open-product-picker aria-haspopup="dialog">
+              {{ garment_label | escape }}
+            </button>
+          </div>
         {%- endif -%}
 
         <div class="dye-preview__row">
@@ -136,7 +139,10 @@
   {%- comment -%} Filled by the script for a product opened from its custom dye swatch (?product=handle) {%- endcomment -%}
   <template data-garment-template>
     <div class="dye-preview__garment" data-garment>
-      <button type="button" class="dye-preview__pill dye-preview__product-trigger" data-garment-label data-open-product-picker aria-haspopup="dialog"></button>
+      <div class="dye-preview__product-choice">
+        <p class="dye-preview__product-hint">Select a product</p>
+        <button type="button" class="dye-preview__pill dye-preview__product-trigger" data-garment-label data-open-product-picker aria-haspopup="dialog"></button>
+      </div>
       <div class="dye-preview__row">
         <button type="button" class="dye-preview__arrow" data-garment-step="-1" aria-label="Previous garment">
           {%- render 'dye-preview-arrow', direction: 'left' -%}
@@ -849,6 +855,20 @@
     letter-spacing: 0.01em;
     text-transform: uppercase;
     text-decoration: none;
+  }
+
+  .dye-preview__product-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dye-preview__product-hint {
+    margin: 0;
+    color: var(--dp-text);
+    font-size: 14px;
+    letter-spacing: 0.04em;
   }
 
   button.dye-preview__product-trigger {
