@@ -201,50 +201,50 @@
     --ps-pt: {{ section.settings.padding_top }}px;
     --ps-pb: {{ section.settings.padding_bottom }}px;
   "
-  >
+>
   <div class="product-showcase__grid">
     <div class="product-showcase__media-viewport">
-    <div class="product-showcase__media" data-media-list>
-      {%- for media in product.media -%}
-        {%- assign media_needle = '|' | append: media.id | append: '|' -%}
-        <figure
-          class="product-showcase__figure"
-          data-media-id="{{ media.id }}"
-          data-media-alt="{{ media.alt | downcase | escape }}"
-          {% if filter_media %}{% unless matched_media_ids contains media_needle %}hidden{% endunless %}{% endif %}
-        >
-          {%- case media.media_type -%}
-            {%- when 'image' -%}
-              {%- assign media_alt = media.alt | default: product.title | escape -%}
-              {{
-                media
-                | image_url: width: 2000
-                | image_tag:
-                  widths: '600, 900, 1200, 1600, 2000',
-                  sizes: '(min-width: 990px) 50vw, 100vw',
-                  loading: 'lazy',
-                  alt: media_alt,
-                  class: 'product-showcase__image'
-              }}
-            {%- when 'video' -%}
-              {{ media | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, class: 'product-showcase__image' }}
-            {%- else -%}
-              {{ media | media_tag: class: 'product-showcase__image' }}
-          {%- endcase -%}
-        </figure>
-      {%- else -%}
-        <figure class="product-showcase__figure">
-          {{ 'product-apparel-1' | placeholder_svg_tag: 'product-showcase__image product-showcase__placeholder' }}
-        </figure>
-      {%- endfor -%}
-    </div>
-    {% if product.media.size > 1 %}
-      <div class="product-showcase__gallery-controls" data-gallery-controls aria-label="Image navigation">
-        <button class="product-showcase__gallery-control" type="button" data-gallery-previous aria-label="Previous image">‹</button>
-        <span class="product-showcase__gallery-status" data-gallery-status aria-live="polite">1 / {{ product.media.size }}</span>
-        <button class="product-showcase__gallery-control" type="button" data-gallery-next aria-label="Next image">›</button>
+      <div class="product-showcase__media" data-media-list>
+        {%- for media in product.media -%}
+          {%- assign media_needle = '|' | append: media.id | append: '|' -%}
+          <figure
+            class="product-showcase__figure"
+            data-media-id="{{ media.id }}"
+            data-media-alt="{{ media.alt | downcase | escape }}"
+            {% if filter_media %}{% unless matched_media_ids contains media_needle %}hidden{% endunless %}{% endif %}
+          >
+            {%- case media.media_type -%}
+              {%- when 'image' -%}
+                {%- assign media_alt = media.alt | default: product.title | escape -%}
+                {{
+                  media
+                  | image_url: width: 2000
+                  | image_tag:
+                    widths: '600, 900, 1200, 1600, 2000',
+                    sizes: '(min-width: 990px) 50vw, 100vw',
+                    loading: 'lazy',
+                    alt: media_alt,
+                    class: 'product-showcase__image'
+                }}
+              {%- when 'video' -%}
+                {{ media | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, class: 'product-showcase__image' }}
+              {%- else -%}
+                {{ media | media_tag: class: 'product-showcase__image' }}
+            {%- endcase -%}
+          </figure>
+        {%- else -%}
+          <figure class="product-showcase__figure">
+            {{ 'product-apparel-1' | placeholder_svg_tag: 'product-showcase__image product-showcase__placeholder' }}
+          </figure>
+        {%- endfor -%}
       </div>
-    {% endif %}
+      {% if product.media.size > 1 %}
+        <div class="product-showcase__gallery-controls" data-gallery-controls aria-label="Image navigation">
+          <button class="product-showcase__gallery-control" type="button" data-gallery-previous aria-label="Previous image">‹</button>
+          <span class="product-showcase__gallery-status" data-gallery-status aria-live="polite">1 / {{ product.media.size }}</span>
+          <button class="product-showcase__gallery-control" type="button" data-gallery-next aria-label="Next image">›</button>
+        </div>
+      {% endif %}
     </div>
 
     <div class="product-showcase__info">
