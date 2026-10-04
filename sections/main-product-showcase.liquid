@@ -136,8 +136,34 @@
     }
 
     product-showcase.product-showcase .vbog__scroll-wrapper {
-      overflow-x: auto;
+      overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch;
+    }
+
+    product-showcase.product-showcase .product-showcase__bulk-grid .vbog__table {
+      width: 100% !important;
+      min-width: 0 !important;
+      table-layout: fixed !important;
+      border-spacing: 2px !important;
+    }
+
+    product-showcase.product-showcase .product-showcase__bulk-grid .vbog__cell {
+      padding-inline: 1px;
+      font-size: 9px;
+      letter-spacing: 0;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    product-showcase.product-showcase .product-showcase__bulk-grid .vbog__cell--label,
+    product-showcase.product-showcase .product-showcase__bulk-grid .vbog__cell--size-header,
+    product-showcase.product-showcase .product-showcase__bulk-grid .vbog__cell--total-label {
+      font-size: 9px;
+      letter-spacing: 0;
+    }
+
+    product-showcase.product-showcase .product-showcase__bulk-grid .vbog__table col.vbog__color-column {
+      width: 18%;
     }
 
     product-showcase.product-showcase .product-showcase__gallery-controls {
@@ -1617,8 +1643,13 @@ data-wpd-product-id="{{ product.id }}">
   .product-showcase__bulk-grid .vbog__total-divider td { height: 1px; padding: 0; border: 0; background: var(--ps-border); }
   @media screen and (max-width: 749px) {
     .product-showcase__bulk-grid > summary { font-size: 15px; }
-    .product-showcase__bulk-grid .vbog__scroll-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .product-showcase__bulk-grid .vbog__table { min-width: 560px !important; }
+    .product-showcase__bulk-grid .vbog__scroll-wrapper { overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    .product-showcase__bulk-grid .vbog__table { width: 100%; min-width: 0 !important; table-layout: fixed; border-spacing: 2px; }
+    .product-showcase__bulk-grid .vbog__cell { padding-inline: 1px; font-size: 9px; letter-spacing: 0; white-space: normal; overflow-wrap: anywhere; }
+    .product-showcase__bulk-grid .vbog__cell--label,
+    .product-showcase__bulk-grid .vbog__cell--size-header,
+    .product-showcase__bulk-grid .vbog__cell--total-label { font-size: 9px; letter-spacing: 0; }
+    .product-showcase__bulk-grid .vbog__table col.vbog__color-column { width: 18%; }
     .product-showcase__bulk-grid .vbog__bulk-bar { padding: 10px; }
     .product-showcase__bulk-grid .vbog__bulk-bar-button { flex-basis: 125px; width: 125px; max-width: 125px; }
   }
