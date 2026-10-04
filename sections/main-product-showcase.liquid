@@ -88,12 +88,14 @@
     }
 
     product-showcase.product-showcase .product-showcase__grid,
-    product-showcase.product-showcase .product-showcase__info {
+    product-showcase.product-showcase .product-showcase__info,
+    product-showcase.product-showcase .product-showcase__media-viewport {
       min-width: 0;
       max-width: 100%;
     }
 
     product-showcase.product-showcase [data-media-list] {
+      position: relative;
       display: flex !important;
       flex-flow: row nowrap !important;
       gap: 0 !important;
@@ -103,6 +105,7 @@
       overscroll-behavior-inline: contain;
       scroll-snap-type: x mandatory;
       scroll-behavior: smooth;
+      touch-action: pan-x pan-y;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
@@ -136,6 +139,43 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
+
+    product-showcase.product-showcase .product-showcase__gallery-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 12px 0 0;
+    }
+
+    product-showcase.product-showcase .product-showcase__gallery-control {
+      display: inline-flex;
+      width: 40px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--ps-border);
+      border-radius: 50%;
+      background: var(--ps-bg);
+      color: var(--ps-text);
+      font: inherit;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    product-showcase.product-showcase .product-showcase__gallery-status {
+      min-width: 48px;
+      text-align: center;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    product-showcase.product-showcase .product-showcase__gallery-control:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
   }
 </style>
 
@@ -161,8 +201,9 @@
     --ps-pt: {{ section.settings.padding_top }}px;
     --ps-pb: {{ section.settings.padding_bottom }}px;
   "
->
+  >
   <div class="product-showcase__grid">
+    <div class="product-showcase__media-viewport">
     <div class="product-showcase__media" data-media-list>
       {%- for media in product.media -%}
         {%- assign media_needle = '|' | append: media.id | append: '|' -%}
@@ -196,6 +237,14 @@
           {{ 'product-apparel-1' | placeholder_svg_tag: 'product-showcase__image product-showcase__placeholder' }}
         </figure>
       {%- endfor -%}
+    </div>
+    {% if product.media.size > 1 %}
+      <div class="product-showcase__gallery-controls" data-gallery-controls aria-label="Image navigation">
+        <button class="product-showcase__gallery-control" type="button" data-gallery-previous aria-label="Previous image">‹</button>
+        <span class="product-showcase__gallery-status" data-gallery-status aria-live="polite">1 / {{ product.media.size }}</span>
+        <button class="product-showcase__gallery-control" type="button" data-gallery-next aria-label="Next image">›</button>
+      </div>
+    {% endif %}
     </div>
 
     <div class="product-showcase__info">
@@ -469,6 +518,17 @@ data-wpd-product-id="{{ product.id }}">
       class ProductShowcase extends HTMLElement {
         connectedCallback() {
           this.variants = JSON.parse(this.querySelector('[data-variants]').textContent);
+          this.mediaTrack = this.querySelector('[data-media-list]');
+          this.galleryPrevious = this.querySelector('[data-gallery-previous]');
+          this.galleryNext = this.querySelector('[data-gallery-next]');
+          this.galleryStatus = this.querySelector('[data-gallery-status]');
+          this.onGalleryScroll = () => this.updateGalleryControls();
+          this.onGalleryPrevious = () => this.moveGallery(-1);
+          this.onGalleryNext = () => this.moveGallery(1);
+          this.mediaTrack?.addEventListener('scroll', this.onGalleryScroll, { passive: true });
+          this.galleryPrevious?.addEventListener('click', this.onGalleryPrevious);
+          this.galleryNext?.addEventListener('click', this.onGalleryNext);
+          this.updateGalleryControls();
           this.form = this.querySelector('[data-product-form]');
           this.variantInput = this.querySelector('[data-variant-input]');
           this.quantity = this.querySelector('[data-quantity]');
@@ -524,6 +584,44 @@ data-wpd-product-id="{{ product.id }}">
         disconnectedCallback() {
           this.tiersObserver?.disconnect();
           if (this.onBulkResize) window.removeEventListener('resize', this.onBulkResize);
+          this.mediaTrack?.removeEventListener('scroll', this.onGalleryScroll);
+          this.galleryPrevious?.removeEventListener('click', this.onGalleryPrevious);
+          this.galleryNext?.removeEventListener('click', this.onGalleryNext);
+        }
+
+        gallerySlides() {
+          return [...(this.mediaTrack?.querySelectorAll('.product-showcase__figure:not([hidden])') || [])];
+        }
+
+        updateGalleryControls() {
+          const slides = this.gallerySlides();
+          if (!slides.length || !this.galleryStatus) return;
+
+          const scrollLeft = this.mediaTrack.scrollLeft;
+          const activeIndex = slides.reduce((closestIndex, slide, index) => {
+            const currentDistance = Math.abs(slides[closestIndex].offsetLeft - scrollLeft);
+            const nextDistance = Math.abs(slide.offsetLeft - scrollLeft);
+            return nextDistance < currentDistance ? index : closestIndex;
+          }, 0);
+
+          this.galleryStatus.textContent = `${activeIndex + 1} / ${slides.length}`;
+          const disabled = slides.length < 2;
+          if (this.galleryPrevious) this.galleryPrevious.disabled = disabled;
+          if (this.galleryNext) this.galleryNext.disabled = disabled;
+        }
+
+        moveGallery(direction) {
+          const slides = this.gallerySlides();
+          if (slides.length < 2 || !this.mediaTrack) return;
+
+          const scrollLeft = this.mediaTrack.scrollLeft;
+          const activeIndex = slides.reduce((closestIndex, slide, index) => {
+            const currentDistance = Math.abs(slides[closestIndex].offsetLeft - scrollLeft);
+            const nextDistance = Math.abs(slide.offsetLeft - scrollLeft);
+            return nextDistance < currentDistance ? index : closestIndex;
+          }, 0);
+          const nextIndex = (activeIndex + direction + slides.length) % slides.length;
+          this.mediaTrack.scrollTo({ left: slides[nextIndex].offsetLeft, behavior: 'smooth' });
         }
 
         // The WCP app injects its volume table asynchronously (and re-renders it on variant change),
@@ -659,6 +757,8 @@ data-wpd-product-id="{{ product.id }}">
             const list = this.querySelector('[data-media-list]');
             if (figure && list && list.firstElementChild !== figure) list.prepend(figure);
           }
+          this.mediaTrack?.scrollTo({ left: 0, behavior: 'auto' });
+          this.updateGalleryControls();
 
           const url = new URL(window.location.href);
           url.searchParams.set('variant', String(variant.id));
@@ -1028,6 +1128,10 @@ data-wpd-product-id="{{ product.id }}">
 
   .product-showcase__figure {
     margin: 0;
+  }
+
+  .product-showcase__gallery-controls {
+    display: none;
   }
 
   .product-showcase__image {
