@@ -1156,6 +1156,14 @@ data-wpd-product-id="{{ product.id }}">
     }
   }
 
+  @media screen and (min-width: 750px) and (max-width: 1599px) {
+    .product-showcase {
+      padding-left: clamp(32px, 6vw, 96px);
+      padding-right: clamp(32px, 6vw, 96px);
+      --ps-gap: clamp(24px, 4vw, 64px);
+    }
+  }
+
   .product-showcase__media {
     display: flex;
     flex-direction: column;
