@@ -106,6 +106,10 @@
     line-height: 0.9;
   }
 
+  .edge-wordmark__line--lower .edge-wordmark__group {
+    transform: scaleX(2);
+  }
+
   .edge-wordmark__line--tagline {
     margin-top: var(--ew-tagline-space);
     font-size: calc(var(--ew-tagline-size) * 1cqw);
@@ -115,7 +119,15 @@
   .edge-wordmark__group { display: block; }
 
   .edge-wordmark__group--left { transform-origin: left center; }
-  .edge-wordmark__group--right { transform-origin: right center; }
+  .edge-wordmark__group--right {
+    position: relative;
+    inset-inline-end: -1.5cqw;
+    transform-origin: right center;
+  }
+
+  .edge-wordmark__line--tagline .edge-wordmark__group--right {
+    inset-inline-end: -0.3cqw;
+  }
 
   .edge-wordmark__group {
     flex: 0 0 auto;
