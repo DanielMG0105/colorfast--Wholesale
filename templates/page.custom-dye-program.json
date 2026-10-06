@@ -348,6 +348,7 @@
         "show_color_name": true,
         "show_reset": true,
         "reset_label": "Original color",
+        "enable_add_to_cart": false,
         "choose_color_label": "Choose a color",
         "add_label": "Add to cart",
         "added_label": "Added",

@@ -232,21 +232,23 @@
     {%- endif -%}
   </div>
 
-  {%- comment -%} Shown for garments whose product has custom.custom_dye = true {%- endcomment -%}
-  <div class="dye-preview__purchase" data-purchase hidden>
-    <p class="dye-preview__price" data-purchase-price></p>
-    <div class="dye-preview__options" data-purchase-options></div>
-    <div class="dye-preview__buy">
-      <label class="dye-preview__quantity">
-        <span class="visually-hidden">Quantity</span>
-        <input type="number" min="1" value="1" inputmode="numeric" data-purchase-quantity>
-      </label>
-      <button type="button" class="dye-preview__add" data-purchase-add disabled>
-        {{- section.settings.choose_color_label | default: 'Choose a color' | escape -}}
-      </button>
+  {%- if section.settings.enable_add_to_cart -%}
+    {%- comment -%} Shown for garments whose product has custom.custom_dye = true {%- endcomment -%}
+    <div class="dye-preview__purchase" data-purchase hidden>
+      <p class="dye-preview__price" data-purchase-price></p>
+      <div class="dye-preview__options" data-purchase-options></div>
+      <div class="dye-preview__buy">
+        <label class="dye-preview__quantity">
+          <span class="visually-hidden">Quantity</span>
+          <input type="number" min="1" value="1" inputmode="numeric" data-purchase-quantity>
+        </label>
+        <button type="button" class="dye-preview__add" data-purchase-add disabled>
+          {{- section.settings.choose_color_label | default: 'Choose a color' | escape -}}
+        </button>
+      </div>
+      <p class="dye-preview__message" role="status" data-purchase-message hidden></p>
     </div>
-    <p class="dye-preview__message" role="status" data-purchase-message hidden></p>
-  </div>
+  {%- endif -%}
 </dye-color-preview>
 
 <script type="module">
@@ -606,6 +608,7 @@
 
         // Adds the base variant with the chosen color as line item properties
         async addToCart() {
+          if (!this.addButton || !this.purchase) return;
           const variant = this.findVariant(this.selection ?? []);
           if (!variant || !this.dye) return;
 
@@ -1529,6 +1532,12 @@
     {
       "type": "header",
       "content": "Add to cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_add_to_cart",
+      "label": "Enable add to cart",
+      "default": false
     },
     {
       "type": "paragraph",
