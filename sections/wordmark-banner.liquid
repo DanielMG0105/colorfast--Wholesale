@@ -147,8 +147,8 @@
 
             groups.forEach((group, i) => {
               group.style.width = `${natural[i] * stretch}px`;
-              const alignmentScale = groups.length > 1 ? 1.02 : 1;
-              group.firstElementChild.style.transform = `scaleX(${stretch * alignmentScale})`;
+              const textScale = groups.length > 1 ? 0.9 : 1;
+              group.firstElementChild.style.transform = `scaleX(${stretch * textScale})`;
             });
             line.classList.add('is-fitted');
           }
