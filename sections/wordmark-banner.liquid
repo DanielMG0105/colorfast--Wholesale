@@ -197,8 +197,10 @@
 
   .wordmark-banner__inner {
     container-type: inline-size;
+    width: 100%;
     max-width: 1550px;
     margin-inline: auto;
+    box-sizing: border-box;
   }
 
   /* Box style: a thin frame drawn around the content instead of full-width lines */
@@ -262,7 +264,9 @@
   }
 
   .wordmark-banner__group {
-    display: inline-block;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
   }
 
   .wordmark-banner__glyphs {
