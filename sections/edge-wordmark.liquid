@@ -30,8 +30,8 @@
 >
   <div class="edge-wordmark__inner">
     <span class="visually-hidden">{{ section.settings.brand_word | escape }}</span>
-    <svg class="edge-wordmark__brand" viewBox="0 0 1000 130" preserveAspectRatio="none" role="presentation" aria-hidden="true">
-      <text x="0" y="130" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ section.settings.brand_word | escape }}</text>
+    <svg class="edge-wordmark__brand" viewBox="0 0 1000 100" preserveAspectRatio="none" role="presentation" aria-hidden="true">
+      <text x="0" y="100" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ section.settings.brand_word | escape }}</text>
     </svg>
 
     {%- if section.settings.lower_line != blank -%}
@@ -39,8 +39,8 @@
         <div class="edge-wordmark__line edge-wordmark__line--lower" aria-hidden="true">
           {%- for group in lower_groups -%}
           <span class="edge-wordmark__group{% if forloop.first %} edge-wordmark__group--left{% endif %}{% if forloop.last %} edge-wordmark__group--right{% endif %}">
-            <svg viewBox="0 0 1000 130" preserveAspectRatio="none" role="presentation">
-              <text x="0" y="130" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ group | strip | escape }}</text>
+            <svg viewBox="0 0 1000 100" preserveAspectRatio="none" role="presentation">
+              <text x="0" y="100" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ group | strip | escape }}</text>
             </svg>
           </span>
           {%- endfor -%}
@@ -52,8 +52,8 @@
         <div class="edge-wordmark__line edge-wordmark__line--tagline" aria-hidden="true">
           {%- for group in tagline_groups -%}
           <span class="edge-wordmark__group{% if forloop.first %} edge-wordmark__group--left{% endif %}{% if forloop.last %} edge-wordmark__group--right{% endif %}">
-            <svg viewBox="0 0 1000 130" preserveAspectRatio="none" role="presentation">
-              <text x="0" y="130" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ group | strip | escape }}</text>
+            <svg viewBox="0 0 1000 100" preserveAspectRatio="none" role="presentation">
+              <text x="0" y="100" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ group | strip | escape }}</text>
             </svg>
           </span>
         {%- endfor -%}
@@ -92,13 +92,13 @@
   .edge-wordmark__brand {
     display: block;
     width: 100%;
-    height: calc(var(--ew-brand-size) * 0.745cqw);
+    height: calc(var(--ew-brand-size) * 0.73cqw);
     overflow: visible;
   }
 
   .edge-wordmark__brand text {
     font-family: var(--ew-font-family);
-    font-size: calc(var(--ew-brand-size) * 1.25cqw);
+    font-size: 135px;
     font-style: normal;
     font-weight: var(--ew-font-weight);
   }
@@ -113,12 +113,12 @@
 
   .edge-wordmark__line--lower {
     margin-top: var(--ew-lower-space);
-    height: calc(var(--ew-lower-size) * 0.745cqw);
+    height: calc(var(--ew-lower-size) * 0.73cqw);
   }
 
   .edge-wordmark__line--lower text {
     font-family: var(--ew-font-family);
-    font-size: calc(var(--ew-lower-size) * 1.25cqw);
+    font-size: 135px;
     font-style: normal;
     font-weight: var(--ew-font-weight);
   }
@@ -128,12 +128,12 @@
 
   .edge-wordmark__line--tagline {
     margin-top: var(--ew-tagline-space);
-    height: calc(var(--ew-tagline-size) * 1cqw);
+    height: calc(var(--ew-tagline-size) * 0.8cqw);
   }
 
   .edge-wordmark__line--tagline text {
     font-family: var(--ew-font-family);
-    font-size: 130px;
+    font-size: 100px;
     font-style: normal;
     font-weight: var(--ew-font-weight);
   }
