@@ -1,5 +1,4 @@
 {%- assign wordmark_font = section.settings.font -%}
-{%- assign brand_letters = section.settings.brand_word | split: '' -%}
 {%- assign lower_groups = section.settings.lower_line | split: '|' -%}
 {%- assign tagline_groups = section.settings.tagline | split: '|' -%}
 
@@ -26,9 +25,7 @@
   "
 >
   <div class="edge-wordmark__inner">
-    <div class="edge-wordmark__brand" aria-label="{{ section.settings.brand_word | escape }}">
-      {%- for letter in brand_letters -%}<span>{{ letter | escape }}</span>{%- endfor -%}
-    </div>
+    <div class="edge-wordmark__brand">{{ section.settings.brand_word | escape }}</div>
 
     {%- if section.settings.lower_line != blank -%}
         <div class="edge-wordmark__line edge-wordmark__line--lower">
@@ -50,6 +47,7 @@
 
 {% stylesheet %}
   .edge-wordmark {
+    position: relative;
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
@@ -57,14 +55,21 @@
     color: var(--ew-text);
     font-family: var(--ew-font-family);
     font-weight: var(--ew-font-weight);
-    border-block: 0 solid transparent;
     padding-block: var(--ew-space-top) var(--ew-space-bottom);
   }
 
-  .edge-wordmark--border {
-    border-block-width: var(--ew-border-width);
-    border-block-color: var(--ew-border);
+  .edge-wordmark--border::before,
+  .edge-wordmark--border::after {
+    position: absolute;
+    inset-inline: 0;
+    height: var(--ew-border-width);
+    background: var(--ew-border);
+    content: '';
+    pointer-events: none;
   }
+
+  .edge-wordmark--border::before { inset-block-start: 0; }
+  .edge-wordmark--border::after { inset-block-end: 0; }
 
   .edge-wordmark__inner {
     container-type: inline-size;
@@ -76,17 +81,13 @@
   }
 
   .edge-wordmark__brand {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+    display: block;
     width: 100%;
     font-size: calc(var(--ew-brand-size) * 1cqw);
     line-height: 0.9;
     font-weight: var(--ew-font-weight);
     white-space: nowrap;
   }
-
-  .edge-wordmark__brand span { display: block; }
 
   .edge-wordmark__line {
     display: flex;
