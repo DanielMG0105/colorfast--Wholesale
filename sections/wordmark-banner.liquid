@@ -98,6 +98,7 @@
       class WordmarkBanner extends HTMLElement {
         connectedCallback() {
           this.lines = [...this.querySelectorAll('.wordmark-banner__line')];
+          this.measurementContext = document.createElement('canvas').getContext('2d');
           this.observer = new ResizeObserver(() => this.layout());
           this.observer.observe(this);
           document.fonts?.ready.then(() => this.layout());
@@ -139,19 +140,28 @@
             const fontScale = line.dataset.mode === 'fill' && verticalStretch > 1 ? Math.pow(verticalStretch, 0.35) : 1;
             const mobileFontScale = window.matchMedia('(max-width: 749px)').matches ? 1.3 : 1;
             line.style.fontSize = `${baseFontSize * fontScale * 0.8 * mobileFontScale}px`;
-            natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
-            total = natural.reduce((sum, value) => sum + value, 0);
-            if (!total) continue;
+            const lineStyle = getComputedStyle(line);
+            this.measurementContext.font = `${lineStyle.fontStyle} ${lineStyle.fontWeight} ${lineStyle.fontSize} ${lineStyle.fontFamily}`;
+            this.measurementContext.textAlign = 'left';
+            const inkMetrics = groups.map((group) => {
+              const metrics = this.measurementContext.measureText(group.firstElementChild.textContent);
+              const left = Math.max(0, -metrics.actualBoundingBoxLeft);
+              const right = Math.max(0, metrics.actualBoundingBoxRight);
+              return { left, width: left + right };
+            });
+            const totalInkWidth = inkMetrics.reduce((sum, metrics) => sum + metrics.width, 0);
+            if (!totalInkWidth) continue;
             if (line.dataset.mode === 'fill') {
-              stretch = availableWidth / total;
+              stretch = availableWidth / totalInkWidth;
             } else {
-              stretch = Math.min(parseFloat(line.dataset.stretch) / 100, availableWidth / total);
+              stretch = Math.min(parseFloat(line.dataset.stretch) / 100, availableWidth / totalInkWidth);
             }
-
             const lineScaleX = (parseFloat(line.dataset.scaleX) || 100) / 100;
             groups.forEach((group, i) => {
-              group.style.width = `${natural[i] * stretch * lineScaleX}px`;
-              group.firstElementChild.style.transform = `scaleX(${stretch * lineScaleX})`;
+              const glyphScale = stretch * lineScaleX;
+              group.style.width = `${inkMetrics[i].width * glyphScale}px`;
+              group.firstElementChild.style.transform =
+                `translateX(${-inkMetrics[i].left * glyphScale}px) scaleX(${glyphScale})`;
             });
             line.classList.add('is-fitted');
           }
@@ -273,12 +283,13 @@
   .wordmark-banner__group {
     display: flex;
     align-items: baseline;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .wordmark-banner__glyphs {
     display: inline-block;
-    transform-origin: center center;
+    flex: 0 0 auto;
+    transform-origin: left center;
   }
 
   .wordmark-banner__image-line {
