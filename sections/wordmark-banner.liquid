@@ -6,6 +6,7 @@
 
 <wordmark-banner
   class="wordmark-banner{% if section.settings.show_borders %} wordmark-banner--borders{% endif %}{% if section.settings.border_style == 'box' %} wordmark-banner--box{% unless section.settings.show_side_borders %} wordmark-banner--no-sides{% endunless %}{% endif %}"
+  data-proportional-fill="{{ section.settings.proportional_fill }}"
   style="
     --wb-bg: {{ section.settings.background_color }};
     --wb-text: {{ section.settings.text_color }};
@@ -90,8 +91,7 @@
 </wordmark-banner>
 
 <script type="module">
-  // Size each text line from the container width and stretch its glyphs horizontally so the
-  // groups (split with "|") fill the line edge to edge, like an extended display typeface.
+  // Size each text line from the container width and fit its groups edge to edge.
   if (!customElements.get('wordmark-banner')) {
     customElements.define(
       'wordmark-banner',
@@ -113,22 +113,34 @@
             const width = line.clientWidth;
             if (!width) continue;
             const groups = [...line.querySelectorAll('.wordmark-banner__group')];
-            line.style.fontSize = `${(parseFloat(line.dataset.size) / 100) * width}px`;
+            const baseFontSize = (parseFloat(line.dataset.size) / 100) * width;
+            line.style.fontSize = `${baseFontSize}px`;
 
             for (const group of groups) {
               group.style.width = '';
               group.firstElementChild.style.transform = '';
             }
 
-            const natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
-            const total = natural.reduce((sum, value) => sum + value, 0);
+            let natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
+            let total = natural.reduce((sum, value) => sum + value, 0);
             if (!total) continue;
 
             const gap = groups.length > 1 ? (parseFloat(line.dataset.gap) / 100) * width : 0;
+            const availableWidth = width - gap;
             let stretch =
-              line.dataset.mode === 'fill' ? (width - gap) / total : parseFloat(line.dataset.stretch) / 100;
+              line.dataset.mode === 'fill' ? availableWidth / total : parseFloat(line.dataset.stretch) / 100;
             // Never overflow the line
-            stretch = Math.min(stretch, (width - gap) / total);
+            stretch = Math.min(stretch, availableWidth / total);
+
+            // For selected banners, use part of the fill scale vertically as well as
+            // horizontally so letters keep a more natural shape instead of looking flattened.
+            if (this.dataset.proportionalFill === 'true' && line.dataset.mode === 'fill' && stretch > 1) {
+              line.style.fontSize = `${baseFontSize * Math.sqrt(stretch)}px`;
+              natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
+              total = natural.reduce((sum, value) => sum + value, 0);
+              if (!total) continue;
+              stretch = Math.min(Math.sqrt(stretch), availableWidth / total);
+            }
 
             groups.forEach((group, i) => {
               group.style.width = `${natural[i] * stretch}px`;
