@@ -26,9 +26,9 @@
 >
   <div class="edge-wordmark__inner">
     <span class="visually-hidden">{{ section.settings.brand_word | escape }}</span>
-    <div class="edge-wordmark__brand" aria-hidden="true">
-      <span class="edge-wordmark__brand-text">{{ section.settings.brand_word | escape }}</span>
-    </div>
+    <svg class="edge-wordmark__brand" viewBox="0 0 1000 100" preserveAspectRatio="none" role="presentation" aria-hidden="true">
+      <text x="0" y="82" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ section.settings.brand_word | escape }}</text>
+    </svg>
 
     {%- if section.settings.lower_line != blank -%}
       <span class="visually-hidden">{{ section.settings.lower_line | replace: '|', ' ' | escape }}</span>
@@ -78,18 +78,17 @@
   }
 
   .edge-wordmark__brand {
+    display: block;
     width: 100%;
-    font-size: calc(var(--ew-brand-size) * 1cqw);
-    line-height: 0.74;
-    white-space: nowrap;
+    height: calc(var(--ew-brand-size) * 1cqw);
+    overflow: visible;
   }
 
-  .edge-wordmark__brand-text {
-    display: block;
-    width: max-content;
-    transform: scaleX(2.25);
-    transform-origin: left center;
-    font-weight: inherit;
+  .edge-wordmark__brand text {
+    font-family: var(--ew-font-family);
+    font-size: 100px;
+    font-style: normal;
+    font-weight: var(--ew-font-weight);
   }
 
   .edge-wordmark__line {
@@ -104,16 +103,6 @@
     margin-top: var(--ew-lower-space);
     font-size: calc(var(--ew-lower-size) * 1cqw);
     line-height: 0.74;
-  }
-
-  .edge-wordmark__line--lower > span {
-    display: inline-block;
-    transform: scaleX(1.95);
-    transform-origin: left center;
-  }
-
-  .edge-wordmark__line--lower > span:last-child {
-    transform-origin: right center;
   }
 
   .edge-wordmark__line--tagline {
