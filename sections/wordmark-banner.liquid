@@ -146,7 +146,7 @@
 
             groups.forEach((group, i) => {
               group.style.width = `${natural[i] * stretch}px`;
-              group.firstElementChild.style.transform = `scaleX(${stretch})`;
+              group.firstElementChild.style.transform = `scaleX(${stretch * 0.8})`;
             });
             line.classList.add('is-fitted');
           }
@@ -267,7 +267,7 @@
 
   .wordmark-banner__glyphs {
     display: inline-block;
-    transform-origin: left center;
+    transform-origin: center center;
   }
 
   .wordmark-banner__image-line {
