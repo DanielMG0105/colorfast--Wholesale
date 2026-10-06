@@ -58,9 +58,7 @@
   white-space: nowrap;  
   transform-origin: left center;
   font-family: "Anton", sans-serif;
-  font-family: "Lilita One", sans-serif;
-  font-family: "Rowdies", sans-serif; 
-}
+  font-size: 200px;
 
 .edge-wordmark__line {
   display: flex;
