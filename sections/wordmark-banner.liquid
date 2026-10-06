@@ -6,7 +6,6 @@
 
 <wordmark-banner
   class="wordmark-banner{% if section.settings.show_borders %} wordmark-banner--borders{% endif %}{% if section.settings.border_style == 'box' %} wordmark-banner--box{% unless section.settings.show_side_borders %} wordmark-banner--no-sides{% endunless %}{% endif %}"
-  data-proportional-fill="{{ section.settings.proportional_fill }}"
   style="
     --wb-bg: {{ section.settings.background_color }};
     --wb-text: {{ section.settings.text_color }};
@@ -132,9 +131,9 @@
             // Never overflow the line
             stretch = Math.min(stretch, availableWidth / total);
 
-            // For selected banners, use part of the fill scale vertically as well as
-            // horizontally so letters keep a more natural shape instead of looking flattened.
-            if (this.dataset.proportionalFill === 'true' && line.dataset.mode === 'fill' && stretch > 1) {
+            // Use part of the fill scale vertically as well as horizontally so letters
+            // keep a more natural shape instead of looking flattened.
+            if (line.dataset.mode === 'fill' && stretch > 1) {
               const fontScale = Math.pow(stretch, 0.35);
               line.style.fontSize = `${baseFontSize * fontScale}px`;
               natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
@@ -447,14 +446,8 @@
       "type": "font_picker",
       "id": "font",
       "label": "Font",
-      "info": "A heavy sans works best; lines are stretched horizontally.",
-      "default": "inter_n7"
-    },
-    {
-      "type": "checkbox",
-      "id": "proportional_fill",
-      "label": "Preserve letter proportions when filling the line",
-      "default": false
+      "info": "A bold sans works well with the proportional line fill.",
+      "default": "inter_n6"
     },
     {
       "type": "range",

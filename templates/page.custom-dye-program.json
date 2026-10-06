@@ -44,7 +44,6 @@
         "image_alt": "",
         "image_width": 100,
         "font": "inter_n6",
-        "proportional_fill": true,
         "side_padding": 0,
         "padding": 16,
         "show_borders": true,
@@ -235,7 +234,7 @@
             "width_mode": "fill",
             "stretch": 200,
             "gap": 11,
-            "space_above": 0.9
+            "space_above": 2.4
           }
         },
         "line_tagline": {
@@ -259,7 +258,7 @@
         "content_mode": "text",
         "image_alt": "",
         "image_width": 100,
-        "font": "inter_n7",
+        "font": "inter_n6",
         "side_padding": 10,
         "padding": 60,
         "show_borders": true,
