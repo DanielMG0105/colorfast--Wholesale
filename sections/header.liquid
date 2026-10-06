@@ -535,7 +535,9 @@
       const box = button.getBoundingClientRect();
       const glyph = icon.getBoundingClientRect();
       if (!glyph.width || !box.width) continue;
-      const dx = box.left + box.width / 2 - (glyph.left + glyph.width / 2);
+      const mobileOffset = window.matchMedia('(max-width: 749px)').matches ? 12 : 0;
+      const targetCenterX = box.left + box.width / 2 + mobileOffset;
+      const dx = targetCenterX - (glyph.left + glyph.width / 2);
       const dy = box.top + box.height / 2 - (glyph.top + glyph.height / 2);
       icon.style.translate = `${Math.round(dx * 2) / 2}px ${Math.round(dy * 2) / 2}px`;
     }
