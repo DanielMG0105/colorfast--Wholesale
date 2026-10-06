@@ -59,6 +59,7 @@
   transform-origin: left center;
   font-family: "Anton", sans-serif;
   font-size: 200px;
+  letter-spacing: 3vw;
 
 .edge-wordmark__line {
   display: flex;
