@@ -43,7 +43,7 @@
         "content_mode": "text",
         "image_alt": "",
         "image_width": 100,
-        "font": "inter_n7",
+        "font": "anton_n4",
         "side_padding": 0,
         "padding": 16,
         "show_borders": true,
