@@ -36,7 +36,7 @@
 .edge-wordmark__inner:before{
   content:"";
   display:block;
-  height:200px;
+  height:600px;
   width:3px;
   position:absolute ;
   left:0;
