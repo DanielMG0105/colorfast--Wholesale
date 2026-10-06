@@ -111,12 +111,17 @@
 @media screen and (max-width: 749px) {
   .edge-wordmark__brand {
     width: 100%;
+    font-size: calc(var(--ew-brand-size) * 1.15 * 1cqw);
     transform: none;
   }
 
   .edge-wordmark__group,
   .edge-wordmark__line--lower .edge-wordmark__group {
     transform: none;
+  }
+
+  .edge-wordmark__line--lower {
+    font-size: calc(var(--ew-lower-size) * 1.15 * 1cqw);
   }
 
   .edge-wordmark__group--right {
@@ -129,6 +134,6 @@
   }
 
   .edge-wordmark__line--tagline {
-    font-size: max(12px, calc(var(--ew-tagline-size) * 1cqw));
+    font-size: max(14px, calc(var(--ew-tagline-size) * 1.15 * 1cqw));
   }
 }
