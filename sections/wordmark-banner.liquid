@@ -135,11 +135,12 @@
             // For selected banners, use part of the fill scale vertically as well as
             // horizontally so letters keep a more natural shape instead of looking flattened.
             if (this.dataset.proportionalFill === 'true' && line.dataset.mode === 'fill' && stretch > 1) {
-              line.style.fontSize = `${baseFontSize * Math.sqrt(stretch)}px`;
+              const fontScale = Math.pow(stretch, 0.35);
+              line.style.fontSize = `${baseFontSize * fontScale}px`;
               natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
               total = natural.reduce((sum, value) => sum + value, 0);
               if (!total) continue;
-              stretch = Math.min(Math.sqrt(stretch), availableWidth / total);
+              stretch = Math.min(stretch / fontScale, availableWidth / total);
             }
 
             groups.forEach((group, i) => {
