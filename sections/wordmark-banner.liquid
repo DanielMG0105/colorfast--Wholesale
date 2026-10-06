@@ -224,6 +224,20 @@
     border-inline: none;
   }
 
+  .wordmark-banner--borders.wordmark-banner--box.wordmark-banner--no-sides::before,
+  .wordmark-banner--borders.wordmark-banner--box.wordmark-banner--no-sides::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--wb-border-width);
+    background-color: var(--wb-border);
+  }
+
+  .wordmark-banner--borders.wordmark-banner--box.wordmark-banner--no-sides::before { top: 0; }
+  .wordmark-banner--borders.wordmark-banner--box.wordmark-banner--no-sides::after { bottom: 0; }
+  .wordmark-banner--borders.wordmark-banner--box.wordmark-banner--no-sides .wordmark-banner__inner { border-block: 0; }
+
   .wordmark-banner__line {
     display: flex;
     justify-content: space-between;
