@@ -32,6 +32,15 @@
   padding-inline: 16px;
 }
 
+edge-wordmark__inner:before{
+  content:;
+  display:block;
+  height:200px;
+  width:3px;
+  position:absolute ;
+  left:0;
+}
+
 .edge-wordmark__brand {
   display: block;
   width: 44%;
