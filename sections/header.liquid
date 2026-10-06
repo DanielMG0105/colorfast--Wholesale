@@ -1039,10 +1039,25 @@
       justify-content: center;
     }
 
+    /* Align the visible edge glyphs to the 20px outer gutter, inside their full-size tap targets. */
+    #header-component .header__icon--menu {
+      justify-content: flex-start;
+    }
+
+    #header-component .header__icon--menu .header-drawer-icon {
+      width: fit-content;
+      margin-inline: 0 auto;
+    }
+
     #header-component header-actions {
       width: 88px;
       justify-self: end;
       gap: 0;
+    }
+
+    #header-component header-actions .header-actions__action:has(.header-actions__cart-icon) .header-actions__cart-icon .svg-wrapper {
+      width: fit-content;
+      margin-inline: auto 0;
     }
   }
 
