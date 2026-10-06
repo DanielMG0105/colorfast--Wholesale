@@ -159,7 +159,7 @@
           "type": "media",
           "settings": {
             "media_type": "image",
-            "image": "shopify://shop_images/ovelaycolorfast_opt.webp",
+            "image": "shopify://shop_images/CF_SCREENPRINT.jpg",
             "video": "shopify://files/videos/f294cc78-85dee34a.mp4",
             "alt": "",
             "overlay_width": 30
@@ -341,7 +341,8 @@
         "media_RTUcGD": {
           "type": "media",
           "settings": {
-            "media_type": "video",
+            "media_type": "image",
+            "image": "shopify://shop_images/CF_EMBROIDERY.jpg",
             "video": "shopify://files/videos/f294cc78-85dee34a.mp4",
             "alt": "",
             "overlay_width": 30
