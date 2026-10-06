@@ -1020,6 +1020,30 @@
     }
   }
 
+  @media screen and (max-width: 749px) {
+    /* Use the same 44px mobile slot for every icon; center the menu glyph in its slot. */
+    #header-component .header__icon--menu,
+    #header-component .search-action .header-actions__action,
+    #header-component header-actions .header-actions__action {
+      box-sizing: border-box;
+      width: 44px;
+      min-width: 44px;
+      height: 44px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    #header-component .search-action {
+      width: 44px;
+      height: 44px;
+      justify-content: center;
+    }
+
+    #header-component header-actions {
+      gap: 0;
+    }
+  }
+
   /* Single column layout if there are no columns within */
   .header__columns:not(:has(.header__column)) {
     grid-template-columns: 1fr;
