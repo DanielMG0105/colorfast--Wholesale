@@ -296,7 +296,6 @@
       "block_order": [
         "garment_1"
       ],
-      "disabled": true,
       "settings": {
         "selector_label": "Color selector",
         "colors": "Natural: #EDE6D6\nBlack: #1C1C1C\nNavy: #1F2A44\nForest: #2F4A3A\nBurgundy: #6B1F2A\nSand: #C9B48F\nSage: #9AA98C\nSky: #8FB3D9\nRust: #B0532A\nLavender: #B7A6D3",
