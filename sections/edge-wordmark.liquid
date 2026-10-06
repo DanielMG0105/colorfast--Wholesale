@@ -1,4 +1,5 @@
 {%- assign wordmark_font = section.settings.font -%}
+{%- assign brand_letters = section.settings.brand_word | split: '' -%}
 {%- assign lower_groups = section.settings.lower_line | split: '|' -%}
 {%- assign tagline_groups = section.settings.tagline | split: '|' -%}
 
@@ -18,10 +19,6 @@
     --ew-brand-size: {{ section.settings.brand_size }};
     --ew-lower-size: {{ section.settings.lower_size }};
     --ew-tagline-size: {{ section.settings.tagline_size }};
-    --ew-lower-left-width: {{ section.settings.lower_left_width }}%;
-    --ew-lower-right-width: {{ section.settings.lower_right_width }}%;
-    --ew-tagline-left-width: {{ section.settings.tagline_left_width }}%;
-    --ew-tagline-right-width: {{ section.settings.tagline_right_width }}%;
     --ew-space-top: {{ section.settings.padding_top }}px;
     --ew-space-bottom: {{ section.settings.padding_bottom }}px;
     --ew-lower-space: {{ section.settings.lower_space }}cqw;
@@ -29,33 +26,22 @@
   "
 >
   <div class="edge-wordmark__inner">
-    <span class="visually-hidden">{{ section.settings.brand_word | escape }}</span>
-    <svg class="edge-wordmark__brand" viewBox="0 0 1000 100" preserveAspectRatio="none" role="presentation" aria-hidden="true">
-      <text x="0" y="100" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ section.settings.brand_word | escape }}</text>
-    </svg>
+    <div class="edge-wordmark__brand" aria-label="{{ section.settings.brand_word | escape }}">
+      {%- for letter in brand_letters -%}<span>{{ letter | escape }}</span>{%- endfor -%}
+    </div>
 
     {%- if section.settings.lower_line != blank -%}
-        <span class="visually-hidden">{{ section.settings.lower_line | replace: '|', ' ' | escape }}</span>
-        <div class="edge-wordmark__line edge-wordmark__line--lower" aria-hidden="true">
+        <div class="edge-wordmark__line edge-wordmark__line--lower">
           {%- for group in lower_groups -%}
-          <span class="edge-wordmark__group{% if forloop.first %} edge-wordmark__group--left{% endif %}{% if forloop.last %} edge-wordmark__group--right{% endif %}">
-            <svg viewBox="0 0 1000 100" preserveAspectRatio="none" role="presentation">
-              <text x="0" y="100" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ group | strip | escape }}</text>
-            </svg>
-          </span>
+          <span class="edge-wordmark__group">{{ group | strip | escape }}</span>
           {%- endfor -%}
       </div>
     {%- endif -%}
 
     {%- if section.settings.tagline != blank -%}
-        <span class="visually-hidden">{{ section.settings.tagline | replace: '|', ' ' | escape }}</span>
-        <div class="edge-wordmark__line edge-wordmark__line--tagline" aria-hidden="true">
+        <div class="edge-wordmark__line edge-wordmark__line--tagline">
           {%- for group in tagline_groups -%}
-          <span class="edge-wordmark__group{% if forloop.first %} edge-wordmark__group--left{% endif %}{% if forloop.last %} edge-wordmark__group--right{% endif %}">
-            <svg viewBox="0 0 1000 100" preserveAspectRatio="none" role="presentation">
-              <text x="0" y="100" textLength="1000" lengthAdjust="spacingAndGlyphs">{{ group | strip | escape }}</text>
-            </svg>
-          </span>
+          <span class="edge-wordmark__group">{{ group | strip | escape }}</span>
         {%- endfor -%}
       </div>
     {%- endif -%}
@@ -90,64 +76,40 @@
   }
 
   .edge-wordmark__brand {
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     width: 100%;
-    height: calc(var(--ew-brand-size) * 0.73cqw);
-    overflow: visible;
+    font-size: calc(var(--ew-brand-size) * 1cqw);
+    line-height: 0.9;
+    font-weight: var(--ew-font-weight);
+    white-space: nowrap;
   }
 
-  .edge-wordmark__brand text {
-    font-family: var(--ew-font-family);
-    font-size: 135px;
-    font-style: normal;
-    font-weight: var(--ew-font-weight);
-  }
+  .edge-wordmark__brand span { display: block; }
 
   .edge-wordmark__line {
     display: flex;
     justify-content: space-between;
-    align-items: stretch;
+    align-items: baseline;
     width: 100%;
     white-space: nowrap;
+    font-weight: var(--ew-font-weight);
   }
 
   .edge-wordmark__line--lower {
     margin-top: var(--ew-lower-space);
-    height: calc(var(--ew-lower-size) * 0.73cqw);
+    font-size: calc(var(--ew-lower-size) * 1cqw);
+    line-height: 0.9;
   }
-
-  .edge-wordmark__line--lower text {
-    font-family: var(--ew-font-family);
-    font-size: 135px;
-    font-style: normal;
-    font-weight: var(--ew-font-weight);
-  }
-
-  .edge-wordmark__line--lower .edge-wordmark__group--left { width: var(--ew-lower-left-width); }
-  .edge-wordmark__line--lower .edge-wordmark__group--right { width: var(--ew-lower-right-width); }
 
   .edge-wordmark__line--tagline {
     margin-top: var(--ew-tagline-space);
-    height: calc(var(--ew-tagline-size) * 0.8cqw);
+    font-size: calc(var(--ew-tagline-size) * 1cqw);
+    line-height: 1;
   }
 
-  .edge-wordmark__line--tagline text {
-    font-family: var(--ew-font-family);
-    font-size: 100px;
-    font-style: normal;
-    font-weight: var(--ew-font-weight);
-  }
-
-  .edge-wordmark__line--tagline .edge-wordmark__group--left { width: var(--ew-tagline-left-width); }
-  .edge-wordmark__line--tagline .edge-wordmark__group--right { width: var(--ew-tagline-right-width); }
-
-  .edge-wordmark__group,
-  .edge-wordmark__group svg {
-    display: block;
-    height: 100%;
-  }
-
-  .edge-wordmark__group svg { width: 100%; }
+  .edge-wordmark__group { display: block; }
 {% endstylesheet %}
 
 {% schema %}
@@ -211,46 +173,6 @@
       "step": 0.5,
       "unit": "%",
       "default": 1.5
-    },
-    {
-      "type": "range",
-      "id": "lower_left_width",
-      "label": "Left lower word width",
-      "min": 10,
-      "max": 50,
-      "step": 1,
-      "unit": "%",
-      "default": 27
-    },
-    {
-      "type": "range",
-      "id": "lower_right_width",
-      "label": "Right lower word width",
-      "min": 10,
-      "max": 60,
-      "step": 1,
-      "unit": "%",
-      "default": 43
-    },
-    {
-      "type": "range",
-      "id": "tagline_left_width",
-      "label": "Left tagline width",
-      "min": 10,
-      "max": 50,
-      "step": 1,
-      "unit": "%",
-      "default": 30
-    },
-    {
-      "type": "range",
-      "id": "tagline_right_width",
-      "label": "Right tagline width",
-      "min": 10,
-      "max": 50,
-      "step": 1,
-      "unit": "%",
-      "default": 25
     },
     {
       "type": "range",
