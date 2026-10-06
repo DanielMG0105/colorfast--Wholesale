@@ -41,6 +41,14 @@
   position:absolute ;
   left: 23px;
 }
+.edge-wordmark__inner:after{
+  content:"";
+  display:block;
+  height:600px;
+  width:3px;
+  position:absolute ;
+  right: 0;
+}
 
 .edge-wordmark__brand {
   display: block;
