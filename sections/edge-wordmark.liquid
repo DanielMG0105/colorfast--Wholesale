@@ -1,0 +1,257 @@
+{%- assign wordmark_font = section.settings.font -%}
+{%- assign brand_characters = section.settings.brand_word | split: '' -%}
+{%- assign lower_groups = section.settings.lower_line | split: '|' -%}
+{%- assign tagline_groups = section.settings.tagline | split: '|' -%}
+
+<style>
+  {{ wordmark_font | font_face: font_display: 'swap' }}
+</style>
+
+<section
+  class="edge-wordmark{% if section.settings.show_border %} edge-wordmark--border{% endif %}"
+  style="
+    --ew-background: {{ section.settings.background_color }};
+    --ew-text: {{ section.settings.text_color }};
+    --ew-border: {{ section.settings.border_color }};
+    --ew-border-width: {{ section.settings.border_width }}px;
+    --ew-font-family: {{ wordmark_font.family }}, {{ wordmark_font.fallback_families }};
+    --ew-font-weight: {{ wordmark_font.weight }};
+    --ew-brand-size: {{ section.settings.brand_size }};
+    --ew-lower-size: {{ section.settings.lower_size }};
+    --ew-tagline-size: {{ section.settings.tagline_size }};
+    --ew-space-top: {{ section.settings.padding_top }}px;
+    --ew-space-bottom: {{ section.settings.padding_bottom }}px;
+    --ew-lower-space: {{ section.settings.lower_space }}cqw;
+    --ew-tagline-space: {{ section.settings.tagline_space }}cqw;
+  "
+>
+  <div class="edge-wordmark__inner">
+    <span class="visually-hidden">{{ section.settings.brand_word | escape }}</span>
+    <div class="edge-wordmark__brand" aria-hidden="true">
+      {%- for character in brand_characters -%}
+        <span>{{ character | escape }}</span>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.lower_line != blank -%}
+      <span class="visually-hidden">{{ section.settings.lower_line | replace: '|', ' ' | escape }}</span>
+      <div class="edge-wordmark__line edge-wordmark__line--lower" aria-hidden="true">
+        {%- for group in lower_groups -%}
+          <span>{{ group | strip | escape }}</span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.tagline != blank -%}
+      <span class="visually-hidden">{{ section.settings.tagline | replace: '|', ' ' | escape }}</span>
+      <div class="edge-wordmark__line edge-wordmark__line--tagline" aria-hidden="true">
+        {%- for group in tagline_groups -%}
+          <span>{{ group | strip | escape }}</span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .edge-wordmark {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: var(--ew-background);
+    color: var(--ew-text);
+    font-family: var(--ew-font-family);
+    font-weight: var(--ew-font-weight);
+    border-block: 0 solid transparent;
+    padding-block: var(--ew-space-top) var(--ew-space-bottom);
+  }
+
+  .edge-wordmark--border {
+    border-block-width: var(--ew-border-width);
+    border-block-color: var(--ew-border);
+  }
+
+  .edge-wordmark__inner {
+    container-type: inline-size;
+    width: 100%;
+    max-width: 1300px;
+    box-sizing: border-box;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+
+  .edge-wordmark__brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+    font-size: calc(var(--ew-brand-size) * 1cqw);
+    line-height: 0.74;
+    white-space: nowrap;
+  }
+
+  .edge-wordmark__line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+    white-space: nowrap;
+  }
+
+  .edge-wordmark__line--lower {
+    margin-top: var(--ew-lower-space);
+    font-size: calc(var(--ew-lower-size) * 1cqw);
+    line-height: 0.74;
+  }
+
+  .edge-wordmark__line--tagline {
+    margin-top: var(--ew-tagline-space);
+    font-size: calc(var(--ew-tagline-size) * 1cqw);
+    line-height: 1;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Edge aligned wordmark",
+  "tag": "section",
+  "class": "section-edge-wordmark",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_word",
+      "label": "Main word",
+      "default": "colorfast"
+    },
+    {
+      "type": "text",
+      "id": "lower_line",
+      "label": "Lower line",
+      "info": "Separate edge-aligned words with |, for example BY|YOU.",
+      "default": "BY|YOU"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Optional tagline",
+      "info": "Leave blank to hide. Separate edge-aligned phrases with |.",
+      "default": ""
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font and weight",
+      "default": "inter_n4"
+    },
+    {
+      "type": "range",
+      "id": "brand_size",
+      "label": "Main word size",
+      "min": 5,
+      "max": 18,
+      "step": 0.5,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "lower_size",
+      "label": "Lower line size",
+      "min": 4,
+      "max": 16,
+      "step": 0.5,
+      "unit": "%",
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "tagline_size",
+      "label": "Tagline size",
+      "min": 1,
+      "max": 6,
+      "step": 0.5,
+      "unit": "%",
+      "default": 1.5
+    },
+    {
+      "type": "range",
+      "id": "lower_space",
+      "label": "Space before lower line",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "unit": "%",
+      "default": 2.4
+    },
+    {
+      "type": "range",
+      "id": "tagline_space",
+      "label": "Space before tagline",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "unit": "%",
+      "default": 1.5
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top space",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom space",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show top and bottom borders",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border width",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#c8c8c7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Edge aligned wordmark"
+    }
+  ]
+}
+{% endschema %}

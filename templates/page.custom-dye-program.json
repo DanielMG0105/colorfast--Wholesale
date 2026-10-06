@@ -10,54 +10,24 @@
 {
   "sections": {
     "by_you_wordmark": {
-      "type": "wordmark-banner",
-      "blocks": {
-        "line_logo": {
-          "type": "text_line",
-          "settings": {
-            "text": "colorfast",
-            "size": 10,
-            "line_width": 100,
-            "scale_x": 100,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 0,
-            "space_above": 0
-          }
-        },
-        "line_by_you": {
-          "type": "text_line",
-          "settings": {
-            "text": "BY|YOU",
-            "size": 9,
-            "line_width": 100,
-            "scale_x": 100,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 28,
-            "space_above": 2.4
-          }
-        }
-      },
-      "block_order": [
-        "line_logo",
-        "line_by_you"
-      ],
+      "type": "edge-wordmark",
       "settings": {
-        "content_mode": "text",
-        "image_alt": "",
-        "image_width": 100,
-        "font": "inter_n6",
-        "side_padding": 0,
-        "padding": 16,
-        "show_borders": true,
-        "border_style": "box",
-        "show_side_borders": false,
+        "brand_word": "colorfast",
+        "lower_line": "BY|YOU",
+        "tagline": "",
+        "font": "inter_n4",
+        "brand_size": 10,
+        "lower_size": 9,
+        "tagline_size": 1.5,
+        "lower_space": 2.4,
+        "tagline_space": 1.5,
+        "padding_top": 16,
+        "padding_bottom": 16,
+        "show_border": true,
         "border_width": 1,
-        "border_offset": 0,
+        "border_color": "#000000",
         "background_color": "#c8c8c7",
-        "text_color": "#000000",
-        "border_color": "#000000"
+        "text_color": "#000000"
       }
     },
     "program_links": {
@@ -102,6 +72,7 @@
     },
     "blanks_marquee": {
       "type": "wordmark-marquee",
+      "disabled": true,
       "settings": {
         "text": "OUR BLANKS|YOUR WAY",
         "font": "inter_n7",
@@ -217,68 +188,24 @@
       }
     },
     "wordmark_banner": {
-      "type": "wordmark-banner",
-      "blocks": {
-        "line_logo": {
-          "type": "text_line",
-          "settings": {
-            "text": "colorfast",
-            "size": 10,
-            "line_width": 100,
-            "scale_x": 100,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 0,
-            "space_above": 0
-          }
-        },
-        "line_by_you": {
-          "type": "text_line",
-          "settings": {
-            "text": "BY|YOU",
-            "size": 9,
-            "line_width": 100,
-            "scale_x": 100,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 28,
-            "space_above": 2.4
-          }
-        },
-        "line_tagline": {
-          "type": "text_line",
-          "settings": {
-            "text": "OUR BLANKS|YOUR WAY",
-            "size": 1.5,
-            "line_width": 100,
-            "scale_x": 100,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 47,
-            "space_above": 1.5
-          }
-        }
-      },
-      "block_order": [
-        "line_logo",
-        "line_by_you",
-        "line_tagline"
-      ],
+      "type": "edge-wordmark",
       "settings": {
-        "content_mode": "text",
-        "image_alt": "",
-        "image_width": 100,
-        "font": "inter_n6",
-        "side_padding": 10,
-        "padding": 60,
-        "show_borders": true,
-        "border_style": "lines",
-        "show_side_borders": true,
+        "brand_word": "colorfast",
+        "lower_line": "BY|YOU",
+        "tagline": "OUR BLANKS|YOUR WAY",
+        "font": "inter_n4",
+        "brand_size": 10,
+        "lower_size": 9,
+        "tagline_size": 1.5,
+        "lower_space": 2.4,
+        "tagline_space": 1.5,
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "show_border": true,
         "border_width": 2,
-        "border_offset": 26,
+        "border_color": "#ffffff",
         "background_color": "#000000",
-        "text_color": "#ffffff",
-        "border_color": "#ffffff"
+        "text_color": "#ffffff"
       }
     },
     "dye_color_preview": {
