@@ -146,8 +146,8 @@
             }
 
             groups.forEach((group, i) => {
-              group.style.width = `${natural[i] * stretch}px`;
               const textScale = groups.length > 1 ? 0.9 : 1;
+              group.style.width = `${natural[i] * stretch * textScale}px`;
               group.firstElementChild.style.transform = `scaleX(${stretch * textScale})`;
             });
             line.classList.add('is-fitted');
