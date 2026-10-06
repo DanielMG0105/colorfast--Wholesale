@@ -17,9 +17,7 @@
           "settings": {
             "text": "colorfast",
             "size": 10,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 0,
+            "scale_x": 226,
             "space_above": 0
           }
         },
@@ -28,9 +26,7 @@
           "settings": {
             "text": "BY|YOU",
             "size": 9,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 28,
+            "scale_x": 100,
             "space_above": 2.4
           }
         }
@@ -220,9 +216,7 @@
           "settings": {
             "text": "colorfast",
             "size": 10,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 0,
+            "scale_x": 226,
             "space_above": 0
           }
         },
@@ -231,9 +225,7 @@
           "settings": {
             "text": "BY|YOU",
             "size": 9,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 28,
+            "scale_x": 100,
             "space_above": 2.4
           }
         },
@@ -243,9 +235,6 @@
             "text": "OUR BLANKS|YOUR WAY",
             "size": 1.5,
             "scale_x": 60,
-            "width_mode": "fill",
-            "stretch": 200,
-            "gap": 47,
             "space_above": 1.5
           }
         }
