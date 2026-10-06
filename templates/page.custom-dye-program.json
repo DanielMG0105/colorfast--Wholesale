@@ -230,8 +230,8 @@
           "type": "text_line",
           "settings": {
             "text": "BY|YOU",
-            "size": 8,
-            "line_width": 90,
+            "size": 6.5,
+            "line_width": 100,
             "width_mode": "fill",
             "stretch": 200,
             "gap": 11,
