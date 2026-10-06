@@ -56,7 +56,7 @@
             data-mode="{{ block.settings.width_mode }}"
             data-stretch="{{ block.settings.stretch }}"
             data-gap="{{ block.settings.gap }}"
-            style="--wb-space: {{ block.settings.space_above }}cqw;"
+            style="--wb-space: {{ block.settings.space_above }}cqw; --wb-line-width: {{ block.settings.line_width }}%;"
             {{ block.shopify_attributes }}
           >
             <span class="visually-hidden">{{ block.settings.text | replace: '|', ' ' | escape }}</span>
@@ -246,6 +246,8 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    width: var(--wb-line-width, 100%);
+    margin-inline: auto;
     margin-top: var(--wb-space);
     font-family: var(--wb-font-family);
     font-weight: var(--wb-font-weight);
@@ -333,6 +335,17 @@
           "step": 0.5,
           "unit": "%",
           "default": 9
+        },
+        {
+          "type": "range",
+          "id": "line_width",
+          "label": "Line width",
+          "info": "Reduce this to make the whole line smaller while keeping its proportions.",
+          "min": 50,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 100
         },
         {
           "type": "select",
