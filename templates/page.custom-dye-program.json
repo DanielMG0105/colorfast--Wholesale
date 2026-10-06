@@ -230,7 +230,7 @@
           "type": "text_line",
           "settings": {
             "text": "BY|YOU",
-            "size": 6.5,
+            "size": 8,
             "line_width": 100,
             "width_mode": "fill",
             "stretch": 200,

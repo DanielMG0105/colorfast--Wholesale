@@ -131,9 +131,11 @@
             // Never overflow the line
             stretch = Math.min(stretch, availableWidth / total);
 
-            // Use part of the fill scale vertically as well as horizontally to keep
-            // the glyphs from looking flattened.
-            const fontScale = line.dataset.mode === 'fill' && stretch > 1 ? Math.pow(stretch, 0.35) : 1;
+            // Keep vertical sizing consistent when lines use different inter-group gaps.
+            // The gap affects horizontal layout, so exclude it from the vertical scale.
+            const verticalStretch =
+              line.dataset.mode === 'fill' && availableWidth > 0 ? (stretch * width) / availableWidth : stretch;
+            const fontScale = line.dataset.mode === 'fill' && verticalStretch > 1 ? Math.pow(verticalStretch, 0.35) : 1;
             const mobileFontScale = window.matchMedia('(max-width: 749px)').matches ? 1.3 : 1;
             line.style.fontSize = `${baseFontSize * fontScale * 0.8 * mobileFontScale}px`;
             natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
