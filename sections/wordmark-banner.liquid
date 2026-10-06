@@ -112,7 +112,7 @@
             const width = line.clientWidth;
             if (!width) continue;
             const groups = [...line.querySelectorAll('.wordmark-banner__group')];
-            const baseFontSize = (parseFloat(line.dataset.size) / 100) * width * 0.7;
+            const baseFontSize = (parseFloat(line.dataset.size) / 100) * width;
             line.style.fontSize = `${baseFontSize}px`;
 
             for (const group of groups) {
@@ -131,16 +131,16 @@
             // Never overflow the line
             stretch = Math.min(stretch, availableWidth / total);
 
-            // Use part of the fill scale vertically as well as horizontally so letters
-            // keep a more natural shape instead of looking flattened.
-            if (line.dataset.mode === 'fill' && stretch > 1) {
-              const fontScale = Math.pow(stretch, 0.35);
-              line.style.fontSize = `${baseFontSize * fontScale}px`;
-              natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
-              total = natural.reduce((sum, value) => sum + value, 0);
-              if (!total) continue;
-              stretch = Math.min(stretch / fontScale, availableWidth / total);
-            }
+            // Reduce the final font size by 20%, then recalculate horizontal fit so
+            // filled lines still span the available width.
+            const fontScale = line.dataset.mode === 'fill' && stretch > 1 ? Math.pow(stretch, 0.35) : 1;
+            line.style.fontSize = `${baseFontSize * fontScale * 0.8}px`;
+            natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
+            total = natural.reduce((sum, value) => sum + value, 0);
+            if (!total) continue;
+            stretch = line.dataset.mode === 'fill'
+              ? availableWidth / total
+              : Math.min(parseFloat(line.dataset.stretch) / 100, availableWidth / total);
 
             groups.forEach((group, i) => {
               group.style.width = `${natural[i] * stretch}px`;
