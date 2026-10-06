@@ -52,7 +52,12 @@
           {%- assign groups = block.settings.text | split: '|' -%}
           <div
             class="wordmark-banner__line"
-            style="--wb-space: {{ block.settings.space_above }}cqw; --wb-size: {{ block.settings.size }}; --wb-scale-x: {{ block.settings.scale_x | default: 100 | divided_by: 100.0 }};"
+            data-size="{{ block.settings.size }}"
+            data-mode="{{ block.settings.width_mode }}"
+            data-stretch="{{ block.settings.stretch }}"
+            data-gap="{{ block.settings.gap }}"
+            data-scale-x="{{ block.settings.scale_x | default: 100 }}"
+            style="--wb-space: {{ block.settings.space_above }}cqw; --wb-line-width: {{ block.settings.line_width | default: 100 }}%;"
             {{ block.shopify_attributes }}
           >
             <span class="visually-hidden">{{ block.settings.text | replace: '|', ' ' | escape }}</span>
@@ -84,6 +89,87 @@
     {%- endif -%}
   </div>
 </wordmark-banner>
+
+<script type="module">
+  // Size each text line from the container width and fit its groups edge to edge.
+  if (!customElements.get('wordmark-banner')) {
+    customElements.define(
+      'wordmark-banner',
+      class WordmarkBanner extends HTMLElement {
+        connectedCallback() {
+          this.lines = [...this.querySelectorAll('.wordmark-banner__line')];
+          this.measurementContext = document.createElement('canvas').getContext('2d');
+          this.observer = new ResizeObserver(() => this.layout());
+          this.observer.observe(this);
+          document.fonts?.ready.then(() => this.layout());
+          this.layout();
+        }
+
+        disconnectedCallback() {
+          this.observer?.disconnect();
+        }
+
+        layout() {
+          for (const line of this.lines) {
+            const width = line.clientWidth;
+            if (!width) continue;
+            const groups = [...line.querySelectorAll('.wordmark-banner__group')];
+            const baseFontSize = (parseFloat(line.dataset.size) / 100) * width;
+            line.style.fontSize = `${baseFontSize}px`;
+
+            for (const group of groups) {
+              group.style.width = '';
+              group.firstElementChild.style.transform = '';
+            }
+
+            let natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
+            let total = natural.reduce((sum, value) => sum + value, 0);
+            if (!total) continue;
+
+            const gap = groups.length > 1 ? (parseFloat(line.dataset.gap) / 100) * width : 0;
+            const availableWidth = width - gap;
+            let stretch =
+              line.dataset.mode === 'fill' ? availableWidth / total : parseFloat(line.dataset.stretch) / 100;
+            // Never overflow the line
+            stretch = Math.min(stretch, availableWidth / total);
+
+            // Keep vertical sizing consistent when lines use different inter-group gaps.
+            // The gap affects horizontal layout, so exclude it from the vertical scale.
+            const verticalStretch =
+              line.dataset.mode === 'fill' && availableWidth > 0 ? (stretch * width) / availableWidth : stretch;
+            const fontScale = line.dataset.mode === 'fill' && verticalStretch > 1 ? Math.pow(verticalStretch, 0.35) : 1;
+            const mobileFontScale = window.matchMedia('(max-width: 749px)').matches ? 1.3 : 1;
+            line.style.fontSize = `${baseFontSize * fontScale * 0.8 * mobileFontScale}px`;
+            const lineStyle = getComputedStyle(line);
+            this.measurementContext.font = `${lineStyle.fontStyle} ${lineStyle.fontWeight} ${lineStyle.fontSize} ${lineStyle.fontFamily}`;
+            this.measurementContext.textAlign = 'left';
+            const inkMetrics = groups.map((group) => {
+              const metrics = this.measurementContext.measureText(group.firstElementChild.textContent);
+              const left = Math.max(0, -metrics.actualBoundingBoxLeft);
+              const right = Math.max(0, metrics.actualBoundingBoxRight);
+              return { left, width: left + right };
+            });
+            const totalInkWidth = inkMetrics.reduce((sum, metrics) => sum + metrics.width, 0);
+            if (!totalInkWidth) continue;
+            if (line.dataset.mode === 'fill') {
+              stretch = availableWidth / totalInkWidth;
+            } else {
+              stretch = Math.min(parseFloat(line.dataset.stretch) / 100, availableWidth / totalInkWidth);
+            }
+            const lineScaleX = (parseFloat(line.dataset.scaleX) || 100) / 100;
+            groups.forEach((group, i) => {
+              const glyphScale = stretch * lineScaleX;
+              group.style.width = `${inkMetrics[i].width * glyphScale}px`;
+              group.firstElementChild.style.transform =
+                `translateX(${-inkMetrics[i].left * glyphScale}px) scaleX(${glyphScale})`;
+            });
+            line.classList.add('is-fitted');
+          }
+        }
+      }
+    );
+  }
+</script>
 
 {% stylesheet %}
   .wordmark-banner {
@@ -173,38 +259,36 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    width: 100%;
+    width: var(--wb-line-width, 100%);
+    margin-inline: auto;
     margin-top: var(--wb-space);
     font-family: var(--wb-font-family);
     font-weight: var(--wb-font-weight);
     font-style: var(--wb-font-style);
-    font-size: calc(var(--wb-size) * 1cqw);
     line-height: 0.74;
     white-space: nowrap;
+  }
 
-    @media screen and (max-width: 749px) {
-      font-size: calc(var(--wb-size) * 1.3cqw);
-    }
+  .wordmark-banner__line:first-child,
+  .wordmark-banner__image-line:first-child {
+    margin-top: 0;
+  }
+
+  /* Before the script runs, keep lines readable instead of stretched */
+  .wordmark-banner__line:not(.is-fitted) {
+    justify-content: center;
+    gap: 0.4em;
   }
 
   .wordmark-banner__group {
     display: flex;
     align-items: baseline;
     justify-content: flex-start;
-    flex: 0 0 auto;
   }
 
   .wordmark-banner__glyphs {
     display: inline-block;
-    transform: scaleX(var(--wb-scale-x, 1));
-    transform-origin: left center;
-  }
-
-  .wordmark-banner__group:last-child .wordmark-banner__glyphs {
-    transform-origin: right center;
-  }
-
-  .wordmark-banner__group:only-child .wordmark-banner__glyphs {
+    flex: 0 0 auto;
     transform-origin: left center;
   }
 
@@ -268,14 +352,63 @@
         },
         {
           "type": "range",
-          "id": "scale_x",
-          "label": "Horizontal scale",
-          "info": "Horizontal scale of the text.",
+          "id": "line_width",
+          "label": "Line width",
+          "info": "Reduce this to make the whole line smaller while keeping its proportions.",
           "min": 50,
-          "max": 300,
+          "max": 100,
           "step": 1,
           "unit": "%",
           "default": 100
+        },
+        {
+          "type": "range",
+          "id": "scale_x",
+          "label": "Horizontal scale",
+          "info": "Reduce this to fit the line horizontally while preserving its outer alignment.",
+          "min": 50,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 100
+        },
+        {
+          "type": "select",
+          "id": "width_mode",
+          "label": "Width",
+          "options": [
+            {
+              "value": "fill",
+              "label": "Stretch to fill the line"
+            },
+            {
+              "value": "stretch",
+              "label": "Fixed stretch"
+            }
+          ],
+          "default": "fill"
+        },
+        {
+          "type": "range",
+          "id": "stretch",
+          "label": "Fixed stretch",
+          "min": 50,
+          "max": 400,
+          "step": 10,
+          "unit": "%",
+          "default": 200,
+          "visible_if": "{{ block.settings.width_mode == 'stretch' }}"
+        },
+        {
+          "type": "range",
+          "id": "gap",
+          "label": "Gap between groups",
+          "info": "Percentage of the banner width.",
+          "min": 0,
+          "max": 80,
+          "step": 1,
+          "unit": "%",
+          "default": 11
         },
         {
           "type": "range",
@@ -482,27 +615,30 @@
         {
           "type": "text_line",
           "settings": {
-          "text": "colorfast",
-          "size": 10,
-            "scale_x": 226,
+            "text": "colorfast",
+            "size": 10,
+            "width_mode": "fill",
+            "gap": 0,
             "space_above": 0
           }
         },
         {
           "type": "text_line",
           "settings": {
-          "text": "BY|YOU",
-          "size": 9,
-            "scale_x": 100,
+            "text": "BY|YOU",
+            "size": 9,
+            "width_mode": "fill",
+            "gap": 11,
             "space_above": 0.9
           }
         },
         {
           "type": "text_line",
           "settings": {
-          "text": "OUR BLANKS|YOUR WAY",
-          "size": 1.5,
-            "scale_x": 60,
+            "text": "OUR BLANKS|YOUR WAY",
+            "size": 1.5,
+            "width_mode": "fill",
+            "gap": 47,
             "space_above": 1.5
           }
         }
