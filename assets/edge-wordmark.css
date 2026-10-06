@@ -48,6 +48,7 @@
   width:3px;
   position:absolute ;
   right: 0;
+  top:0;
 }
 
 .edge-wordmark__brand {
@@ -85,7 +86,7 @@
   margin-top: var(--ew-tagline-space);
   font-size: calc(var(--ew-tagline-size) * 1cqw);
   line-height: 1;
-  padding-left:12px;
+  padding-left:7px;
 }
 
 .edge-wordmark__group { display: block; }
