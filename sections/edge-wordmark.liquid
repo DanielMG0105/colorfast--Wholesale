@@ -1,5 +1,4 @@
 {%- assign wordmark_font = section.settings.font -%}
-{%- assign brand_characters = section.settings.brand_word | split: '' -%}
 {%- assign lower_groups = section.settings.lower_line | split: '|' -%}
 {%- assign tagline_groups = section.settings.tagline | split: '|' -%}
 
@@ -28,9 +27,7 @@
   <div class="edge-wordmark__inner">
     <span class="visually-hidden">{{ section.settings.brand_word | escape }}</span>
     <div class="edge-wordmark__brand" aria-hidden="true">
-      {%- for character in brand_characters -%}
-        <span>{{ character | escape }}</span>
-      {%- endfor -%}
+      <span class="edge-wordmark__brand-text">{{ section.settings.brand_word | escape }}</span>
     </div>
 
     {%- if section.settings.lower_line != blank -%}
@@ -81,13 +78,18 @@
   }
 
   .edge-wordmark__brand {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
     width: 100%;
-    font-size: calc(var(--ew-brand-size) * 1cqw);
+    font-size: calc(var(--ew-brand-size) * 1.1cqw);
     line-height: 0.74;
     white-space: nowrap;
+  }
+
+  .edge-wordmark__brand-text {
+    display: block;
+    width: max-content;
+    transform: scaleX(2.25);
+    transform-origin: left center;
+    font-weight: inherit;
   }
 
   .edge-wordmark__line {
@@ -141,7 +143,7 @@
       "type": "font_picker",
       "id": "font",
       "label": "Font and weight",
-      "default": "inter_n4"
+      "default": "inter_n6"
     },
     {
       "type": "range",
