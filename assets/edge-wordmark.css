@@ -69,7 +69,8 @@
 }
 
 .edge-wordmark__line--lower .edge-wordmark__group {
-  transform: scaleX(2);
+  transform: scaleX(2);  
+  margin-left: -7px;
 }
 
 .edge-wordmark__line--tagline {
