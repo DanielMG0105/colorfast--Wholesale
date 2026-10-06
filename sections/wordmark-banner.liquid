@@ -131,16 +131,19 @@
             // Never overflow the line
             stretch = Math.min(stretch, availableWidth / total);
 
-            // Apply another 0.8 factor to the previous 0.8 scale for a true 20%
-            // reduction from the rendered size, then recalculate the horizontal fit.
+            // Use part of the fill scale vertically as well as horizontally to keep
+            // the glyphs from looking flattened. Limit horizontal stretch to 1.6x.
             const fontScale = line.dataset.mode === 'fill' && stretch > 1 ? Math.pow(stretch, 0.35) : 1;
-            line.style.fontSize = `${baseFontSize * fontScale * 0.64}px`;
+            line.style.fontSize = `${baseFontSize * fontScale * 0.8}px`;
             natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
             total = natural.reduce((sum, value) => sum + value, 0);
             if (!total) continue;
-            stretch = line.dataset.mode === 'fill'
-              ? availableWidth / total
-              : Math.min(parseFloat(line.dataset.stretch) / 100, availableWidth / total);
+            if (line.dataset.mode === 'fill') {
+              stretch = Math.min(availableWidth / total, 1.6);
+              line.style.justifyContent = groups.length === 1 ? 'center' : 'space-between';
+            } else {
+              stretch = Math.min(parseFloat(line.dataset.stretch) / 100, availableWidth / total);
+            }
 
             groups.forEach((group, i) => {
               group.style.width = `${natural[i] * stretch}px`;
@@ -195,6 +198,8 @@
 
   .wordmark-banner__inner {
     container-type: inline-size;
+    max-width: 1600px;
+    margin-inline: auto;
   }
 
   /* Box style: a thin frame drawn around the content instead of full-width lines */
