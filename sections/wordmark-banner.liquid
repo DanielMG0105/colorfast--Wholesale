@@ -56,7 +56,7 @@
             data-mode="{{ block.settings.width_mode }}"
             data-stretch="{{ block.settings.stretch }}"
             data-gap="{{ block.settings.gap }}"
-            style="--wb-space: {{ block.settings.space_above }}cqw; --wb-line-width: {{ block.settings.line_width }}%;"
+            style="--wb-space: {{ block.settings.space_above }}cqw; --wb-line-width: {{ block.settings.line_width | default: 100 }}%;"
             {{ block.shopify_attributes }}
           >
             <span class="visually-hidden">{{ block.settings.text | replace: '|', ' ' | escape }}</span>
