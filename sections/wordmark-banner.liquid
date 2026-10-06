@@ -56,6 +56,7 @@
             data-mode="{{ block.settings.width_mode }}"
             data-stretch="{{ block.settings.stretch }}"
             data-gap="{{ block.settings.gap }}"
+            data-scale-x="{{ block.settings.scale_x | default: 100 }}"
             style="--wb-space: {{ block.settings.space_above }}cqw; --wb-line-width: {{ block.settings.line_width | default: 100 }}%;"
             {{ block.shopify_attributes }}
           >
@@ -147,9 +148,10 @@
               stretch = Math.min(parseFloat(line.dataset.stretch) / 100, availableWidth / total);
             }
 
+            const lineScaleX = (parseFloat(line.dataset.scaleX) || 100) / 100;
             groups.forEach((group, i) => {
-              group.style.width = `${natural[i] * stretch}px`;
-              group.firstElementChild.style.transform = `scaleX(${stretch})`;
+              group.style.width = `${natural[i] * stretch * lineScaleX}px`;
+              group.firstElementChild.style.transform = `scaleX(${stretch * lineScaleX})`;
             });
             line.classList.add('is-fitted');
           }
@@ -342,6 +344,17 @@
           "id": "line_width",
           "label": "Line width",
           "info": "Reduce this to make the whole line smaller while keeping its proportions.",
+          "min": 50,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "scale_x",
+          "label": "Horizontal scale",
+          "info": "Reduce this to fit the line horizontally while preserving its outer alignment.",
           "min": 50,
           "max": 100,
           "step": 1,

@@ -242,6 +242,7 @@
           "settings": {
             "text": "OUR BLANKS|YOUR WAY",
             "size": 1.5,
+            "scale_x": 60,
             "width_mode": "fill",
             "stretch": 200,
             "gap": 47,
