@@ -4,8 +4,8 @@
 
 <style>
   {{ wordmark_font | font_face: font_display: 'swap' }}
-  @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 </style>
+{{ 'edge-wordmark.css' | asset_url | stylesheet_tag }}
 
 <section
   class="edge-wordmark{% if section.settings.show_border %} edge-wordmark--border{% endif %}"
@@ -45,97 +45,6 @@
     {%- endif -%}
   </div>
 </section>
-
-{% stylesheet %}
-  .edge-wordmark {
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    background: var(--ew-background);
-    color: var(--ew-text);
-    font-family: var(--ew-font-family);
-    font-weight: var(--ew-font-weight);
-    padding-block: var(--ew-space-top) var(--ew-space-bottom);
-  }
-
-  .edge-wordmark--border::before,
-  .edge-wordmark--border::after {
-    position: absolute;
-    inset-inline: 0;
-    height: var(--ew-border-width);
-    background: var(--ew-border);
-    content: '';
-    pointer-events: none;
-  }
-
-  .edge-wordmark--border::before { inset-block-start: 0; }
-  .edge-wordmark--border::after { inset-block-end: 0; }
-
-  .edge-wordmark__inner {
-    container-type: inline-size;
-    width: 100%;
-    max-width: 1300px;
-    box-sizing: border-box;
-    margin-inline: auto;
-    padding-inline: 16px;
-  }
-
-  .edge-wordmark__brand {
-    display: block;
-    width: 44%;
-    font-size: calc(var(--ew-brand-size) * 1cqw);
-    line-height: 0.9;
-    font-weight: var(--ew-font-weight);
-    white-space: nowrap;
-    transform: scaleX(2.272727);
-    transform-origin: left center;
-  }
-
-  .edge-wordmark__line {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    width: 100%;
-    white-space: nowrap;
-    font-weight: var(--ew-font-weight);
-  }
-
-  .edge-wordmark__line--lower {
-    margin-top: var(--ew-lower-space);
-    font-size: calc(var(--ew-lower-size) * 1cqw);
-    line-height: 0.9;
-  }
-
-  .edge-wordmark__line--lower .edge-wordmark__group {
-    transform: scaleX(2);
-  }
-
-  .edge-wordmark__line--tagline {
-    margin-top: var(--ew-tagline-space);
-    font-size: calc(var(--ew-tagline-size) * 1cqw);
-    line-height: 1;
-  }
-
-  .edge-wordmark__group { display: block; }
-
-  .edge-wordmark__group--left { transform-origin: left center; }
-  .edge-wordmark__group--right {
-    position: relative;
-    inset-inline-end: -1.5cqw;
-    transform-origin: right center;
-  }
-
-  .edge-wordmark__line--tagline .edge-wordmark__group--right {
-    inset-inline-end: -0.3cqw;
-  }
-
-  .edge-wordmark__group {
-    flex: 0 0 auto;
-    width: max-content;
-    transform: scaleX(2.272727);
-  }
-{% endstylesheet %}
 
 {% schema %}
 {
