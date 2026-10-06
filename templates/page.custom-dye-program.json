@@ -27,7 +27,7 @@
           "type": "text_line",
           "settings": {
             "text": "BY|YOU",
-            "size": 10,
+            "size": 9,
             "width_mode": "fill",
             "stretch": 200,
             "gap": 28,
