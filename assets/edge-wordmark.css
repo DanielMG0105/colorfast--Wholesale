@@ -33,7 +33,7 @@
 }
 
 .edge-wordmark__inner:before{
-  content:;
+  content:"";
   display:block;
   height:200px;
   width:3px;
