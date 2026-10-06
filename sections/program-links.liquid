@@ -35,27 +35,29 @@
     --pl-padding-bottom: {{ section.settings.padding_bottom }}px;
   "
 >
-  {%- if section.settings.heading != blank -%}
-    <h2 class="program-links__heading">{{ section.settings.heading | escape }}</h2>
-  {%- endif -%}
+  <div class="program-links__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="program-links__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
 
-  <div class="program-links__cards">
-    {%- for block in section.blocks -%}
-      {%- if block.settings.link != blank -%}
-        <a class="program-links__card" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
-      {%- else -%}
-        <div class="program-links__card" {{ block.shopify_attributes }}>
-      {%- endif -%}
-          <span class="program-links__content">
-            <span class="program-links__label">{{ block.settings.label | escape }}</span>
-            <span class="program-links__arrow" aria-hidden="true">&rarr;</span>
-          </span>
-      {%- if block.settings.link != blank -%}
-        </a>
-      {%- else -%}
-        </div>
-      {%- endif -%}
-    {%- endfor -%}
+    <div class="program-links__cards">
+      {%- for block in section.blocks -%}
+        {%- if block.settings.link != blank -%}
+          <a class="program-links__card" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+        {%- else -%}
+          <div class="program-links__card" {{ block.shopify_attributes }}>
+        {%- endif -%}
+            <span class="program-links__content">
+              <span class="program-links__label">{{ block.settings.label | escape }}</span>
+              <span class="program-links__arrow" aria-hidden="true">&rarr;</span>
+            </span>
+        {%- if block.settings.link != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
   </div>
 </div>
 
@@ -70,6 +72,12 @@
     @media screen and (min-width: 750px) {
       padding: calc(var(--pl-padding-top-n) * var(--pl-u)) 24px calc(var(--pl-padding-bottom-n) * var(--pl-u));
     }
+  }
+
+  .program-links__inner {
+    width: 100%;
+    max-width: 1400px;
+    margin-inline: auto;
   }
 
   .program-links__heading {
