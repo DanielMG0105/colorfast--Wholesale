@@ -1045,9 +1045,19 @@
     }
 
     #header-component .header__icon--menu .header-drawer-icon {
-      width: 44px;
-      margin-inline: 0;
+      width: var(--icon-size-xs);
+      height: var(--icon-size-xs);
+      margin-inline: 0 auto;
       justify-content: flex-start;
+    }
+
+    #header-component .search-action .svg-wrapper {
+      justify-content: flex-start;
+    }
+
+    #header-component .account-button__icon {
+      position: relative;
+      inset-inline-start: 14px;
     }
 
     #header-component header-actions {
