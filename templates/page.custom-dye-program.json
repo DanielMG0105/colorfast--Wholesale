@@ -17,7 +17,11 @@
           "settings": {
             "text": "colorfast",
             "size": 10,
-            "scale_x": 226,
+            "line_width": 100,
+            "scale_x": 100,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 0,
             "space_above": 0
           }
         },
@@ -26,7 +30,11 @@
           "settings": {
             "text": "BY|YOU",
             "size": 9,
+            "line_width": 100,
             "scale_x": 100,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 28,
             "space_above": 2.4
           }
         }
@@ -216,7 +224,11 @@
           "settings": {
             "text": "colorfast",
             "size": 10,
-            "scale_x": 226,
+            "line_width": 100,
+            "scale_x": 100,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 0,
             "space_above": 0
           }
         },
@@ -225,7 +237,11 @@
           "settings": {
             "text": "BY|YOU",
             "size": 9,
+            "line_width": 100,
             "scale_x": 100,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 28,
             "space_above": 2.4
           }
         },
@@ -234,7 +250,11 @@
           "settings": {
             "text": "OUR BLANKS|YOUR WAY",
             "size": 1.5,
-            "scale_x": 60,
+            "line_width": 100,
+            "scale_x": 100,
+            "width_mode": "fill",
+            "stretch": 200,
+            "gap": 47,
             "space_above": 1.5
           }
         }
@@ -276,6 +296,7 @@
       "block_order": [
         "garment_1"
       ],
+      "disabled": true,
       "settings": {
         "selector_label": "Color selector",
         "colors": "Natural: #EDE6D6\nBlack: #1C1C1C\nNavy: #1F2A44\nForest: #2F4A3A\nBurgundy: #6B1F2A\nSand: #C9B48F\nSage: #9AA98C\nSky: #8FB3D9\nRust: #B0532A\nLavender: #B7A6D3",
