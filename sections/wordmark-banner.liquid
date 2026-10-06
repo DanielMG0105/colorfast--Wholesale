@@ -131,10 +131,10 @@
             // Never overflow the line
             stretch = Math.min(stretch, availableWidth / total);
 
-            // Reduce the final font size by 20%, then recalculate horizontal fit so
-            // filled lines still span the available width.
+            // Apply another 0.8 factor to the previous 0.8 scale for a true 20%
+            // reduction from the rendered size, then recalculate the horizontal fit.
             const fontScale = line.dataset.mode === 'fill' && stretch > 1 ? Math.pow(stretch, 0.35) : 1;
-            line.style.fontSize = `${baseFontSize * fontScale * 0.8}px`;
+            line.style.fontSize = `${baseFontSize * fontScale * 0.64}px`;
             natural = groups.map((group) => group.firstElementChild.getBoundingClientRect().width);
             total = natural.reduce((sum, value) => sum + value, 0);
             if (!total) continue;
