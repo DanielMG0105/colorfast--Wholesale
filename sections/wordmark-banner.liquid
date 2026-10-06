@@ -112,7 +112,7 @@
             const width = line.clientWidth;
             if (!width) continue;
             const groups = [...line.querySelectorAll('.wordmark-banner__group')];
-            const baseFontSize = (parseFloat(line.dataset.size) / 100) * width;
+            const baseFontSize = (parseFloat(line.dataset.size) / 100) * width * 0.8;
             line.style.fontSize = `${baseFontSize}px`;
 
             for (const group of groups) {
