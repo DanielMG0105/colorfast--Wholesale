@@ -107,3 +107,28 @@
   width: max-content;
   transform: scaleX(2.272727);
 }
+
+@media screen and (max-width: 749px) {
+  .edge-wordmark__brand {
+    width: 100%;
+    transform: none;
+  }
+
+  .edge-wordmark__group,
+  .edge-wordmark__line--lower .edge-wordmark__group {
+    transform: none;
+  }
+
+  .edge-wordmark__group--right {
+    position: static;
+    inset-inline-end: auto;
+  }
+
+  .edge-wordmark__line--tagline .edge-wordmark__group--right {
+    inset-inline-end: auto;
+  }
+
+  .edge-wordmark__line--tagline {
+    font-size: max(12px, calc(var(--ew-tagline-size) * 1cqw));
+  }
+}
