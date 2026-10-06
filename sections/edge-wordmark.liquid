@@ -30,7 +30,7 @@
     {%- if section.settings.lower_line != blank -%}
         <div class="edge-wordmark__line edge-wordmark__line--lower">
           {%- for group in lower_groups -%}
-          <span class="edge-wordmark__group">{{ group | strip | escape }}</span>
+          <span class="edge-wordmark__group{% if forloop.first %} edge-wordmark__group--left{% endif %}{% if forloop.last %} edge-wordmark__group--right{% endif %}">{{ group | strip | escape }}</span>
           {%- endfor -%}
       </div>
     {%- endif -%}
@@ -38,7 +38,7 @@
     {%- if section.settings.tagline != blank -%}
         <div class="edge-wordmark__line edge-wordmark__line--tagline">
           {%- for group in tagline_groups -%}
-          <span class="edge-wordmark__group">{{ group | strip | escape }}</span>
+          <span class="edge-wordmark__group{% if forloop.first %} edge-wordmark__group--left{% endif %}{% if forloop.last %} edge-wordmark__group--right{% endif %}">{{ group | strip | escape }}</span>
         {%- endfor -%}
       </div>
     {%- endif -%}
@@ -113,6 +113,15 @@
   }
 
   .edge-wordmark__group { display: block; }
+
+  .edge-wordmark__group--left { transform-origin: left center; }
+  .edge-wordmark__group--right { transform-origin: right center; }
+
+  .edge-wordmark__group {
+    flex: 0 0 auto;
+    width: max-content;
+    transform: scaleX(2.272727);
+  }
 {% endstylesheet %}
 
 {% schema %}
