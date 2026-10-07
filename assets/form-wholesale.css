@@ -572,3 +572,8 @@
   color: #bdbdbd;
   cursor: no-drop;
 }
+
+/* Keep the requested typeface on every label in the wholesale form. */
+.container--form label {
+  font-family: 'sf_pro_displayregular', sans-serif !important;
+}
