@@ -583,3 +583,7 @@
 .container--form textarea {
   font-family: 'sf_pro_displayregular', sans-serif !important;
 }
+
+.container--form textarea {
+  padding: 20px 15px !important;
+}
