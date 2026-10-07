@@ -618,6 +618,7 @@ data-wpd-product-id="{{ product.id }}">
           window.addEventListener('resize', this.onBulkResize);
           this.updateAvailability();
           this.refreshBulkQuantities();
+          this.loadGridQuantitiesFromCart();
           this.updateBulkButtonState();
           requestAnimationFrame(() => this.syncBulkButtonWidth());
           this.watchAppTiers();
@@ -909,6 +910,38 @@ data-wpd-product-id="{{ product.id }}">
           input.closest('.product-showcase__bulk-cell')?.classList.toggle('is-added', Number(input.value) > 0);
           this.updateGridTotals();
           this.updateBulkButtonState();
+        }
+
+        async loadGridQuantitiesFromCart() {
+          const gridInputs = [...this.querySelectorAll('[data-grid-qty]')];
+          if (!gridInputs.length) return;
+
+          try {
+            const cart = await fetch(`${window.Shopify?.routes?.root ?? '/'}cart.js`).then((response) => {
+              if (!response.ok) throw new Error('Could not load cart');
+              return response.json();
+            });
+            const quantitiesByVariant = new Map();
+
+            cart.items
+              .filter((item) => String(item.product_id) === String(this.dataset.productId))
+              .forEach((item) => {
+                const variantId = String(item.variant_id);
+                quantitiesByVariant.set(variantId, (quantitiesByVariant.get(variantId) || 0) + item.quantity);
+              });
+
+            gridInputs.forEach((input) => {
+              const quantity = quantitiesByVariant.get(input.dataset.variantId);
+              if (quantity === undefined || input.value !== '') return;
+              input.value = String(quantity);
+              input.closest('.product-showcase__bulk-cell')?.classList.toggle('is-added', quantity > 0);
+            });
+
+            this.updateGridTotals();
+            this.updateBulkButtonState();
+          } catch (error) {
+            console.warn('Unable to preload product quantities from cart.', error);
+          }
         }
 
         updateGridTotals() {
@@ -1666,6 +1699,7 @@ data-wpd-product-id="{{ product.id }}">
   .product-showcase__bulk-grid .vbog__cell--editing .vbog__cell-inventory { position: absolute; top: 4px; right: 5px; z-index: 1; display: block; font-size: 9px; opacity: .7; }
   .product-showcase__bulk-grid .vbog__cell--editing .vbog__cell-qty-input { position: absolute; right: 2px; bottom: 1px; left: 2px; display: block !important; width: calc(100% - 4px); height: 25px; }
   .product-showcase__bulk-grid .vbog__cell--variant.is-added { background: var(--ps-text); color: var(--ps-bg); }
+  .product-showcase__bulk-grid .vbog__cell--variant.is-added:hover:not(.vbog__cell--disabled) { background: var(--ps-text); color: var(--ps-bg); }
   .product-showcase__bulk-grid .vbog__cell--disabled { cursor: not-allowed; opacity: .28; }
   .product-showcase__bulk-grid .vbog__cell--empty { opacity: .18; pointer-events: none; }
   .product-showcase__bulk-grid .vbog__row--total .vbog__cell { height: 48px; font-size: 12px; font-weight: 500; letter-spacing: .1em; }
