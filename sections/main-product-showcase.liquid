@@ -67,13 +67,6 @@
 
   assign form_id = 'ProductShowcaseForm-' | append: section.id
 
-  # Custom dye swatch: sends the product to the dye preview page, which loads it into the picker
-  assign dye_enabled = false
-  if product.metafields.custom.custom_dye.value == true and color_option_position > 0
-    assign dye_enabled = true
-    assign dye_link = section.settings.dye_page.url | default: '/pages/custom-dye'
-    assign dye_link = dye_link | append: '?product=' | append: product.handle | append: '#custom-dye'
-  endif
 -%}
 
 <style>
@@ -360,6 +353,7 @@ data-wpd-product-id="{{ product.id }}">
 
                   {%- if option.position == color_option_position and related_products != blank -%}
                     {%- for related_product in related_products -%}
+                      {%- unless related_product.id == product.id -%}
                       {%- liquid
                         assign related_color = related_product.title
                         assign related_swatch_color = blank
@@ -388,18 +382,10 @@ data-wpd-product-id="{{ product.id }}">
                         aria-label="View {{ related_color | escape }}"
                         style="{% if related_swatch_image %}background-image: url({{ related_swatch_image | image_url: width: 72 }});{% elsif related_swatch_color != blank %}background-color: {{ related_swatch_color }};{% else %}background-image: url({{ related_product.featured_image | image_url: width: 72 }});{% endif %}"
                       ><span class="visually-hidden">{{ related_color | escape }}</span></a>
+                      {%- endunless -%}
                     {%- endfor -%}
                   {%- endif -%}
 
-                  {%- if dye_enabled and option.position == color_option_position -%}
-                    <a
-                      class="product-showcase__swatch product-showcase__swatch--dye"
-                      href="{{ dye_link }}"
-                      title="{{ section.settings.dye_label | default: 'Custom dye' | escape }}"
-                    >
-                      <span class="visually-hidden">{{ section.settings.dye_label | default: 'Custom dye' | escape }}</span>
-                    </a>
-                  {%- endif -%}
                 </div>
               </fieldset>
             {%- endfor -%}
@@ -1384,20 +1370,6 @@ data-wpd-product-id="{{ product.id }}">
     position: relative;
   }
 
-  /* Same hue wheel as the dye preview picker */
-  .product-showcase__swatch--dye {
-    background:
-      radial-gradient(closest-side, #fff, rgb(255 255 255 / 0)),
-      conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
-    transition: outline-offset 0.2s ease;
-  }
-
-  .product-showcase__swatch--dye:hover,
-  .product-showcase__swatch--dye:focus-visible {
-    outline: 1px solid var(--ps-text);
-    outline-offset: 3px;
-  }
-
   [data-option-input]:checked + .product-showcase__swatch {
     outline: 1px solid var(--ps-text);
     outline-offset: 3px;
@@ -1999,18 +1971,6 @@ data-wpd-product-id="{{ product.id }}">
       "label": "Color option names",
       "info": "Comma-separated option names shown as swatches.",
       "default": "Color,Colour"
-    },
-    {
-      "type": "page",
-      "id": "dye_page",
-      "label": "Custom dye page",
-      "info": "Products with the custom.custom_dye metafield set to true show a dye swatch next to their colors that opens this page with the product loaded. Defaults to /pages/custom-dye."
-    },
-    {
-      "type": "text",
-      "id": "dye_label",
-      "label": "Custom dye swatch label",
-      "default": "Custom dye"
     },
     {
       "type": "header",
