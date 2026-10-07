@@ -476,7 +476,7 @@ data-wpd-product-id="{{ product.id }}">
                         {%- if grid_variant -%}
                           {%- assign grid_max = '' -%}
                           {%- if grid_variant.inventory_management == 'shopify' and grid_variant.inventory_policy == 'deny' -%}{%- assign grid_max = grid_variant.inventory_quantity -%}{%- endif -%}
-                          <td class="vbog__cell vbog__cell--variant vbog__qty-cell product-showcase__bulk-cell{% unless grid_variant.available %} vbog__cell--disabled is-unavailable{% endunless %}" data-variant-id="{{ grid_variant.id }}" data-size="{{ size | escape }}" data-color="{{ color | escape }}" role="gridcell"{% if grid_variant.available %} tabindex="0" aria-label="{{ color | escape }} / {{ size | escape }} – Quantity"{% else %} aria-disabled="true"{% endif %}><span class="vbog__cell-inventory" data-vbog-display>{{ grid_variant.inventory_quantity | default: 0 }}</span><input type="number" class="vbog__cell-qty-input" min="0" step="1" inputmode="numeric"{% if grid_max != blank %} max="{{ grid_max }}"{% endif %} aria-label="{{ color | escape }} / {% render 'variant-option-label', value: size.name, option_name: size_option.name %} quantity" data-grid-qty data-grid-size="{{ size | escape }}" data-variant-id="{{ grid_variant.id }}"{% unless grid_variant.available %} disabled{% endunless %}></td>
+                          <td class="vbog__cell vbog__cell--variant vbog__qty-cell product-showcase__bulk-cell{% unless grid_variant.available %} vbog__cell--disabled is-unavailable{% endunless %}" data-variant-id="{{ grid_variant.id }}" data-size="{{ size | escape }}" data-color="{{ color | escape }}" role="gridcell"{% if grid_variant.available %} tabindex="0" aria-label="{{ color | escape }} / {{ size | escape }} – Quantity"{% else %} aria-disabled="true"{% endif %}><span class="vbog__cell-inventory" data-vbog-display data-inventory="{{ grid_variant.inventory_quantity | default: 0 }}">{{ grid_variant.inventory_quantity | default: 0 }}</span><input type="number" class="vbog__cell-qty-input" min="0" step="1" inputmode="numeric"{% if grid_max != blank %} max="{{ grid_max }}"{% endif %} aria-label="{{ color | escape }} / {% render 'variant-option-label', value: size.name, option_name: size_option.name %} quantity" data-grid-qty data-grid-size="{{ size | escape }}" data-variant-id="{{ grid_variant.id }}"{% unless grid_variant.available %} disabled{% endunless %}></td>
                         {%- else -%}<td class="vbog__cell vbog__cell--empty" aria-hidden="true">—</td>{%- endif -%}
                       {%- endfor -%}
                     </tr>
@@ -637,11 +637,17 @@ data-wpd-product-id="{{ product.id }}">
             input.closest('.product-showcase__bulk-cell')?.addEventListener('click', (event) => {
               if (input.disabled) return;
               event.currentTarget.classList.add('vbog__cell--editing');
+              const display = event.currentTarget.querySelector('[data-vbog-display]');
+              if (display) display.textContent = display.dataset.inventory || '0';
               input.focus();
               input.select();
             });
             input.addEventListener('blur', () => {
-              if (!input.value) input.closest('.product-showcase__bulk-cell')?.classList.remove('vbog__cell--editing', 'is-added');
+              const cell = input.closest('.product-showcase__bulk-cell');
+              cell?.classList.remove('vbog__cell--editing');
+              cell?.classList.toggle('is-added', Number(input.value) > 0);
+              const display = cell?.querySelector('[data-vbog-display]');
+              if (display) display.textContent = input.value || display.dataset.inventory || '0';
             });
           });
           this.onBulkResize = () => this.syncBulkButtonWidth();
@@ -938,6 +944,10 @@ data-wpd-product-id="{{ product.id }}">
             input.value = input.max;
           }
           input.closest('.product-showcase__bulk-cell')?.classList.toggle('is-added', Number(input.value) > 0);
+          const display = input.closest('.product-showcase__bulk-cell')?.querySelector('[data-vbog-display]');
+          if (display && !input.closest('.product-showcase__bulk-cell')?.classList.contains('vbog__cell--editing')) {
+            display.textContent = input.value || display.dataset.inventory || '0';
+          }
           this.updateGridTotals();
           this.updateBulkButtonState();
         }
@@ -965,6 +975,8 @@ data-wpd-product-id="{{ product.id }}">
               if (quantity === undefined || input.value !== '') return;
               input.value = String(quantity);
               input.closest('.product-showcase__bulk-cell')?.classList.toggle('is-added', quantity > 0);
+              const display = input.closest('.product-showcase__bulk-cell')?.querySelector('[data-vbog-display]');
+              if (display) display.textContent = String(quantity);
             });
 
             this.updateGridTotals();
