@@ -587,3 +587,22 @@
 .container--form textarea {
   padding: 20px 15px !important;
 }
+
+.form-demo-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+
+.form-demo-tools button {
+  padding: 8px 12px;
+  border: 1px solid #777;
+  border-radius: 6px;
+  background: #fff;
+  color: #222;
+  cursor: pointer;
+  font: inherit;
+}

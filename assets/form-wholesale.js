@@ -6,6 +6,54 @@
 
     console.log("ready")
 
+    document.getElementById("fill-demo-data")?.addEventListener("click", () => {
+      const demoValues = {
+        "name-mod-1": "Alex",
+        "last-name-mod-1": "Morgan",
+        "address-mod-1": "123 Demo Street",
+        "city-mod-1": "Los Angeles",
+        "state-mod-1": "CA",
+        "zip-mode-1": "90001",
+        "phone-mod-1": "555-010-1234",
+        "email-mod-1": "alex.morgan@example.test",
+        "accounting_contact_name": "Alex Morgan",
+        "accounting-phone-mod-2": "555-010-1234",
+        "accounting-name-mod-2": "accounts@example.test",
+        "sales-name-mod-2": "Alex Morgan",
+        "sales-phone-mod-2": "555-010-1234",
+        "main_sales_contact_email": "sales@example.test",
+        "company-mod-3": "Example Demo Company",
+        "website-mod-3": "https://example.test",
+        "address-mod-3": "123 Demo Street",
+        "city-mod-3": "Los Angeles",
+        "state-mod-3": "CA",
+        "zip-mode-3": "90001",
+        "company-phone-mod-2": "555-010-1234",
+        "sales-email-mod-2": "sales@example.test",
+        "federal-employer-mod-3": "12-3456789",
+        "reseller-number-mod-3": "DEMO-12345",
+        "about-company-mod-3": "This is demo information for testing the wholesale application form.",
+        "company-sales-mod-3": "$50,000 - $500,000",
+        "employees-mod-3": "10-19",
+        "about-color-fast-mod-3": "Demo referral source for form testing.",
+        "company-goals-mod-3": "Testing form submission with sample information."
+      };
+
+      Object.entries(demoValues).forEach(([id, value]) => {
+        const field = document.getElementById(id);
+        if (!field) return;
+        field.value = value;
+        field.dispatchEvent(new Event("input", { bubbles: true }));
+        field.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+
+      const message = document.getElementById("view-msg");
+      if (message) {
+        message.style.color = "#555";
+        message.textContent = "Demo data filled. Review it and select consent checkboxes manually if needed.";
+      }
+    });
+
     let currStep;
     document.querySelectorAll(".frm--btn.next-form").forEach((item) => {
       item.addEventListener("click", (e) => {
