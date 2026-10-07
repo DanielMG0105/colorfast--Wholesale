@@ -209,7 +209,7 @@
               if (el.name === "copy" || !el.name) return;
 
               if (el.type === "checkbox") {
-                formData.set(el.name, el.checked ? "1" : "0");
+                formData.set(el.name, el.value);
                 return;
               }
 
