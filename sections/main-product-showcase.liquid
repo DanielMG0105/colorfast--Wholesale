@@ -480,6 +480,46 @@ data-wpd-product-id="{{ product.id }}">
                         {%- else -%}<td class="vbog__cell vbog__cell--empty" aria-hidden="true">—</td>{%- endif -%}
                       {%- endfor -%}
                     </tr>
+              {%- endfor -%}
+                  {%- for related_product in related_products -%}
+                    {%- unless related_product.id == product.id -%}
+                      {%- assign related_color_position = 0 -%}
+                      {%- assign related_size_position = 0 -%}
+                      {%- for related_option in related_product.options_with_values -%}
+                        {%- assign related_option_name = related_option.name | downcase | strip -%}
+                        {%- if related_color_position == 0 -%}
+                          {%- for accepted in color_option_names -%}
+                            {%- if related_option_name == accepted -%}{%- assign related_color_position = related_option.position -%}{%- break -%}{%- endif -%}
+                          {%- endfor -%}
+                        {%- endif -%}
+                        {%- if related_size_position == 0 -%}
+                          {%- if related_option_name == 'size' or related_option_name == 'talla' -%}{%- assign related_size_position = related_option.position -%}{%- endif -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                      {%- if related_color_position > 0 and related_size_position > 0 -%}
+                        {%- assign related_color_index = related_color_position | minus: 1 -%}
+                        {%- assign related_size_index = related_size_position | minus: 1 -%}
+                        {%- assign related_color_value = related_product.options_with_values[related_color_index].values.first -%}
+                        {%- assign related_color_label = related_color_value.name | default: related_color_value -%}
+                        {%- assign related_color_lower = related_color_label | downcase | strip -%}
+                        {%- if related_color_lower == 'pfd' or related_color_lower contains 'prepared for dye' -%}{%- assign related_color_label = 'PFD' -%}{%- endif -%}
+                        {%- assign related_swatch = related_color_value.swatch.color | default: related_color_value -%}
+                        {%- assign related_is_dark = false -%}
+                        {%- if related_color_value.swatch.color -%}{%- assign related_brightness = related_color_value.swatch.color | color_brightness -%}{%- if related_brightness < 128 -%}{%- assign related_is_dark = true -%}{%- endif -%}{%- elsif related_color_lower contains 'black' or related_color_lower contains 'navy' or related_color_lower contains 'caviar' -%}{%- assign related_is_dark = true -%}{%- endif -%}
+                        <tr class="vbog__row vbog__row--color" data-color="{{ related_color_label | escape }}" data-related-product-id="{{ related_product.id }}" role="row"><td class="vbog__cell vbog__cell--swatch" scope="row" role="rowheader"><div class="vbog__swatch{% if related_is_dark %} vbog__swatch--dark{% endif %}" title="{{ related_color_label | escape }}" style="{% if related_color_value.swatch.image %}background-image: url({{ related_color_value.swatch.image | image_url: width: 72 }});{% elsif related_color_value.swatch.color %}background-color: {{ related_swatch }};{% else %}background-image: url({{ related_product.featured_image | image_url: width: 72 }});{% endif %}"><span class="vbog__swatch-name">{{ related_color_label | upcase }}</span></div></td>
+                          {%- for size in size_option.values -%}
+                            {%- assign related_grid_variant = nil -%}
+                            {%- for candidate_variant in related_product.variants -%}
+                              {%- if candidate_variant.options[related_size_index] == size -%}{%- assign related_grid_variant = candidate_variant -%}{%- break -%}{%- endif -%}
+                            {%- endfor -%}
+                            {%- if related_grid_variant -%}
+                              {%- assign related_grid_max = '' -%}{%- if related_grid_variant.inventory_management == 'shopify' and related_grid_variant.inventory_policy == 'deny' -%}{%- assign related_grid_max = related_grid_variant.inventory_quantity -%}{%- endif -%}
+                              <td class="vbog__cell vbog__cell--variant vbog__qty-cell product-showcase__bulk-cell{% unless related_grid_variant.available %} vbog__cell--disabled is-unavailable{% endunless %}" data-variant-id="{{ related_grid_variant.id }}" data-size="{{ size | escape }}" data-color="{{ related_color_label | escape }}" role="gridcell"{% if related_grid_variant.available %} tabindex="0" aria-label="{{ related_color_label | escape }} / {{ size | escape }} – Quantity"{% else %} aria-disabled="true"{% endif %}><span class="vbog__cell-inventory" data-vbog-display data-inventory="{{ related_grid_variant.inventory_quantity | default: 0 }}">{{ related_grid_variant.inventory_quantity | default: 0 }}</span><input type="number" class="vbog__cell-qty-input" min="0" step="1" inputmode="numeric"{% if related_grid_max != blank %} max="{{ related_grid_max }}"{% endif %} aria-label="{{ related_color_label | escape }} / {% render 'variant-option-label', value: size.name, option_name: size_option.name %} quantity" data-grid-qty data-grid-size="{{ size | escape }}" data-variant-id="{{ related_grid_variant.id }}"{% unless related_grid_variant.available %} disabled{% endunless %}></td>
+                            {%- else -%}<td class="vbog__cell vbog__cell--empty" aria-hidden="true">—</td>{%- endif -%}
+                          {%- endfor -%}
+                        </tr>
+                      {%- endif -%}
+                    {%- endunless -%}
                   {%- endfor -%}
                 </tbody>
                 <tfoot class="vbog__tfoot"><tr class="vbog__total-divider" aria-hidden="true"><td colspan="{{ size_option.values.size | plus: 1 }}"></td></tr><tr class="vbog__row vbog__row--total" role="row"><td class="vbog__cell vbog__cell--total-label" role="rowheader">TOTAL</td>{%- for size in size_option.values -%}<td class="vbog__cell vbog__cell--total-value" data-grid-total="{{ size | escape }}" role="gridcell" aria-label="{{ size | escape }} total"><span>—</span></td>{%- endfor -%}</tr></tfoot>
@@ -564,18 +604,38 @@ data-wpd-product-id="{{ product.id }}">
     }
   </style>
 
+  {%- assign grid_variant_count = product.variants.size -%}
+  {%- for related_product in related_products -%}{%- unless related_product.id == product.id -%}{%- assign grid_variant_count = grid_variant_count | plus: related_product.variants.size -%}{%- endunless -%}{%- endfor -%}
   <script type="application/json" data-variants>
+    {%- assign grid_variant_index = 0 -%}
     [
       {%- for variant in product.variants -%}
         {
           "id": {{ variant.id }},
+          "productId": {{ product.id }},
           "options": {{ variant.options | json }},
           "available": {{ variant.available | json }},
           "price": {{ variant.price | money_with_currency | json }},
           "mediaId": {{ variant.featured_media.id | default: 0 }},
           "inventoryQuantity": {{ variant.inventory_quantity | json }},
           "inventoryManagement": {{ variant.inventory_management | json }}
-        }{% unless forloop.last %},{% endunless %}
+        }{%- assign grid_variant_index = grid_variant_index | plus: 1 -%}{% if grid_variant_index < grid_variant_count %},{% endif %}
+      {%- endfor -%}
+      {%- for related_product in related_products -%}
+        {%- unless related_product.id == product.id -%}
+          {%- for variant in related_product.variants -%}
+            {
+              "id": {{ variant.id }},
+              "productId": {{ related_product.id }},
+              "options": {{ variant.options | json }},
+              "available": {{ variant.available | json }},
+              "price": {{ variant.price | money_with_currency | json }},
+              "mediaId": {{ variant.featured_media.id | default: 0 }},
+              "inventoryQuantity": {{ variant.inventory_quantity | json }},
+              "inventoryManagement": {{ variant.inventory_management | json }}
+            }{%- assign grid_variant_index = grid_variant_index | plus: 1 -%}{% if grid_variant_index < grid_variant_count %},{% endif %}
+          {%- endfor -%}
+        {%- endunless -%}
       {%- endfor -%}
     ]
   </script>
@@ -799,7 +859,11 @@ data-wpd-product-id="{{ product.id }}">
         }
 
         findVariant(options) {
-          return this.variants.find((variant) => variant.options.every((value, i) => value === options[i]));
+          return this.variants.find(
+            (variant) =>
+              String(variant.productId) === String(this.dataset.productId) &&
+              variant.options.every((value, i) => value === options[i])
+          );
         }
 
         displayOptionValue(optionName, value) {
@@ -964,7 +1028,7 @@ data-wpd-product-id="{{ product.id }}">
             const quantitiesByVariant = new Map();
 
             cart.items
-              .filter((item) => String(item.product_id) === String(this.dataset.productId))
+              .filter((item) => this.variants.some((variant) => String(variant.productId) === String(item.product_id)))
               .forEach((item) => {
                 const variantId = String(item.variant_id);
                 quantitiesByVariant.set(variantId, (quantitiesByVariant.get(variantId) || 0) + item.quantity);
