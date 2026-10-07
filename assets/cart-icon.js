@@ -22,7 +22,7 @@ class CartIcon extends Component {
   }
 
   set currentCartCount(value) {
-    this.refs.cartBubbleCount.textContent = value < 100 ? String(value) : '';
+    this.refs.cartBubbleCount.textContent = value < 100 ? String(value) : '99+';
   }
 
   connectedCallback() {
@@ -82,7 +82,7 @@ class CartIcon extends Component {
     sessionStorage.setItem(
       'cart-count',
       JSON.stringify({
-        value: String(this.currentCartCount),
+        value: String(itemCount),
         timestamp: Date.now(),
       })
     );
@@ -115,16 +115,16 @@ class CartIcon extends Component {
 
     try {
       const { value, timestamp } = JSON.parse(sessionStorageCount);
+      const storedCount = parseInt(value, 10);
+      const storedDisplayCount = storedCount >= 100 ? '99+' : String(storedCount);
 
       // Check if the stored count matches what's visible
-      if (value === visibleCount) return;
+      if (storedDisplayCount === visibleCount) return;
 
       // Only update if timestamp is recent (within 10 seconds)
       if (Date.now() - timestamp < 10000) {
-        const count = parseInt(value, 10);
-
-        if (count >= 0) {
-          this.renderCartBubble(count, false);
+        if (storedCount >= 0) {
+          this.renderCartBubble(storedCount, false);
         }
       }
     } catch (_) {
