@@ -63,7 +63,7 @@
 
   assign tiers_source = product.metafields.custom.wholesale_tiers.value | default: section.settings.wholesale_tiers
   assign tier_lines = tiers_source | newline_to_br | split: '<br />'
-  assign related_products = product.metafields.custom.related_products.value
+  assign related_products = product.metafields.custom.variants_products.value
 
   assign form_id = 'ProductShowcaseForm-' | append: section.id
 
