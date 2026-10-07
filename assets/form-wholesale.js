@@ -177,11 +177,21 @@
                 //body: serializedData, // FormData will be sent as multipart/form-data
                 redirect: "follow"
             })
-            .then(response => {
-                if(response.ok) {
-                    return response.json(); // or response.text() if the server returns plain text
+            .then(async response => {
+                const responseText = await response.text();
+                if (!response.ok) {
+                    const details = responseText.trim().slice(0, 500);
+                    throw new Error(
+                      `Form submission failed (HTTP ${response.status}${response.statusText ? ` ${response.statusText}` : ''})${details ? `: ${details}` : '.'}`
+                    );
                 }
-                throw new Error('Network response was not ok.');
+
+                if (!responseText) return null;
+                try {
+                    return JSON.parse(responseText);
+                } catch {
+                    return responseText;
+                }
             })
             .then(data => {
                 success = true
@@ -194,6 +204,12 @@
             })
             .catch(error => {
                 console.error('Error during upload:', error);
+                document.querySelector("#send-frm-progress span").innerText = "Submit";
+                const message = document.getElementById("view-msg");
+                if (message) {
+                  message.style.color = "red";
+                  message.textContent = "We couldn't submit your application. Please try again.";
+                }
             });
             
           }       
