@@ -205,22 +205,21 @@
             document.querySelector("#send-frm-progress span").innerText = "Sending ...";
             let formData = new FormData();
 
-            document.querySelectorAll("#form-data-wholesale input, #form-data-wholesale textarea, #form-data-wholesale select").forEach(function(el, index) {                      
-              if(el.name != "copy" & el.name != "acept_terms_and_conditions" & el.name != "i_consent_to_colorfast_contacting" & el.name != "your_reseller"){          
-                  formData.append(el.name, el.value);              
+            document.querySelectorAll("#form-data-wholesale input, #form-data-wholesale textarea, #form-data-wholesale select").forEach(function(el) {
+              if (el.name === "copy" || !el.name) return;
+
+              if (el.type === "checkbox") {
+                formData.set(el.name, el.checked ? "1" : "0");
+                return;
               }
-              if(el.name == "acept_terms_and_conditions" || el.name == "i_consent_to_colorfast_contacting"){
-                if(el.checked){
-                  formData.append(el.name, 1); 
-                }else{
-                  formData.append(el.name, 0); 
-                }              
-              }          
+
+              formData.append(el.name, el.value);
             });
 
           // Use fetch API to send the data
             fetch("https://colorfast.portaldev.xyz/api/v1/saveform", {
                 method: 'POST',
+                headers: { Accept: 'application/json' },
                 body: formData,
                 //body: serializedData, // FormData will be sent as multipart/form-data
                 redirect: "follow"
