@@ -414,7 +414,7 @@ data-wpd-product-id="{{ product.id }}">
           <div id='wcp_vd_table' data-app-tiers></div>
         {%- endform -%}
 
-        {%- if section.settings.show_bulk_grid and size_option_position > 0 and color_option_position > 0 -%}
+        {%- if customer and section.settings.show_bulk_grid and size_option_position > 0 and color_option_position > 0 -%}
           {%- assign size_index = size_option_position | minus: 1 -%}
           {%- assign color_index = color_option_position | minus: 1 -%}
           {%- assign size_option = product.options_with_values[size_index] -%}
@@ -494,27 +494,33 @@ data-wpd-product-id="{{ product.id }}">
               {{ section.settings.wholesale_heading | escape }}
               <span class="product-showcase__circle-plus" aria-hidden="true"></span>
             </summary>
-            <table class="product-showcase__table product-showcase__tiers">
-              <tbody data-tiers>
-                {%- for line in tier_lines -%}
-                  {%- assign parts = line | strip | split: ':' -%}
-                  {%- if parts.size > 1 -%}
-                    {%- liquid
-                      # The first tier (1-99) is always the product's own price
-                      if forloop.first
-                        assign tier_price = current_variant.price
-                      else
-                        assign tier_price = parts[1] | strip | remove: '$' | times: 100
-                      endif
-                    -%}
-                    <tr>
-                      <td>{{ parts[0] | strip | escape }}</td>
-                      <td>{{ tier_price | money }}</td>
-                    </tr>
-                  {%- endif -%}
-                {%- endfor -%}
-              </tbody>
-            </table>
+            {%- if customer -%}
+              <table class="product-showcase__table product-showcase__tiers">
+                <tbody data-tiers>
+                  {%- for line in tier_lines -%}
+                    {%- assign parts = line | strip | split: ':' -%}
+                    {%- if parts.size > 1 -%}
+                      {%- liquid
+                        # The first tier (1-99) is always the product's own price
+                        if forloop.first
+                          assign tier_price = current_variant.price
+                        else
+                          assign tier_price = parts[1] | strip | remove: '$' | times: 100
+                        endif
+                      -%}
+                      <tr>
+                        <td>{{ parts[0] | strip | escape }}</td>
+                        <td>{{ tier_price | money }}</td>
+                      </tr>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            {%- else -%}
+              <p class="product-showcase__login-prompt">
+                <a href="{{ routes.account_login_url }}">Please Log in</a> / <a href="/pages/create-wholesale-account">Apply for wholesale</a>
+              </p>
+            {%- endif -%}
           </details>
         {%- endif -%}
 
