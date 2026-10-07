@@ -589,7 +589,7 @@
 }
 
 .form-demo-tools {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
