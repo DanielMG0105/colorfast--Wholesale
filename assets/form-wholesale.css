@@ -577,3 +577,9 @@
 .container--form label {
   font-family: 'sf_pro_displayregular', sans-serif !important;
 }
+
+.container--form input:not([type='hidden']),
+.container--form select,
+.container--form textarea {
+  font-family: 'sf_pro_displayregular', sans-serif !important;
+}
