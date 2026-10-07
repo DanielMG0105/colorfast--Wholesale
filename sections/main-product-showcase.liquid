@@ -63,6 +63,7 @@
 
   assign tiers_source = product.metafields.custom.wholesale_tiers.value | default: section.settings.wholesale_tiers
   assign tier_lines = tiers_source | newline_to_br | split: '<br />'
+  assign related_products = product.metafields.custom.related_products.value
 
   assign form_id = 'ProductShowcaseForm-' | append: section.id
 
@@ -356,6 +357,39 @@ data-wpd-product-id="{{ product.id }}">
                       <label for="{{ input_id }}" class="product-showcase__pill">{% render 'variant-option-label', value: value.name, option_name: option.name %}</label>
                     {%- endif -%}
                   {%- endfor -%}
+
+                  {%- if option.position == color_option_position and related_products != blank -%}
+                    {%- for related_product in related_products -%}
+                      {%- liquid
+                        assign related_color = related_product.title
+                        assign related_swatch_color = blank
+                        assign related_swatch_image = blank
+                        for related_option in related_product.options_with_values
+                          assign related_option_name = related_option.name | downcase | strip
+                          for accepted in color_option_names
+                            assign accepted_name = accepted | strip
+                            if related_option_name == accepted_name
+                              assign related_color_value = related_option.values.first
+                              assign related_color = related_color_value.name | default: related_color_value
+                              assign related_swatch_color = related_color_value.swatch.color
+                              assign related_swatch_image = related_color_value.swatch.image
+                              break
+                            endif
+                          endfor
+                          if related_swatch_color != blank or related_swatch_image != blank
+                            break
+                          endif
+                        endfor
+                      -%}
+                      <a
+                        class="product-showcase__swatch product-showcase__related-swatch"
+                        href="{{ related_product.url }}"
+                        title="{{ related_color | escape }}"
+                        aria-label="View {{ related_color | escape }}"
+                        style="{% if related_swatch_image %}background-image: url({{ related_swatch_image | image_url: width: 72 }});{% elsif related_swatch_color != blank %}background-color: {{ related_swatch_color }};{% else %}background-image: url({{ related_product.featured_image | image_url: width: 72 }});{% endif %}"
+                      ><span class="visually-hidden">{{ related_color | escape }}</span></a>
+                    {%- endfor -%}
+                  {%- endif -%}
 
                   {%- if dye_enabled and option.position == color_option_position -%}
                     <a
