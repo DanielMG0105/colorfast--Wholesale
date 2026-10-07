@@ -21,7 +21,7 @@
         "height": 110,
         "height_mobile": 100,
         "button_label": "Shop the collection",
-        "button_link": "shopify://collections/all",
+        "button_link": "shopify://collections/shop-all",
         "open_in_new_tab": false,
         "button_font_size": 17,
         "button_padding_x": 46,
