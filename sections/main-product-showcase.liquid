@@ -67,13 +67,6 @@
   if related_products == blank
     assign related_products = product.metafields.custom.variants_color.value
   endif
-  assign swatch_product_order = product.id | append: ''
-  for related_product in related_products
-    unless related_product.id == product.id
-      assign swatch_product_order = swatch_product_order | append: ',' | append: related_product.id
-    endunless
-  endfor
-
   assign form_id = 'ProductShowcaseForm-' | append: section.id
 
 -%}
@@ -389,7 +382,7 @@ data-wpd-product-id="{{ product.id }}">
                       <a
                         class="product-showcase__swatch product-showcase__related-swatch"
                         data-swatch-product-id="{{ related_product.id }}"
-                        href="{{ related_product.url }}?color_order={{ swatch_product_order | url_encode }}"
+                        href="{{ related_product.url }}"
                         title="{{ related_color | escape }}"
                         aria-label="View {{ related_color | escape }}"
                         style="{% if related_swatch_image %}background-image: url({{ related_swatch_image | image_url: width: 72 }});{% elsif related_swatch_color != blank %}background-color: {{ related_swatch_color }};{% else %}background-image: url({{ related_product.featured_image | image_url: width: 72 }});{% endif %}"
@@ -743,47 +736,33 @@ data-wpd-product-id="{{ product.id }}">
         }
 
         sortColorSwatches() {
-          const order = new URLSearchParams(window.location.search).get('color_order');
-          if (!order) return;
-
           const container = this.querySelector('.product-showcase__values--swatches');
           if (!container) return;
 
-          const groups = new Map();
-          const addToGroup = (productId, elements) => {
-            if (!productId) return;
-            if (!groups.has(productId)) groups.set(productId, []);
-            groups.get(productId).push(...elements);
-          };
-
+          const swatches = [];
           container.querySelectorAll('[data-option-input][data-swatch-product-id]').forEach((input) => {
             const label = input.nextElementSibling;
             if (label?.matches('.product-showcase__swatch')) {
-              addToGroup(input.dataset.swatchProductId, [input, label]);
+              swatches.push({
+                label: input.value.trim(),
+                productId: input.dataset.swatchProductId,
+                elements: [input, label],
+              });
             }
           });
           container.querySelectorAll('a[data-swatch-product-id]').forEach((swatch) => {
-            addToGroup(swatch.dataset.swatchProductId, [swatch]);
+            swatches.push({
+              label: (swatch.title || swatch.textContent).trim(),
+              productId: swatch.dataset.swatchProductId,
+              elements: [swatch],
+            });
           });
 
-          const orderedIds = order.split(',').filter(Boolean);
-          if (!orderedIds.some((id) => groups.has(id))) return;
-
-          const orderedElements = [];
-          orderedIds.forEach((id) => {
-            const elements = groups.get(id);
-            if (elements) {
-              orderedElements.push(...elements);
-              groups.delete(id);
-            }
-          });
-          groups.forEach((elements) => orderedElements.push(...elements));
-          container.replaceChildren(...orderedElements);
-          container.querySelectorAll('a[data-swatch-product-id]').forEach((swatch) => {
-            const url = new URL(swatch.href);
-            url.searchParams.set('color_order', orderedIds.join(','));
-            swatch.href = url.toString();
-          });
+          swatches.sort((a, b) =>
+            a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }) ||
+            a.productId.localeCompare(b.productId)
+          );
+          container.replaceChildren(...swatches.flatMap((swatch) => swatch.elements));
         }
 
         updateGalleryControls() {
