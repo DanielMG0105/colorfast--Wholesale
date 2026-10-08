@@ -1085,9 +1085,14 @@ data-wpd-product-id="{{ product.id }}">
               const quantity = quantitiesByVariant.get(input.dataset.variantId);
               if (quantity === undefined || input.value !== '') return;
               input.value = String(quantity);
-              input.closest('.product-showcase__bulk-cell')?.classList.toggle('is-added', quantity > 0);
-              const display = input.closest('.product-showcase__bulk-cell')?.querySelector('[data-vbog-display]');
-              if (display) display.textContent = String(quantity);
+              const cell = input.closest('.product-showcase__bulk-cell');
+              cell?.classList.toggle('is-added', quantity > 0);
+              if (quantity > 0) {
+                input.dataset.gridCommitted = 'true';
+                cell?.classList.add('vbog__cell--editing');
+              }
+              const display = cell?.querySelector('[data-vbog-display]');
+              if (display) display.textContent = quantity > 0 ? display.dataset.inventory || '0' : String(quantity);
             });
 
             this.updateGridTotals();
