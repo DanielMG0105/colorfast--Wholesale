@@ -1186,6 +1186,14 @@ data-wpd-product-id="{{ product.id }}">
           );
 
           this.bulkRequestInProgress = true;
+          items.forEach(({ id }) => {
+            const input = this.querySelector(`[data-grid-qty][data-variant-id="${id}"]`);
+            const cell = input?.closest('.product-showcase__bulk-cell');
+            if (!cell) return;
+            cell.classList.add('vbog__cell--editing', 'is-added');
+            const display = cell.querySelector('[data-vbog-display]');
+            if (display) display.textContent = display.dataset.inventory || '0';
+          });
           this.updateBulkButtonState();
           if (this.bulkMessage) this.bulkMessage.hidden = true;
 
@@ -1852,8 +1860,8 @@ data-wpd-product-id="{{ product.id }}">
   .product-showcase__bulk-grid .vbog__cell-qty-input::-webkit-inner-spin-button { margin: 0; -webkit-appearance: none; }
   .product-showcase__bulk-grid .vbog__cell--editing .vbog__cell-inventory { position: absolute; top: 4px; right: 5px; z-index: 1; display: block; font-size: 9px; opacity: .7; }
   .product-showcase__bulk-grid .vbog__cell--editing .vbog__cell-qty-input { position: absolute; right: 2px; bottom: 1px; left: 2px; display: block !important; width: calc(100% - 4px); height: 25px; }
-  .product-showcase__bulk-grid .vbog__cell--variant.is-added { background: var(--ps-text); color: var(--ps-bg); }
-  .product-showcase__bulk-grid .vbog__cell--variant.is-added:hover:not(.vbog__cell--disabled) { background: var(--ps-text); color: var(--ps-bg); }
+  .product-showcase__bulk-grid .vbog__cell--variant.is-added { background: var(--ps-text) !important; color: var(--ps-bg) !important; }
+  .product-showcase__bulk-grid .vbog__cell--variant.is-added:hover:not(.vbog__cell--disabled) { background: var(--ps-text) !important; color: var(--ps-bg) !important; }
   .product-showcase__bulk-grid .vbog__cell--disabled { cursor: not-allowed; opacity: .28; }
   .product-showcase__bulk-grid .vbog__cell--empty { opacity: .18; pointer-events: none; }
   .product-showcase__bulk-grid .vbog__row--total .vbog__cell { height: 48px; font-size: 12px; font-weight: 500; letter-spacing: .1em; }
