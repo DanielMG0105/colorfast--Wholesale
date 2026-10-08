@@ -699,14 +699,26 @@ data-wpd-product-id="{{ product.id }}">
             input.addEventListener('change', () => this.onGridQuantityChange(input));
             input.closest('.product-showcase__bulk-cell')?.addEventListener('click', (event) => {
               if (input.disabled) return;
+              if (input.dataset.gridCommitted === 'true') {
+                delete input.dataset.gridCommitted;
+                input.value = '';
+              }
               event.currentTarget.classList.add('vbog__cell--editing');
               const display = event.currentTarget.querySelector('[data-vbog-display]');
               if (display) display.textContent = display.dataset.inventory || '0';
               input.focus();
               input.select();
+              this.updateGridTotals();
+              this.updateBulkButtonState();
             });
             input.addEventListener('blur', () => {
               const cell = input.closest('.product-showcase__bulk-cell');
+              if (input.dataset.gridCommitted === 'true') {
+                cell?.classList.add('vbog__cell--editing', 'is-added');
+                const display = cell?.querySelector('[data-vbog-display]');
+                if (display) display.textContent = display.dataset.inventory || '0';
+                return;
+              }
               cell?.classList.remove('vbog__cell--editing');
               cell?.classList.toggle('is-added', Number(input.value) > 0);
               const display = cell?.querySelector('[data-vbog-display]');
@@ -1003,6 +1015,7 @@ data-wpd-product-id="{{ product.id }}">
           const gridInputs = this.querySelectorAll('[data-grid-qty]');
           if (gridInputs.length) {
             return [...gridInputs].flatMap((input) => {
+              if (input.dataset.gridCommitted === 'true') return [];
               const quantity = Math.max(0, parseInt(input.value, 10) || 0);
               if (quantity < 1 || input.disabled) return [];
               const variant = this.variants.find((item) => String(item.id) === input.dataset.variantId);
@@ -1034,6 +1047,7 @@ data-wpd-product-id="{{ product.id }}">
         }
 
         onGridQuantityChange(input) {
+          delete input.dataset.gridCommitted;
           const quantity = parseInt(input.value, 10);
           if (!Number.isFinite(quantity) || quantity < 0) {
             input.value = '';
@@ -1205,9 +1219,24 @@ data-wpd-product-id="{{ product.id }}">
               },
             });
 
-            this.querySelectorAll('[data-bulk-size], [data-grid-qty]').forEach((input) => {
+            const addedQuantities = new Map(items.map((item) => [String(item.id), item.quantity]));
+            this.querySelectorAll('[data-bulk-size]').forEach((input) => {
               input.value = '';
-              input.closest('.product-showcase__bulk-cell')?.classList.remove('vbog__cell--editing', 'is-added');
+            });
+            this.querySelectorAll('[data-grid-qty]').forEach((input) => {
+              const cell = input.closest('.product-showcase__bulk-cell');
+              const quantity = addedQuantities.get(input.dataset.variantId);
+              if (quantity !== undefined) {
+                input.value = String(quantity);
+                input.dataset.gridCommitted = 'true';
+                cell?.classList.add('vbog__cell--editing', 'is-added');
+                const display = cell?.querySelector('[data-vbog-display]');
+                if (display) display.textContent = display.dataset.inventory || '0';
+              } else {
+                input.value = '';
+                delete input.dataset.gridCommitted;
+                cell?.classList.remove('vbog__cell--editing', 'is-added');
+              }
             });
             this.updateGridTotals();
             if (wasPartiallyAdded) {
