@@ -1245,9 +1245,12 @@ data-wpd-product-id="{{ product.id }}">
                 cell?.classList.add('vbog__cell--editing', 'is-added');
                 const display = cell?.querySelector('[data-vbog-display]');
                 if (display) display.textContent = display.dataset.inventory || '0';
+              } else if (input.dataset.gridCommitted === 'true') {
+                cell?.classList.add('vbog__cell--editing', 'is-added');
+                const display = cell?.querySelector('[data-vbog-display]');
+                if (display) display.textContent = display.dataset.inventory || '0';
               } else {
                 input.value = '';
-                delete input.dataset.gridCommitted;
                 cell?.classList.remove('vbog__cell--editing', 'is-added');
               }
             });
