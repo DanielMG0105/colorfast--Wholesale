@@ -40,9 +40,9 @@
     "collection_showcase_main": {
       "type": "collection-showcase",
       "settings": {
-        "collection": "shop-all",
+        "collection": "feautured-collection",
         "heading": "",
-        "products_to_show": 4,
+        "products_to_show": 12,
         "layout": "slider",
         "show_arrows": true,
         "columns_desktop": 4,
@@ -54,7 +54,7 @@
         "gap": 64,
         "side_margin": 108,
         "button_label": "Shop our bestsellers",
-        "button_link": "shopify://collections/all",
+        "button_link": "shopify://collections/shop-all",
         "button_font": "figtree_n4",
         "button_font_size": 20,
         "button_letter_spacing": 30,
