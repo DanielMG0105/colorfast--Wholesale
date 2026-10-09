@@ -861,6 +861,32 @@ data-wpd-product-id="{{ product.id }}">
             .filter((tier) => tier.range && tier.price);
         }
 
+        lowestTierPrice(tiers = []) {
+          const prices = tiers.length
+            ? tiers.map((tier) => tier.price)
+            : [...(this.tiersBody?.querySelectorAll('tr') || [])].map((row) => row.querySelector('td:last-child')?.textContent);
+
+          return prices
+            .map((price) => {
+              const value = String(price || '').match(/[\d.,]+/g)?.join('');
+              if (!value) return null;
+
+              let normalized = value;
+              if (normalized.includes('.') && normalized.includes(',')) {
+                normalized = normalized.replace(/,/g, '');
+              } else if (normalized.includes(',')) {
+                normalized = /,\d{1,2}$/.test(normalized)
+                  ? normalized.replace(',', '.')
+                  : normalized.replace(/,/g, '');
+              }
+
+              const amount = Number.parseFloat(normalized);
+              return Number.isFinite(amount) ? { amount, formatted: String(price).trim() } : null;
+            })
+            .filter(Boolean)
+            .sort((a, b) => a.amount - b.amount)[0]?.formatted || '';
+        }
+
         // Price shown for the product, formatted like the table ("$21.87", no currency code). The wholesale app
         // rewrites [data-price] as <s>compare-at</s>price, so the struck-through amount is dropped; before the app
         // runs (or for guests) this is the variant's own price.
@@ -940,7 +966,8 @@ data-wpd-product-id="{{ product.id }}">
           if (!tiers.length) {
             const baseCell = this.tiersBody.querySelector('tr:first-child td:last-child');
             if (baseCell && basePrice) baseCell.textContent = basePrice;
-            if (baseCell?.textContent.trim()) this.setDisplayedTierPrice(baseCell.textContent);
+            const lowestPrice = this.lowestTierPrice();
+            if (lowestPrice) this.setDisplayedTierPrice(lowestPrice);
             return;
           }
 
@@ -950,7 +977,8 @@ data-wpd-product-id="{{ product.id }}">
             tiers.unshift({ range: firstMin === 2 ? '1' : `1-${firstMin - 1}`, price: basePrice });
           }
 
-          this.setDisplayedTierPrice(tiers[0].price);
+          const lowestPrice = this.lowestTierPrice(tiers);
+          if (lowestPrice) this.setDisplayedTierPrice(lowestPrice);
 
           const signature = JSON.stringify(tiers);
           if (signature === this.tiersSignature) return;
