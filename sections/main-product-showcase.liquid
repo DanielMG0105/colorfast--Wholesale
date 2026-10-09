@@ -831,28 +831,30 @@ data-wpd-product-id="{{ product.id }}">
         }
 
         lowestTierPrice() {
-          const prices = [...(this.tiersBody?.querySelectorAll('tr') || [])]
-            .map((row) => row.querySelector('td:last-child')?.textContent);
+          const rows = this.tiersBody?.querySelectorAll('tr') || [];
+          let lowest = null;
 
-          return prices
-            .map((price) => {
-              const value = String(price || '').match(/[\d.,]+/g)?.join('');
-              if (!value) return null;
+          rows.forEach((row) => {
+            const formatted = row.querySelector('td:last-child')?.textContent.trim();
+            const value = formatted?.match(/[\d.,]+/g)?.join('');
+            if (!value) return;
 
-              let normalized = value;
-              if (normalized.includes('.') && normalized.includes(',')) {
-                normalized = normalized.replace(/,/g, '');
-              } else if (normalized.includes(',')) {
-                normalized = /,\d{1,2}$/.test(normalized)
-                  ? normalized.replace(',', '.')
-                  : normalized.replace(/,/g, '');
-              }
+            let normalized = value;
+            if (normalized.includes('.') && normalized.includes(',')) {
+              normalized = normalized.replace(/,/g, '');
+            } else if (normalized.includes(',')) {
+              normalized = /,\d{1,2}$/.test(normalized)
+                ? normalized.replace(',', '.')
+                : normalized.replace(/,/g, '');
+            }
 
-              const amount = Number.parseFloat(normalized);
-              return Number.isFinite(amount) ? { amount, formatted: String(price).trim() } : null;
-            })
-            .filter(Boolean)
-            .sort((a, b) => a.amount - b.amount)[0]?.formatted || '';
+            const amount = Number.parseFloat(normalized);
+            if (Number.isFinite(amount) && (!lowest || amount < lowest.amount)) {
+              lowest = { amount, formatted };
+            }
+          });
+
+          return lowest?.formatted || '';
         }
 
         wrapAppPrice() {
@@ -885,30 +887,8 @@ data-wpd-product-id="{{ product.id }}">
           const formattedPrice = String(price ?? '').trim();
           if (!priceElement || !formattedPrice) return;
 
-          const appPriceSpan = this.wrapAppPrice();
-          if (appPriceSpan) {
-            if (appPriceSpan.textContent.trim() !== formattedPrice) appPriceSpan.textContent = formattedPrice;
-            return;
-          }
-
-          const compareAtSelector = 's, .wpd-ext-compare-at-price';
-          const priceNode = [...priceElement.childNodes].reverse().find((node) => {
-            if (node.nodeType === Node.TEXT_NODE) return node.textContent.trim() !== '';
-            return node.nodeType === Node.ELEMENT_NODE && !node.matches(compareAtSelector);
-          });
-
-          if (!priceNode) {
-            priceElement.append(document.createTextNode(formattedPrice));
-            return;
-          }
-
-          if (priceNode.textContent.trim() === formattedPrice) return;
-          if (priceNode.nodeType === Node.TEXT_NODE) {
-            const hasCompareAt = Boolean(priceElement.querySelector(compareAtSelector));
-            priceNode.nodeValue = `${hasCompareAt ? ' ' : ''}${formattedPrice}`;
-          } else {
-            priceNode.textContent = formattedPrice;
-          }
+          const priceSpan = priceElement.querySelector('[data-tier-price]') || this.wrapAppPrice();
+          if (priceSpan && priceSpan.textContent.trim() !== formattedPrice) priceSpan.textContent = formattedPrice;
         }
 
         syncTiers() {
