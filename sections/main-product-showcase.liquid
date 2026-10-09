@@ -808,8 +808,8 @@ data-wpd-product-id="{{ product.id }}">
           this.mediaTrack.scrollTo({ left: slides[nextIndex].offsetLeft, behavior: 'smooth' });
         }
 
-        // The WCP app injects its volume table asynchronously (and re-renders it on variant change),
-        // so watch for it and rebuild the wholesale table whenever the app's table appears or changes.
+        // The WCP app injects its price and hidden volume table asynchronously, so re-read our visible
+        // reference table when app markup changes without modifying any reference-table cells.
         watchAppTiers() {
           this.tiersBody = this.querySelector('[data-tiers]');
           if (!this.tiersBody) return;
@@ -836,31 +836,6 @@ data-wpd-product-id="{{ product.id }}">
           schedule();
         }
 
-        // Reads the app's table (Quantity / Discount / Price) into [range, price] pairs
-        readAppTiers() {
-          // Search the whole document because the app's hidden snippet can own the generated table
-          // when duplicate #wcp_vd_table containers are present.
-          const table = [...document.querySelectorAll('#wcp_vd_table table')].find((candidate) =>
-            candidate.querySelectorAll('tr').length > 0
-          );
-          if (!table) return [];
-
-          const headers = [...table.querySelectorAll('tr:first-child th, thead th')].map((th) =>
-            th.textContent.trim().toLowerCase()
-          );
-          const quantityIndex = Math.max(0, headers.findIndex((text) => text.includes('quantity')));
-          const priceIndex = headers.findIndex((text) => text.includes('price'));
-
-          return [...table.querySelectorAll('tr')]
-            .map((row) => [...row.querySelectorAll('td')].map((cell) => cell.textContent.trim()))
-            .filter((cells) => cells.length > 1)
-            .map((cells) => ({
-              range: cells[quantityIndex].replace(/\s*-\s*/, '-'),
-              price: cells[priceIndex >= 0 ? priceIndex : cells.length - 1],
-            }))
-            .filter((tier) => tier.range && tier.price);
-        }
-
         lowestTierPrice() {
           const prices = [...(this.tiersBody?.querySelectorAll('tr') || [])]
             .map((row) => row.querySelector('td:last-child')?.textContent);
@@ -884,16 +859,6 @@ data-wpd-product-id="{{ product.id }}">
             })
             .filter(Boolean)
             .sort((a, b) => a.amount - b.amount)[0]?.formatted || '';
-        }
-
-        // Price shown for the product, formatted like the table ("$21.87", no currency code). The wholesale app
-        // rewrites [data-price] as <s>compare-at</s>price, so the struck-through amount is dropped; before the app
-        // runs (or for guests) this is the variant's own price.
-        basePrice() {
-          const price = this.querySelector('[data-price]')?.cloneNode(true);
-          if (!price) return '';
-          price.querySelectorAll('s, .wpd-ext-compare-at-price').forEach((element) => element.remove());
-          return price.textContent.trim().replace(/\s+[A-Z]{3}$/, '');
         }
 
         wrapAppPrice() {
@@ -958,41 +923,7 @@ data-wpd-product-id="{{ product.id }}">
           // WCP inserts the compare-at element and leaves the current price as a bare text node.
           // Wrap that app-generated text once so we can update only it and preserve the compare-at price.
           this.wrapAppPrice();
-          const basePrice = this.basePrice();
-          const tiers = this.readAppTiers();
-
-          // No app table (e.g. guests): keep the Liquid tiers, only refresh the base row's price
-          if (!tiers.length) {
-            const baseCell = this.tiersBody.querySelector('tr:first-child td:last-child');
-            if (baseCell && basePrice) baseCell.textContent = basePrice;
-            const lowestPrice = this.lowestTierPrice();
-            if (lowestPrice) this.setDisplayedTierPrice(lowestPrice);
-            return;
-          }
-
-          // The app only lists discounted tiers; prepend the base tier (1 up to the first break) at the product's price
-          const firstMin = parseInt(tiers[0].range, 10);
-          if (firstMin > 1 && basePrice) {
-            tiers.unshift({ range: firstMin === 2 ? '1' : `1-${firstMin - 1}`, price: basePrice });
-          }
-
-          const signature = JSON.stringify(tiers);
-          if (signature !== this.tiersSignature) {
-            this.tiersSignature = signature;
-            this.tiersBody.replaceChildren(
-              ...tiers.map(({ range, price }) => {
-                const row = document.createElement('tr');
-                for (const text of [range, price]) {
-                  const cell = document.createElement('td');
-                  cell.textContent = text;
-                  row.append(cell);
-                }
-                return row;
-              })
-            );
-          }
-
-          // Use the rendered reference table as the source of truth, after synchronizing its rows.
+          // Read the rendered table only; its values and rows are left untouched.
           const lowestPrice = this.lowestTierPrice();
           if (lowestPrice) this.setDisplayedTierPrice(lowestPrice);
         }
