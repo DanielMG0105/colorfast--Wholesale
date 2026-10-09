@@ -190,7 +190,7 @@
             const step = item.offsetWidth + gap;
             const perPage = Math.max(1, Math.floor((this.track.clientWidth + gap) / step));
             const rtl = getComputedStyle(this).direction === 'rtl' ? -1 : 1;
-            this.animateTo(this.track.scrollLeft + direction * rtl * step * perPage, 1100);
+            this.animateTo(this.track.scrollLeft + direction * rtl * step * perPage, 2000);
           }
 
           setManualScrollMode() {
@@ -252,7 +252,7 @@
             this.dragState.moved = true;
             event.preventDefault();
             const rtl = getComputedStyle(this).direction === 'rtl' ? -1 : 1;
-            this.track.scrollLeft = this.dragState.startScroll - delta * rtl * 0.65;
+            this.track.scrollLeft = this.dragState.startScroll - delta * rtl * 0.35;
           }
 
           endDrag(event) {
@@ -279,7 +279,7 @@
             }, { item: this.track.firstElementChild, distance: Infinity }).item;
             const nearestRect = nearest?.getBoundingClientRect();
             const offset = nearestRect ? (rtl ? nearestRect.right - edge : nearestRect.left - edge) : 0;
-            this.animateTo(this.track.scrollLeft + offset, 900);
+            this.animateTo(this.track.scrollLeft + offset, 1600);
           }
 
           removeDragListeners() {
