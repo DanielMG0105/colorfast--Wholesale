@@ -813,6 +813,8 @@ data-wpd-product-id="{{ product.id }}">
         watchAppTiers() {
           this.tiersBody = this.querySelector('[data-tiers]');
           if (!this.tiersBody) return;
+          const priceElement = this.querySelector('[data-price]');
+          if (!priceElement) return;
 
           let scheduled = false;
           const schedule = () => {
@@ -825,8 +827,8 @@ data-wpd-product-id="{{ product.id }}">
           };
 
           this.tiersObserver = new MutationObserver(schedule);
-          // The app may rewrite the price, so observe the section and resync only the displayed price.
-          this.tiersObserver.observe(this, { childList: true, subtree: true, characterData: true });
+          // Observe only the app-generated price markup. The reference table is read once and never observed or changed.
+          this.tiersObserver.observe(priceElement, { childList: true, subtree: true, characterData: true });
           schedule();
         }
 
