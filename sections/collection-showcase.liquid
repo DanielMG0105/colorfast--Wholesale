@@ -182,15 +182,14 @@
             cancelAnimationFrame(this.animationFrame);
           }
 
-          // Scroll by the visible width, snapped to whole items
+          // Advance exactly one item per arrow press
           go(direction) {
             const item = this.track.firstElementChild;
             if (!item) return;
             const gap = parseFloat(getComputedStyle(this.track).columnGap) || 0;
             const step = item.offsetWidth + gap;
-            const perPage = Math.max(1, Math.floor((this.track.clientWidth + gap) / step));
             const rtl = getComputedStyle(this).direction === 'rtl' ? -1 : 1;
-            this.animateTo(this.track.scrollLeft + direction * rtl * step * perPage, 2000);
+            this.animateTo(this.track.scrollLeft + direction * rtl * step, 2000);
           }
 
           setManualScrollMode() {
