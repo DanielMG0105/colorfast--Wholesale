@@ -733,12 +733,12 @@ data-wpd-product-id="{{ product.id }}">
           this.updateBulkButtonState();
           requestAnimationFrame(() => this.syncBulkButtonWidth());
           this.watchAppPrice();
-          this.watchAppTiers();
+          this.watchTierTable();
         }
 
         disconnectedCallback() {
           this.appPriceObserver?.disconnect();
-          this.tiersObserver?.disconnect();
+          this.tierTableObserver?.disconnect();
           if (this.onBulkResize) window.removeEventListener('resize', this.onBulkResize);
           this.mediaTrack?.removeEventListener('scroll', this.onGalleryScroll);
           this.galleryPrevious?.removeEventListener('click', this.onGalleryPrevious);
@@ -810,32 +810,17 @@ data-wpd-product-id="{{ product.id }}">
           this.mediaTrack.scrollTo({ left: slides[nextIndex].offsetLeft, behavior: 'smooth' });
         }
 
-        // Wrap only the current price text inserted by WPD; do not change its compare-at price or the tier table.
+        // Wrap only the current price text inserted by WPD.
         watchAppPrice() {
           const priceElement = this.querySelector('p.product-showcase__price[data-price]');
           if (!priceElement) return;
 
-          const wrapCurrentPrice = () => {
-            if (!priceElement.classList.contains('wpd-processed')) return;
-            if (priceElement.querySelector(':scope > [data-tier-price]')) return;
-
-            const priceText = [...priceElement.childNodes].find((node) =>
-              node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== ''
-            );
-            if (!priceText) return;
-
-            const formattedPrice = priceText.textContent.trim();
-            const hasCompareAt = Boolean(priceElement.querySelector(':scope > s, :scope > .wpd-ext-compare-at-price'));
-            const hadLeadingSpace = /^\s/.test(priceText.textContent);
-            const priceSpan = document.createElement('span');
-            priceSpan.dataset.tierPrice = '';
-            priceSpan.textContent = formattedPrice;
-
-            priceText.replaceWith(priceSpan);
-            if (hasCompareAt && !hadLeadingSpace) priceSpan.before(document.createTextNode(' '));
+          const syncPriceSpan = () => {
+            this.wrapAppPrice(priceElement);
+            this.updateDisplayedTierPrice();
           };
 
-          this.appPriceObserver = new MutationObserver(wrapCurrentPrice);
+          this.appPriceObserver = new MutationObserver(syncPriceSpan);
           this.appPriceObserver.observe(priceElement, {
             attributes: true,
             attributeFilter: ['class'],
@@ -843,96 +828,67 @@ data-wpd-product-id="{{ product.id }}">
             subtree: true,
             characterData: true,
           });
-          wrapCurrentPrice();
+          syncPriceSpan();
         }
 
-        // The WCP app injects its volume table asynchronously (and re-renders it on variant change),
-        // so watch for it and rebuild the wholesale table whenever the app's table appears or changes.
-        watchAppTiers() {
+        // Read the displayed tier table when it changes. This observer never writes to the table.
+        watchTierTable() {
           this.tiersBody = this.querySelector('[data-tiers]');
           if (!this.tiersBody) return;
 
-          let scheduled = false;
-          const schedule = () => {
-            if (scheduled) return;
-            scheduled = true;
-            requestAnimationFrame(() => {
-              scheduled = false;
-              this.syncTiers();
-            });
-          };
-
-          this.tiersObserver = new MutationObserver(schedule);
-          // Observe the whole section: the app may rewrite the price too. Rewriting our own table is a no-op
-          // the second time thanks to the signature check in syncTiers.
-          this.tiersObserver.observe(this, { childList: true, subtree: true, characterData: true });
-          schedule();
+          this.tierTableObserver = new MutationObserver(() => this.updateDisplayedTierPrice());
+          this.tierTableObserver.observe(this.tiersBody, { childList: true, subtree: true, characterData: true });
+          this.updateDisplayedTierPrice();
         }
 
-        // Reads the app's table (Quantity / Discount / Price) into [range, price] pairs
-        readAppTiers() {
-          const table = this.querySelector('[data-app-tiers] table, #wcp_vd_table table');
-          if (!table) return [];
+        wrapAppPrice(priceElement = this.querySelector('p.product-showcase__price[data-price]')) {
+          if (!priceElement?.classList.contains('wpd-processed')) return null;
+          const existingSpan = priceElement.querySelector(':scope > [data-tier-price]');
+          if (existingSpan) return existingSpan;
 
-          const headers = [...table.querySelectorAll('tr:first-child th, thead th')].map((th) =>
-            th.textContent.trim().toLowerCase()
+          const priceText = [...priceElement.childNodes].find((node) =>
+            node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== ''
           );
-          const quantityIndex = Math.max(0, headers.findIndex((text) => text.includes('quantity')));
-          const priceIndex = headers.findIndex((text) => text.includes('price'));
+          if (!priceText) return null;
 
-          return [...table.querySelectorAll('tr')]
-            .map((row) => [...row.querySelectorAll('td')].map((cell) => cell.textContent.trim()))
-            .filter((cells) => cells.length > 1)
-            .map((cells) => ({
-              range: cells[quantityIndex].replace(/\s*-\s*/, '-'),
-              price: cells[priceIndex >= 0 ? priceIndex : cells.length - 1],
-            }))
-            .filter((tier) => tier.range && tier.price);
+          const formattedPrice = priceText.textContent.trim();
+          const hasCompareAt = Boolean(priceElement.querySelector(':scope > s, :scope > .wpd-ext-compare-at-price'));
+          const priceSpan = document.createElement('span');
+          priceSpan.dataset.tierPrice = '';
+          priceSpan.textContent = formattedPrice;
+          priceText.replaceWith(priceSpan);
+          if (hasCompareAt) priceSpan.before(document.createTextNode(' '));
+          return priceSpan;
         }
 
-        // Price shown for the product, formatted like the table ("$21.87", no currency code). The wholesale app
-        // rewrites [data-price] as <s>compare-at</s>price, so the struck-through amount is dropped; before the app
-        // runs (or for guests) this is the variant's own price.
-        basePrice() {
-          const price = this.querySelector('[data-price]')?.cloneNode(true);
-          if (!price) return '';
-          price.querySelectorAll('s, .wpd-ext-compare-at-price').forEach((element) => element.remove());
-          return price.textContent.trim().replace(/\s+[A-Z]{3}$/, '');
+        lowestTierPrice() {
+          let lowest = null;
+          this.tiersBody?.querySelectorAll('tr').forEach((row) => {
+            const formatted = row.querySelector('td:last-child')?.textContent.trim();
+            const rawAmount = formatted?.match(/[\d.,]+/g)?.join('');
+            if (!rawAmount) return;
+
+            let normalized = rawAmount;
+            if (normalized.includes('.') && normalized.includes(',')) {
+              normalized = normalized.replace(/,/g, '');
+            } else if (normalized.includes(',')) {
+              normalized = /,\d{1,2}$/.test(normalized)
+                ? normalized.replace(',', '.')
+                : normalized.replace(/,/g, '');
+            }
+            const amount = Number.parseFloat(normalized);
+            if (Number.isFinite(amount) && (!lowest || amount < lowest.amount)) lowest = { amount, formatted };
+          });
+          return lowest?.formatted || '';
         }
 
-        syncTiers() {
-          if (!this.tiersBody) return;
-          const basePrice = this.basePrice();
-          const tiers = this.readAppTiers();
-
-          // No app table (e.g. guests): keep the Liquid tiers, only refresh the base row's price
-          if (!tiers.length) {
-            const baseCell = this.tiersBody.querySelector('tr:first-child td:last-child');
-            if (baseCell && basePrice) baseCell.textContent = basePrice;
-            return;
+        updateDisplayedTierPrice() {
+          const priceElement = this.querySelector('p.product-showcase__price[data-price]');
+          const priceSpan = priceElement?.querySelector(':scope > [data-tier-price]') || this.wrapAppPrice(priceElement);
+          const lowestPrice = this.lowestTierPrice();
+          if (priceSpan && lowestPrice && priceSpan.textContent.trim() !== lowestPrice) {
+            priceSpan.textContent = lowestPrice;
           }
-
-          // The app only lists discounted tiers; prepend the base tier (1 up to the first break) at the product's price
-          const firstMin = parseInt(tiers[0].range, 10);
-          if (firstMin > 1 && basePrice) {
-            tiers.unshift({ range: firstMin === 2 ? '1' : `1-${firstMin - 1}`, price: basePrice });
-          }
-
-          const signature = JSON.stringify(tiers);
-          if (signature === this.tiersSignature) return;
-          this.tiersSignature = signature;
-
-          this.tiersBody.replaceChildren(
-            ...tiers.map(({ range, price }) => {
-              const row = document.createElement('tr');
-              for (const text of [range, price]) {
-                const cell = document.createElement('td');
-                cell.textContent = text;
-                row.append(cell);
-              }
-              return row;
-            })
-          );
         }
 
         selectedOptions() {
@@ -974,8 +930,9 @@ data-wpd-product-id="{{ product.id }}">
           }
 
           this.variantInput.value = String(variant.id);
-          this.querySelector('[data-price]').textContent = variant.price;
-          this.syncTiers();
+          const priceElement = this.querySelector('[data-price]');
+          if (!priceElement?.querySelector(':scope > [data-tier-price]')) priceElement.textContent = variant.price;
+          this.updateDisplayedTierPrice();
           this.setButton(variant.available, variant.available ? this.defaultLabel : '{{ section.settings.sold_out_label | escape }}');
 
           if (variant.mediaId) {
