@@ -289,7 +289,7 @@ data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
 data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
 data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
 data-wpd-product-id="{{ product.id }}">
-          {{- current_variant.price | money_with_currency -}}
+          <span>{{- current_variant.price | money_with_currency -}}</span>
         </p>
 
         {%- if product.description != blank -%}
@@ -643,6 +643,62 @@ data-wpd-product-id="{{ product.id }}">
   </script>
 </product-showcase>
 
+<script>
+  (function () {
+    function wrapLoosePrice() {
+      var priceEl = document.querySelector('.product-showcase__price[data-price]');
+      if (!priceEl) return;
+      var looseNodes = Array.prototype.slice.call(priceEl.childNodes).filter(function (node) {
+        return node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0;
+      });
+      if (!looseNodes.length) return;
+
+      looseNodes.forEach(function (node) {
+        var text = node.textContent;
+        var trimmed = text.trim();
+        if (!trimmed) return;
+
+        var span = document.createElement('span');
+        span.textContent = trimmed;
+
+        var toInsert = [];
+        if (/^\s/.test(text) || (node.previousSibling && node.previousSibling.nodeType === Node.ELEMENT_NODE)) {
+          toInsert.push(document.createTextNode(' '));
+        }
+        toInsert.push(span);
+        if (/\s$/.test(text)) {
+          toInsert.push(document.createTextNode(' '));
+        }
+
+        node.replaceWith.apply(node, toInsert);
+      });
+    }
+
+    function init() {
+      var priceEl = document.querySelector('.product-showcase__price[data-price]');
+      if (!priceEl) return;
+
+      var observer = new MutationObserver(function () {
+        observer.disconnect();
+        try {
+          wrapLoosePrice();
+        } finally {
+          observer.observe(priceEl, { childList: true, characterData: true, subtree: true });
+        }
+      });
+
+      observer.observe(priceEl, { childList: true, characterData: true, subtree: true });
+      wrapLoosePrice();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
 <script type="module">
   import { CartLinesUpdateEvent, CartErrorEvent } from '@shopify/events';
 
@@ -936,7 +992,8 @@ data-wpd-product-id="{{ product.id }}">
           }
 
           this.variantInput.value = String(variant.id);
-          this.querySelector('[data-price]').textContent = variant.price;
+          const priceElement = this.querySelector('[data-price]');
+          if (priceElement) priceElement.innerHTML = `<span>${variant.price}</span>`;
           this.syncTiers();
           this.setButton(variant.available, variant.available ? this.defaultLabel : '{{ section.settings.sold_out_label | escape }}');
 
