@@ -288,7 +288,8 @@ data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
 data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
 data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
 data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
-data-wpd-product-id="{{ product.id }}">
+data-wpd-product-id="{{ product.id }}"
+data-original-price="{{ current_variant.price | money_with_currency }}">
           <span>{{- current_variant.price | money_with_currency -}}</span>
         </p>
 
@@ -658,6 +659,8 @@ data-wpd-product-id="{{ product.id }}">
         var trimmed = text.trim();
         if (!trimmed) return;
 
+        priceEl.setAttribute('data-original-price', trimmed);
+
         var span = document.createElement('span');
         span.textContent = trimmed;
 
@@ -956,7 +959,12 @@ data-wpd-product-id="{{ product.id }}">
         // rewrites [data-price] as <s>compare-at</s>price, so the struck-through amount is dropped; before the app
         // runs (or for guests) this is the variant's own price.
         basePrice() {
-          const price = this.querySelector('[data-price]')?.cloneNode(true);
+          const priceContainer = this.querySelector('[data-price]');
+          const originalPrice = priceContainer?.getAttribute('data-original-price');
+          if (originalPrice) {
+            return originalPrice.trim().replace(/\s+[A-Z]{3}$/, '');
+          }
+          const price = priceContainer?.cloneNode(true);
           if (!price) return '';
           price.querySelectorAll('s, .wpd-ext-compare-at-price').forEach((element) => element.remove());
           return price.textContent.trim().replace(/\s+[A-Z]{3}$/, '');
@@ -1074,7 +1082,10 @@ data-wpd-product-id="{{ product.id }}">
 
           this.variantInput.value = String(variant.id);
           const priceElement = this.querySelector('[data-price]');
-          if (priceElement) priceElement.innerHTML = `<span>${variant.price}</span>`;
+          if (priceElement) {
+            priceElement.setAttribute('data-original-price', variant.price);
+            priceElement.innerHTML = `<span>${variant.price}</span>`;
+          }
           this.syncTiers();
           this.setButton(variant.available, variant.available ? this.defaultLabel : '{{ section.settings.sold_out_label | escape }}');
 
