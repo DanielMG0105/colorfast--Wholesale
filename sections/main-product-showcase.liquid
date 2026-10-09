@@ -825,15 +825,24 @@ data-wpd-product-id="{{ product.id }}">
           };
 
           this.tiersObserver = new MutationObserver(schedule);
-          // Observe the whole section: the app may rewrite the price too. Rewriting our own table is a no-op
-          // the second time thanks to the signature check in syncTiers.
+          // The WCP snippet and this section both use #wcp_vd_table. WCP can populate the snippet's
+          // hidden table rather than the empty container in this section, so observe all app roots.
           this.tiersObserver.observe(this, { childList: true, subtree: true, characterData: true });
+          document.querySelectorAll('#wcp_vd_table').forEach((root) => {
+            if (root !== this && !this.contains(root)) {
+              this.tiersObserver.observe(root, { childList: true, subtree: true, characterData: true });
+            }
+          });
           schedule();
         }
 
         // Reads the app's table (Quantity / Discount / Price) into [range, price] pairs
         readAppTiers() {
-          const table = this.querySelector('[data-app-tiers] table, #wcp_vd_table table');
+          // Search the whole document because the app's hidden snippet can own the generated table
+          // when duplicate #wcp_vd_table containers are present.
+          const table = [...document.querySelectorAll('#wcp_vd_table table')].find((candidate) =>
+            candidate.querySelectorAll('tr').length > 0
+          );
           if (!table) return [];
 
           const headers = [...table.querySelectorAll('tr:first-child th, thead th')].map((th) =>
