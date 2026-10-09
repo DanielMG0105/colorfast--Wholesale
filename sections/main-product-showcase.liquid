@@ -681,19 +681,30 @@ data-wpd-product-id="{{ product.id }}">
       if (!span || !tiersBody) return;
       var cells = Array.prototype.slice.call(tiersBody.querySelectorAll('tr td:last-child'));
       if (!cells.length) return;
-      var nums = cells
-        .map(function (td) {
-          var match = td.textContent.replace(/,/g, '').match(/\d+(?:\.\d+)?/);
-          return match ? parseFloat(match[0]) : null;
-        })
-        .filter(function (n) {
-          return n !== null && !isNaN(n);
-        });
-      if (!nums.length) return;
-      var lowest = Math.min.apply(null, nums).toFixed(2);
-      span.setAttribute('data-lowest-price', lowest);
-      span.setAttribute('data-min-price', lowest);
-      span.setAttribute('data-lowest', lowest);
+
+      var lowestCellText = '';
+      var minPrice = Infinity;
+
+      cells.forEach(function (td) {
+        var match = td.textContent.replace(/,/g, '').match(/\d+(?:\.\d+)?/);
+        if (match) {
+          var val = parseFloat(match[0]);
+          if (val < minPrice) {
+            minPrice = val;
+            lowestCellText = td.textContent.trim();
+          }
+        }
+      });
+
+      if (!lowestCellText || minPrice === Infinity) return;
+      var lowestStr = minPrice.toFixed(2);
+
+      if (span.getAttribute('data-lowest-price') !== lowestStr) {
+        span.setAttribute('data-lowest-price', lowestStr);
+      }
+      if (span.textContent.trim() !== lowestCellText) {
+        span.textContent = lowestCellText;
+      }
     }
 
     function init() {
@@ -998,22 +1009,29 @@ data-wpd-product-id="{{ product.id }}">
           const cells = [...(this.tiersBody?.querySelectorAll('tr td:last-child') || [])];
           if (!cells.length) return;
 
-          const numericPrices = cells
-            .map((td) => {
-              const match = td.textContent.replace(/,/g, '').match(/\d+(?:\.\d+)?/);
-              return match ? parseFloat(match[0]) : null;
-            })
-            .filter((val) => val !== null && !isNaN(val));
+          let lowestCellText = '';
+          let minPrice = Infinity;
 
-          if (!numericPrices.length) return;
+          cells.forEach((td) => {
+            const match = td.textContent.replace(/,/g, '').match(/\d+(?:\.\d+)?/);
+            if (match) {
+              const val = parseFloat(match[0]);
+              if (val < minPrice) {
+                minPrice = val;
+                lowestCellText = td.textContent.trim();
+              }
+            }
+          });
 
-          const minPrice = Math.min(...numericPrices).toFixed(2);
-          priceSpan.dataset.lowestPrice = minPrice;
-          priceSpan.dataset.minPrice = minPrice;
-          priceSpan.dataset.lowest = minPrice;
-          priceSpan.setAttribute('data-lowest-price', minPrice);
-          priceSpan.setAttribute('data-min-price', minPrice);
-          priceSpan.setAttribute('data-lowest', minPrice);
+          if (!lowestCellText || minPrice === Infinity) return;
+          const lowestStr = minPrice.toFixed(2);
+
+          if (priceSpan.getAttribute('data-lowest-price') !== lowestStr) {
+            priceSpan.setAttribute('data-lowest-price', lowestStr);
+          }
+          if (priceSpan.textContent.trim() !== lowestCellText) {
+            priceSpan.textContent = lowestCellText;
+          }
         }
 
         selectedOptions() {
