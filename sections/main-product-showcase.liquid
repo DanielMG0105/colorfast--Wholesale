@@ -862,6 +862,31 @@ data-wpd-product-id="{{ product.id }}">
           return price.textContent.trim().replace(/\s+[A-Z]{3}$/, '');
         }
 
+        setDisplayedTierPrice(price) {
+          const priceElement = this.querySelector('[data-price]');
+          const formattedPrice = String(price ?? '').trim();
+          if (!priceElement || !formattedPrice) return;
+
+          const compareAtSelector = 's, .wpd-ext-compare-at-price';
+          const priceNode = [...priceElement.childNodes].reverse().find((node) => {
+            if (node.nodeType === Node.TEXT_NODE) return node.textContent.trim() !== '';
+            return node.nodeType === Node.ELEMENT_NODE && !node.matches(compareAtSelector);
+          });
+
+          if (!priceNode) {
+            priceElement.append(document.createTextNode(formattedPrice));
+            return;
+          }
+
+          if (priceNode.textContent.trim() === formattedPrice) return;
+          if (priceNode.nodeType === Node.TEXT_NODE) {
+            const hasCompareAt = Boolean(priceElement.querySelector(compareAtSelector));
+            priceNode.nodeValue = `${hasCompareAt ? ' ' : ''}${formattedPrice}`;
+          } else {
+            priceNode.textContent = formattedPrice;
+          }
+        }
+
         syncTiers() {
           if (!this.tiersBody) return;
           const basePrice = this.basePrice();
@@ -871,6 +896,7 @@ data-wpd-product-id="{{ product.id }}">
           if (!tiers.length) {
             const baseCell = this.tiersBody.querySelector('tr:first-child td:last-child');
             if (baseCell && basePrice) baseCell.textContent = basePrice;
+            if (baseCell?.textContent.trim()) this.setDisplayedTierPrice(baseCell.textContent);
             return;
           }
 
@@ -879,6 +905,8 @@ data-wpd-product-id="{{ product.id }}">
           if (firstMin > 1 && basePrice) {
             tiers.unshift({ range: firstMin === 2 ? '1' : `1-${firstMin - 1}`, price: basePrice });
           }
+
+          this.setDisplayedTierPrice(tiers[0].price);
 
           const signature = JSON.stringify(tiers);
           if (signature === this.tiersSignature) return;
