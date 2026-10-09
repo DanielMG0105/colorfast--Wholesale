@@ -13,7 +13,7 @@
       "type": "main-collection-showcase",
       "settings": {
         "show_title": false,
-        "products_per_page": 24,
+        "products_per_page": 48,
         "top_line_source": "none",
         "title_delimiter": "|",
         "show_swatches": true,
