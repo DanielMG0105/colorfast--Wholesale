@@ -861,10 +861,9 @@ data-wpd-product-id="{{ product.id }}">
             .filter((tier) => tier.range && tier.price);
         }
 
-        lowestTierPrice(tiers = []) {
-          const prices = tiers.length
-            ? tiers.map((tier) => tier.price)
-            : [...(this.tiersBody?.querySelectorAll('tr') || [])].map((row) => row.querySelector('td:last-child')?.textContent);
+        lowestTierPrice() {
+          const prices = [...(this.tiersBody?.querySelectorAll('tr') || [])]
+            .map((row) => row.querySelector('td:last-child')?.textContent);
 
           return prices
             .map((price) => {
@@ -977,24 +976,25 @@ data-wpd-product-id="{{ product.id }}">
             tiers.unshift({ range: firstMin === 2 ? '1' : `1-${firstMin - 1}`, price: basePrice });
           }
 
-          const lowestPrice = this.lowestTierPrice(tiers);
-          if (lowestPrice) this.setDisplayedTierPrice(lowestPrice);
-
           const signature = JSON.stringify(tiers);
-          if (signature === this.tiersSignature) return;
-          this.tiersSignature = signature;
+          if (signature !== this.tiersSignature) {
+            this.tiersSignature = signature;
+            this.tiersBody.replaceChildren(
+              ...tiers.map(({ range, price }) => {
+                const row = document.createElement('tr');
+                for (const text of [range, price]) {
+                  const cell = document.createElement('td');
+                  cell.textContent = text;
+                  row.append(cell);
+                }
+                return row;
+              })
+            );
+          }
 
-          this.tiersBody.replaceChildren(
-            ...tiers.map(({ range, price }) => {
-              const row = document.createElement('tr');
-              for (const text of [range, price]) {
-                const cell = document.createElement('td');
-                cell.textContent = text;
-                row.append(cell);
-              }
-              return row;
-            })
-          );
+          // Use the rendered reference table as the source of truth, after synchronizing its rows.
+          const lowestPrice = this.lowestTierPrice();
+          if (lowestPrice) this.setDisplayedTierPrice(lowestPrice);
         }
 
         selectedOptions() {
