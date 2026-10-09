@@ -817,7 +817,7 @@ data-wpd-product-id="{{ product.id }}">
 
           const syncPriceSpan = () => {
             this.wrapAppPrice(priceElement);
-            this.updateDisplayedTierPrice();
+            this.setLowestTierPriceData();
           };
 
           this.appPriceObserver = new MutationObserver(syncPriceSpan);
@@ -836,9 +836,9 @@ data-wpd-product-id="{{ product.id }}">
           this.tiersBody = this.querySelector('[data-tiers]');
           if (!this.tiersBody) return;
 
-          this.tierTableObserver = new MutationObserver(() => this.updateDisplayedTierPrice());
+          this.tierTableObserver = new MutationObserver(() => this.setLowestTierPriceData());
           this.tierTableObserver.observe(this.tiersBody, { childList: true, subtree: true, characterData: true });
-          this.updateDisplayedTierPrice();
+          this.setLowestTierPriceData();
         }
 
         wrapAppPrice(priceElement = this.querySelector('p.product-showcase__price[data-price]')) {
@@ -882,12 +882,12 @@ data-wpd-product-id="{{ product.id }}">
           return lowest?.formatted || '';
         }
 
-        updateDisplayedTierPrice() {
+        setLowestTierPriceData() {
           const priceElement = this.querySelector('p.product-showcase__price[data-price]');
           const priceSpan = priceElement?.querySelector(':scope > [data-tier-price]') || this.wrapAppPrice(priceElement);
           const lowestPrice = this.lowestTierPrice();
-          if (priceSpan && lowestPrice && priceSpan.textContent.trim() !== lowestPrice) {
-            priceSpan.textContent = lowestPrice;
+          if (priceSpan && lowestPrice && priceSpan.dataset.lowestTierPrice !== lowestPrice) {
+            priceSpan.dataset.lowestTierPrice = lowestPrice;
           }
         }
 
@@ -932,7 +932,7 @@ data-wpd-product-id="{{ product.id }}">
           this.variantInput.value = String(variant.id);
           const priceElement = this.querySelector('[data-price]');
           if (!priceElement?.querySelector(':scope > [data-tier-price]')) priceElement.textContent = variant.price;
-          this.updateDisplayedTierPrice();
+          this.setLowestTierPriceData();
           this.setButton(variant.available, variant.available ? this.defaultLabel : '{{ section.settings.sold_out_label | escape }}');
 
           if (variant.mediaId) {
