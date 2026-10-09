@@ -672,6 +672,28 @@ data-wpd-product-id="{{ product.id }}">
 
         node.replaceWith.apply(node, toInsert);
       });
+      syncLowestPrice();
+    }
+
+    function syncLowestPrice() {
+      var span = document.querySelector('.product-showcase__price[data-price] span');
+      var tiersBody = document.querySelector('[data-tiers]');
+      if (!span || !tiersBody) return;
+      var cells = Array.prototype.slice.call(tiersBody.querySelectorAll('tr td:last-child'));
+      if (!cells.length) return;
+      var nums = cells
+        .map(function (td) {
+          var match = td.textContent.replace(/,/g, '').match(/\d+(?:\.\d+)?/);
+          return match ? parseFloat(match[0]) : null;
+        })
+        .filter(function (n) {
+          return n !== null && !isNaN(n);
+        });
+      if (!nums.length) return;
+      var lowest = Math.min.apply(null, nums).toFixed(2);
+      span.setAttribute('data-lowest-price', lowest);
+      span.setAttribute('data-min-price', lowest);
+      span.setAttribute('data-lowest', lowest);
     }
 
     function init() {
@@ -682,6 +704,7 @@ data-wpd-product-id="{{ product.id }}">
         observer.disconnect();
         try {
           wrapLoosePrice();
+          syncLowestPrice();
         } finally {
           observer.observe(priceEl, { childList: true, characterData: true, subtree: true });
         }
@@ -689,6 +712,15 @@ data-wpd-product-id="{{ product.id }}">
 
       observer.observe(priceEl, { childList: true, characterData: true, subtree: true });
       wrapLoosePrice();
+      syncLowestPrice();
+
+      var tiersEl = document.querySelector('[data-tiers]');
+      if (tiersEl) {
+        var tiersObs = new MutationObserver(function () {
+          syncLowestPrice();
+        });
+        tiersObs.observe(tiersEl, { childList: true, characterData: true, subtree: true });
+      }
     }
 
     if (document.readyState === 'loading') {
@@ -789,6 +821,7 @@ data-wpd-product-id="{{ product.id }}">
           this.updateBulkButtonState();
           requestAnimationFrame(() => this.syncBulkButtonWidth());
           this.watchAppTiers();
+          this.syncLowestPriceToSpan();
         }
 
         disconnectedCallback() {
@@ -927,6 +960,7 @@ data-wpd-product-id="{{ product.id }}">
           if (!tiers.length) {
             const baseCell = this.tiersBody.querySelector('tr:first-child td:last-child');
             if (baseCell && basePrice) baseCell.textContent = basePrice;
+            this.syncLowestPriceToSpan();
             return;
           }
 
@@ -937,7 +971,10 @@ data-wpd-product-id="{{ product.id }}">
           }
 
           const signature = JSON.stringify(tiers);
-          if (signature === this.tiersSignature) return;
+          if (signature === this.tiersSignature) {
+            this.syncLowestPriceToSpan();
+            return;
+          }
           this.tiersSignature = signature;
 
           this.tiersBody.replaceChildren(
@@ -951,6 +988,32 @@ data-wpd-product-id="{{ product.id }}">
               return row;
             })
           );
+          this.syncLowestPriceToSpan();
+        }
+
+        syncLowestPriceToSpan() {
+          const priceSpan = this.querySelector('.product-showcase__price[data-price] span');
+          if (!priceSpan) return;
+
+          const cells = [...(this.tiersBody?.querySelectorAll('tr td:last-child') || [])];
+          if (!cells.length) return;
+
+          const numericPrices = cells
+            .map((td) => {
+              const match = td.textContent.replace(/,/g, '').match(/\d+(?:\.\d+)?/);
+              return match ? parseFloat(match[0]) : null;
+            })
+            .filter((val) => val !== null && !isNaN(val));
+
+          if (!numericPrices.length) return;
+
+          const minPrice = Math.min(...numericPrices).toFixed(2);
+          priceSpan.dataset.lowestPrice = minPrice;
+          priceSpan.dataset.minPrice = minPrice;
+          priceSpan.dataset.lowest = minPrice;
+          priceSpan.setAttribute('data-lowest-price', minPrice);
+          priceSpan.setAttribute('data-min-price', minPrice);
+          priceSpan.setAttribute('data-lowest', minPrice);
         }
 
         selectedOptions() {
