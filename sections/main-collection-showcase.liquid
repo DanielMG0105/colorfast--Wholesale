@@ -86,6 +86,11 @@
               endif
             endfor
 
+            assign related_products = product.metafields.custom.variants_products.value
+            if related_products == blank
+              assign related_products = product.metafields.custom.variants_color.value
+            endif
+
             assign image = product.featured_media
           -%}
           <li class="collection-grid__item">
@@ -158,6 +163,52 @@
                       <span class="visually-hidden">{{ value | escape }}</span>
                     </a>
                   </li>
+                {%- endfor -%}
+                {%- for related_product in related_products -%}
+                  {%- unless related_product.id == product.id -%}
+                    {%- liquid
+                      assign related_color = related_product.title
+                      assign related_swatch_color = blank
+                      assign related_swatch_image = blank
+                      for related_option in related_product.options_with_values
+                        assign related_option_name = related_option.name | downcase | strip
+                        for accepted in color_option_names
+                          assign accepted_name = accepted | strip
+                          if related_option_name == accepted_name
+                            assign related_color_value = related_option.values.first
+                            assign related_color = related_color_value.name | default: related_color_value
+                            assign related_swatch_color = related_color_value.swatch.color
+                            assign related_swatch_image = related_color_value.swatch.image
+                            break
+                          endif
+                        endfor
+                        if related_swatch_color != blank or related_swatch_image != blank
+                          break
+                        endif
+                      endfor
+                      assign related_swatch_bg = blank
+                      if related_swatch_image
+                        assign related_swatch_image_url = related_swatch_image | image_url: width: 72
+                        assign related_swatch_bg = 'background-image: url(' | append: related_swatch_image_url | append: ');'
+                      elsif related_swatch_color != blank
+                        assign related_swatch_bg = 'background-color: ' | append: related_swatch_color | append: ';'
+                      else
+                        assign related_featured_image_swatch = related_product.featured_image | image_url: width: 72
+                        assign related_swatch_bg = 'background-image: url(' | append: related_featured_image_swatch | append: ');'
+                      endif
+                      assign related_preview_image = related_product.featured_image | image_url: width: 1200
+                    -%}
+                    <li>
+                      <a
+                        class="collection-grid__swatch"
+                        href="{{ related_product.url }}"
+                        style="{{ related_swatch_bg }}"
+                        title="{{ related_color | escape }}"
+                        aria-label="View {{ related_color | escape }}"
+                        {% if related_preview_image != blank %}data-swatch-image="{{ related_preview_image }}"{% endif %}
+                      ><span class="visually-hidden">{{ related_color | escape }}</span></a>
+                    </li>
+                  {%- endunless -%}
                 {%- endfor -%}
               </ul>
             {%- endif -%}
