@@ -1,0 +1,178 @@
+<article class="lookbook" itemscope itemtype="https://schema.org/Article">
+  <header class="lookbook__header">
+    {% if section.settings.show_title %}
+      <h1 class="lookbook__title" itemprop="headline">{{ page.title | escape }}</h1>
+    {% endif %}
+
+    {% if section.settings.intro != blank %}
+      <div class="lookbook__intro rte" itemprop="description">
+        {{ section.settings.intro }}
+      </div>
+    {% endif %}
+
+    {% if section.settings.cta_label != blank and section.settings.cta_url != blank %}
+      <a class="lookbook__cta" href="{{ section.settings.cta_url }}">
+        {{ section.settings.cta_label | escape }}
+      </a>
+    {% endif %}
+  </header>
+
+  {% if page.content != blank %}
+    <div class="lookbook__story rte" itemprop="articleBody">
+      <rte-formatter>{{ page.content }}</rte-formatter>
+    </div>
+  {% endif %}
+</article>
+
+{% stylesheet %}
+  .lookbook {
+    --lookbook-gutter: clamp(16px, 3.2vw, 48px);
+    color: var(--color-foreground);
+    background: var(--color-background);
+    padding-block: clamp(36px, 6vw, 88px) 72px;
+  }
+
+  .lookbook__header {
+    width: min(100% - 2 * var(--lookbook-gutter), 780px);
+    margin: 0 auto clamp(48px, 7vw, 96px);
+    text-align: center;
+  }
+
+  .lookbook__title {
+    max-width: 760px;
+    margin: 0 auto 18px;
+    font-family: var(--font-heading--family, var(--font-body--family));
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+
+  .lookbook__intro {
+    max-width: 660px;
+    margin: 0 auto;
+    font-size: clamp(14px, 1.2vw, 16px);
+    line-height: 1.65;
+  }
+
+  .lookbook__intro > :first-child,
+  .lookbook__story > :first-child {
+    margin-top: 0;
+  }
+
+  .lookbook__cta {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 12px 2px 7px;
+    border-bottom: 1px solid currentcolor;
+    color: inherit;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: opacity 180ms ease;
+  }
+
+  .lookbook__cta:hover {
+    opacity: 0.62;
+  }
+
+  .lookbook__story {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .lookbook__story p {
+    max-width: min(680px, calc(100% - 2 * var(--lookbook-gutter)));
+    margin: 0 auto 28px;
+    line-height: 1.65;
+  }
+
+  .lookbook__story p:has(img, video, iframe) {
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  .lookbook__story img,
+  .lookbook__story video,
+  .lookbook__story iframe {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 auto clamp(24px, 3.5vw, 52px);
+  }
+
+  .lookbook__story figure {
+    margin: 0 auto clamp(24px, 3.5vw, 52px);
+  }
+
+  .lookbook__story figure img,
+  .lookbook__story figure video {
+    margin-bottom: 0;
+  }
+
+  .lookbook__story figcaption {
+    width: min(100% - 2 * var(--lookbook-gutter), 680px);
+    margin: 10px auto 0;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .lookbook__story a {
+    color: inherit;
+  }
+
+  @media screen and (max-width: 749px) {
+    .lookbook {
+      padding-block-start: 28px;
+    }
+
+    .lookbook__header {
+      margin-bottom: 42px;
+    }
+
+    .lookbook__story img,
+    .lookbook__story video,
+    .lookbook__story iframe {
+      margin-bottom: 24px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lookbook page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show page title",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Introductory text"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Collection link label",
+      "default": "View the Collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Collection link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lookbook page"
+    }
+  ]
+}
+{% endschema %}

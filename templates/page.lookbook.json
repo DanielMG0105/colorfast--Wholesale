@@ -1,0 +1,18 @@
+/*
+ * ------------------------------------------------------------
+ * Independent page template for lookbook/editorial pages.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "lookbook": {
+      "type": "main-lookbook-page",
+      "settings": {
+        "show_title": true,
+        "cta_label": "View the Collection",
+        "cta_url": ""
+      }
+    }
+  },
+  "order": ["lookbook"]
+}
