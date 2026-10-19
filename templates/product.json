@@ -16,8 +16,8 @@
           "type": "collapsible",
           "settings": {
             "heading": "Product Details",
-            "use_description": true,
-            "content": "",
+            "use_description": false,
+            "content": "<p>Disclaimer: We strongly recommend conducting a sample test before proceeding with bulk dyeing or washing of any Prepared for Dye (PFD) garments. Dyeing and washing methods vary between facilities, and results may differ depending on the techniques, chemicals, and processes used. Colorfast is not responsible for any changes or defects resulting from third-party dyeing or washing processes, including but not limited to shrinkage, stretching, color variations, twisting, pilling, fabric distortion, or other changes to the garment's appearance, fit, or quality. Customers are responsible for accounting for this potential fallout when determining order quantities. Colorfast will not issue refunds, credits, or replacements for garments damaged or deemed second-quality as a result of post-purchase dyeing or washing treatments. By purchasing PFD garments, customers acknowledge and accept the inherent risks associated with subsequent dyeing and washing processes.<br/><br/></p>",
             "page": ""
           }
         },
@@ -50,14 +50,13 @@
         "added_label": "Added",
         "sold_out_label": "Sold out",
         "color_option_names": "Color,Colour",
-        "dye_page": "",
-        "dye_label": "Custom dye",
         "show_wholesale": true,
         "wholesale_heading": "Wholesale pricing",
         "wholesale_tiers": "1-99: 24.49\n100-299: 23.27\n300-999: 22.10\n1000+: 21.00",
         "show_bulk_grid": true,
         "bulk_heading": "",
         "bulk_hint": "",
+        "bulk_add_label": "Add to cart",
         "heading_font": "montserrat_n6",
         "body_font": "montserrat_n4",
         "title_size": 42,
