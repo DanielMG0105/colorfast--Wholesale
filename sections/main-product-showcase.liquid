@@ -546,16 +546,20 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
                 if block.settings.page != blank
                   assign block_content = block.settings.page.content
                 endif
-                if block.settings.use_description
-                  assign block_content = product.description
-                endif
               -%}
               <details class="product-showcase__accordion" {{ block.shopify_attributes }}>
                 <summary>
                   <span class="product-showcase__plus" aria-hidden="true"></span>
                   {{ block.settings.heading | escape }}
                 </summary>
-                <div class="product-showcase__accordion-body rte">{{ block_content }}</div>
+                <div class="product-showcase__accordion-body rte">
+                  {% if block.settings.use_description and product.description != blank %}
+                    <div class="product-showcase__accordion-description">{{ product.description }}</div>
+                  {% endif %}
+                  {% if block_content != blank %}
+                    <div class="product-showcase__accordion-custom-content">{{ block_content }}</div>
+                  {% endif %}
+                </div>
               </details>
             {%- endfor -%}
           </div>
@@ -1811,7 +1815,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
   }
 
   .product-showcase__accordion summary {
-    font-size: 17px;
+    font-size: calc(17px * 0.85);
   }
 
   .product-showcase__plus {
@@ -1842,7 +1846,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
 
   .product-showcase__accordion-body {
     padding: 16px 0 0 30px;
-    font-size: 15px;
+    font-size: calc(15px * 0.85);
     line-height: 1.45;
   }
 
@@ -2130,7 +2134,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
     }
 
     .product-showcase__accordion summary {
-      font-size: 15px;
+      font-size: calc(15px * 0.85);
     }
 
     .product-showcase__plus {
@@ -2140,7 +2144,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
 
     .product-showcase__accordion-body {
       padding: 10px 0 0 26px;
-      font-size: 14px;
+      font-size: calc(14px * 0.85);
     }
 
     .product-showcase__wholesale {
