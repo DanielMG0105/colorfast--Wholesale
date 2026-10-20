@@ -559,6 +559,9 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
                   {% if block_content != blank %}
                     <div class="product-showcase__accordion-custom-content">{{ block_content }}</div>
                   {% endif %}
+                  {% if block.settings.disclaimer != blank %}
+                    <div class="product-showcase__accordion-disclaimer">{{ block.settings.disclaimer }}</div>
+                  {% endif %}
                 </div>
               </details>
             {%- endfor -%}
@@ -1850,6 +1853,11 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
     line-height: 1.45;
   }
 
+  .product-showcase__accordion-disclaimer {
+    margin-top: 1em;
+    font-size: 0.85em;
+  }
+
   .product-showcase__wholesale {
     margin-top: 110px;
 
@@ -2242,6 +2250,11 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
           "type": "richtext",
           "id": "content",
           "label": "Content"
+        },
+        {
+          "type": "richtext",
+          "id": "disclaimer",
+          "label": "Disclaimer"
         },
         {
           "type": "page",
