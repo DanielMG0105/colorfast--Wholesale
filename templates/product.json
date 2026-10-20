@@ -18,6 +18,7 @@
             "heading": "Product Details",
             "use_description": true,
             "content": "",
+            "disclaimer": "<p>Disclaimer: We strongly recommend conducting a sample test before proceeding with bulk dyeing or washing of any Prepared for Dye (PFD) garments. Dyeing and washing methods vary between facilities, and results may differ depending on the techniques, chemicals, and processes used. Colorfast is not responsible for any changes or defects resulting from third-party dyeing or washing processes, including but not limited to shrinkage, stretching, color variations, twisting, pilling, fabric distortion, or other changes to the garment's appearance, fit, or quality. Customers are responsible for accounting for this potential fallout when determining order quantities. Colorfast will not issue refunds, credits, or replacements for garments damaged or deemed second-quality as a result of post-purchase dyeing or washing treatments. By purchasing PFD garments, customers acknowledge and accept the inherent risks associated with subsequent dyeing and washing processes.<br/><br/></p>",
             "page": ""
           }
         },
@@ -27,6 +28,7 @@
             "heading": "Size & Fit",
             "use_description": false,
             "content": "<ul><li><strong>Fit:</strong>&nbsp;Oversized Fit, generous through the chest, shoulders, and body.</li><li><strong>Length:</strong>&nbsp;Standard Length, sits at the hips.</li><li><strong>Details:</strong>&nbsp;Heavyweight fleece with a double-lined hood, kangaroo pocket, and ribbed cuffs and hem.</li><li><strong>Recommendation:</strong>&nbsp;Fits oversized. Size down for a more standard fit.</li></ul>",
+            "disclaimer": "",
             "page": ""
           }
         },
@@ -36,6 +38,7 @@
             "heading": "Shipping & Returns",
             "use_description": false,
             "content": "<p>We work quickly to ship your order as soon as possible. Once your order has shipped, you will receive an email with tracking and further details. Delivery times vary depending on your location.</p><p>Our products are manufactured both locally and globally. We carefully select our manufacturing partners to ensure every piece is high quality and a fair value.</p><p>If something isn't right, we're here to help. Reach out to our team and we'll work with you to make it right.</p>",
+            "disclaimer": "",
             "page": ""
           }
         }
