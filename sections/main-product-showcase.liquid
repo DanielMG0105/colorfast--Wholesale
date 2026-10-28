@@ -1626,7 +1626,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
   }
 
   .product-showcase__wholesale {
-    scroll-margin-top: 24px;
+    scroll-margin-top: calc(var(--header-height, 80px) + 40px);
   }
 
   .product-showcase__description {
