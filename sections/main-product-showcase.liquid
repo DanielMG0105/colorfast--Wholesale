@@ -293,6 +293,13 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
           <span>{{- current_variant.price | money_with_currency -}}</span>
         </p>
 
+        {%- if customer and customer.tags contains 'wholesale' -%}
+          <div class="product-showcase__wholesale-note">
+            <p>Price shown applies to orders of 1,000+ pieces. Lower quantities are priced according to our wholesale tiers.</p>
+            <a href="#wholesale-pricing">View wholesale pricing ↓</a>
+          </div>
+        {%- endif -%}
+
         {%- if product.description != blank -%}
           <div class="product-showcase__description rte">{{ product.description }}</div>
         {%- endif -%}
@@ -569,7 +576,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
         {%- endif -%}
 
         {%- if section.settings.show_wholesale and tiers_source != blank -%}
-          <details class="product-showcase__wholesale" open>
+          <details id="wholesale-pricing" class="product-showcase__wholesale" open>
             <summary>
               {{ section.settings.wholesale_heading | escape }}
               <span class="product-showcase__circle-plus" aria-hidden="true"></span>
@@ -1598,6 +1605,28 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
     margin: 22px 0 0;
     font-size: 27px;
     line-height: 1.1;
+  }
+
+  .product-showcase__wholesale-note {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .product-showcase__wholesale-note p {
+    margin: 0;
+  }
+
+  .product-showcase__wholesale-note a {
+    display: inline-block;
+    margin-top: 5px;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .product-showcase__wholesale {
+    scroll-margin-top: 24px;
   }
 
   .product-showcase__description {
