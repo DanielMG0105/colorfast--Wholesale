@@ -1,0 +1,17 @@
+/*
+ * ------------------------------------------------------------
+ * Independent page template for collection landing pages.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "collections": {
+      "type": "main-collections-page",
+      "settings": {
+        "show_title": true,
+        "cta_label": "View the Collection"
+      }
+    }
+  },
+  "order": ["collections"]
+}

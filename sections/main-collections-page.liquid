@@ -1,0 +1,150 @@
+<article class="collections-page">
+  {% if section.settings.image != blank %}
+    <div class="collections-page__image-wrap">
+      {{
+        section.settings.image
+        | image_url: width: 2400
+        | image_tag:
+          widths: '750, 1100, 1500, 2000, 2400',
+          sizes: '100vw',
+          loading: 'eager',
+          alt: section.settings.image.alt | default: page.title | escape,
+          class: 'collections-page__image'
+      }}
+    </div>
+  {% endif %}
+
+  <header class="collections-page__header">
+    {% if section.settings.show_title %}
+      <h1 class="collections-page__title">{{ page.title | escape }}</h1>
+    {% endif %}
+
+    {% if section.settings.intro != blank %}
+      <div class="collections-page__intro rte">
+        {{ section.settings.intro }}
+      </div>
+    {% endif %}
+
+    {% if section.settings.collection != blank and section.settings.cta_label != blank %}
+      <a class="collections-page__cta" href="{{ section.settings.collection.url }}">
+        {{ section.settings.cta_label | escape }}
+      </a>
+    {% endif %}
+  </header>
+</article>
+
+{% stylesheet %}
+  .collections-page {
+    --collections-page-gutter: clamp(16px, 3.2vw, 48px);
+    color: var(--color-foreground);
+    background: var(--color-background);
+    padding-block: clamp(28px, 4vw, 56px) 72px;
+  }
+
+  .collections-page__image-wrap {
+    width: 100%;
+    margin: 0 auto clamp(48px, 7vw, 96px);
+  }
+
+  .collections-page__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .collections-page__header {
+    width: min(100% - 2 * var(--collections-page-gutter), 780px);
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .collections-page__title {
+    max-width: 760px;
+    margin: 0 auto 18px;
+    font-family: var(--font-heading--family, var(--font-body--family));
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+
+  .collections-page__intro {
+    max-width: 660px;
+    margin: 0 auto;
+    font-size: clamp(14px, 1.2vw, 16px);
+    line-height: 1.65;
+  }
+
+  .collections-page__intro > :first-child {
+    margin-top: 0;
+  }
+
+  .collections-page__cta {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 12px 2px 7px;
+    border-bottom: 1px solid currentcolor;
+    color: inherit;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: opacity 180ms ease;
+  }
+
+  .collections-page__cta:hover {
+    opacity: 0.62;
+  }
+
+  @media screen and (max-width: 749px) {
+    .collections-page {
+      padding-block-start: 20px;
+    }
+
+    .collections-page__image-wrap {
+      margin-bottom: 42px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collections page",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show page title",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Text"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection link"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Link label",
+      "default": "View the Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collections page"
+    }
+  ]
+}
+{% endschema %}
