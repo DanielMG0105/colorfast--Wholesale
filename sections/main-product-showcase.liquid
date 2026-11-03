@@ -452,6 +452,42 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
           {%- assign color_index = color_option_position | minus: 1 -%}
           {%- assign size_option = product.options_with_values[size_index] -%}
           {%- assign color_option = product.options_with_values[color_index] -%}
+          {%- assign grid_size_names = '|' -%}
+          {%- assign grid_size_keys = '|' -%}
+          {%- for size_value in size_option.values -%}
+            {%- assign size_value_name = size_value.name | default: size_value -%}
+            {%- capture size_value_key -%}{%- render 'variant-size-key', value: size_value_name -%}{%- endcapture -%}
+            {%- assign size_marker = '|' | append: size_value_key | append: '|' -%}
+            {%- unless grid_size_keys contains size_marker -%}
+              {%- assign grid_size_names = grid_size_names | append: size_value_name | append: '|' -%}
+              {%- assign grid_size_keys = grid_size_keys | append: size_value_key | append: '|' -%}
+            {%- endunless -%}
+          {%- endfor -%}
+          {%- for related_product in related_products -%}
+            {%- assign related_size_position = 0 -%}
+            {%- for related_option in related_product.options_with_values -%}
+              {%- assign related_option_name = related_option.name | downcase | strip -%}
+              {%- if related_option_name == 'size' or related_option_name == 'talla' -%}
+                {%- assign related_size_position = related_option.position -%}
+                {%- break -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if related_size_position > 0 -%}
+              {%- assign related_size_index = related_size_position | minus: 1 -%}
+              {%- assign related_size_option = related_product.options_with_values[related_size_index] -%}
+              {%- for related_size_value in related_size_option.values -%}
+                {%- assign related_size_name = related_size_value.name | default: related_size_value -%}
+                {%- capture related_size_key -%}{%- render 'variant-size-key', value: related_size_name -%}{%- endcapture -%}
+                {%- assign related_size_marker = '|' | append: related_size_key | append: '|' -%}
+                {%- unless grid_size_keys contains related_size_marker -%}
+                  {%- assign grid_size_names = grid_size_names | append: related_size_name | append: '|' -%}
+                  {%- assign grid_size_keys = grid_size_keys | append: related_size_key | append: '|' -%}
+                {%- endunless -%}
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- assign grid_size_names = grid_size_names | remove_first: '|' | remove_last: '|' -%}
+          {%- assign grid_sizes = grid_size_names | split: '|' -%}
           <details class="product-showcase__bulk-grid" open>
             <summary><span class="product-showcase__plus" aria-hidden="true"></span>View Bulk Order Grid</summary>
             <div class="product-showcase__accordion-body product-showcase__bulk-content">
@@ -459,9 +495,9 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
             <div class="product-showcase__bulk-wrap vbog__scroll-wrapper">
               <div class="vbog__table-clip">
               <table class="product-showcase__table product-showcase__bulk-table vbog__table" role="table" aria-label="View Bulk Order Grid">
-                <colgroup><col class="vbog__color-column">{%- for size in size_option.values -%}<col>{%- endfor -%}</colgroup>
+                <colgroup><col class="vbog__color-column">{%- for size in grid_sizes -%}<col>{%- endfor -%}</colgroup>
                 <thead class="vbog__thead"><tr class="vbog__row vbog__row--header" role="row"><th class="vbog__cell vbog__cell--label" scope="col" role="columnheader">COLOR</th>
-                  {%- for value in size_option.values -%}<th class="vbog__cell vbog__cell--size-header" scope="col" role="columnheader">{% render 'variant-option-label', value: value.name, option_name: size_option.name %}</th>{%- endfor -%}
+                  {%- for size in grid_sizes -%}<th class="vbog__cell vbog__cell--size-header" scope="col" role="columnheader">{% render 'variant-option-label', value: size, option_name: size_option.name %}</th>{%- endfor -%}
                 </tr></thead>
                 <tbody class="vbog__tbody">
                   {%- for color in color_option.values -%}
@@ -478,15 +514,17 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
                       {%- assign grid_swatch_is_dark = true -%}
                     {%- endif -%}
                     <tr class="vbog__row vbog__row--color" data-color="{{ color | escape }}" role="row"><td class="vbog__cell vbog__cell--swatch" scope="row" role="rowheader"><div class="vbog__swatch{% if grid_swatch_is_dark %} vbog__swatch--dark{% endif %}" title="{{ color | escape }}" style="{% if color.swatch.image %}background-image: url({{ color.swatch.image | image_url: width: 72 }});{% else %}background-color: {{ grid_swatch }};{% endif %}"><span class="vbog__swatch-name">{{ grid_color_label | upcase }}</span></div></td>
-                      {%- for size in size_option.values -%}
+                      {%- for size in grid_sizes -%}
+                        {%- capture grid_size_key -%}{%- render 'variant-size-key', value: size -%}{%- endcapture -%}
                         {%- assign grid_variant = nil -%}
                         {%- for variant in product.variants -%}
-                          {%- if variant.options[color_index] == color and variant.options[size_index] == size -%}{%- assign grid_variant = variant -%}{%- break -%}{%- endif -%}
+                          {%- capture product_variant_size_key -%}{%- render 'variant-size-key', value: variant.options[size_index] -%}{%- endcapture -%}
+                          {%- if variant.options[color_index] == color and product_variant_size_key == grid_size_key -%}{%- assign grid_variant = variant -%}{%- break -%}{%- endif -%}
                         {%- endfor -%}
                         {%- if grid_variant -%}
                           {%- assign grid_max = '' -%}
                           {%- if grid_variant.inventory_management == 'shopify' and grid_variant.inventory_policy == 'deny' -%}{%- assign grid_max = grid_variant.inventory_quantity -%}{%- endif -%}
-                          <td class="vbog__cell vbog__cell--variant vbog__qty-cell product-showcase__bulk-cell{% unless grid_variant.available %} vbog__cell--disabled is-unavailable{% endunless %}" data-variant-id="{{ grid_variant.id }}" data-size="{{ size | escape }}" data-color="{{ color | escape }}" role="gridcell"{% if grid_variant.available %} tabindex="0" aria-label="{{ color | escape }} / {{ size | escape }} – Quantity"{% else %} aria-disabled="true"{% endif %}><span class="vbog__cell-inventory" data-vbog-display data-inventory="{{ grid_variant.inventory_quantity | default: 0 }}">{{ grid_variant.inventory_quantity | default: 0 }}</span><input type="number" class="vbog__cell-qty-input" min="0" step="1" inputmode="numeric"{% if grid_max != blank %} max="{{ grid_max }}"{% endif %} aria-label="{{ color | escape }} / {% render 'variant-option-label', value: size.name, option_name: size_option.name %} quantity" data-grid-qty data-grid-size="{{ size | escape }}" data-variant-id="{{ grid_variant.id }}"{% unless grid_variant.available %} disabled{% endunless %}></td>
+                          <td class="vbog__cell vbog__cell--variant vbog__qty-cell product-showcase__bulk-cell{% unless grid_variant.available %} vbog__cell--disabled is-unavailable{% endunless %}" data-variant-id="{{ grid_variant.id }}" data-size="{{ size | escape }}" data-color="{{ color | escape }}" role="gridcell"{% if grid_variant.available %} tabindex="0" aria-label="{{ color | escape }} / {{ size | escape }} – Quantity"{% else %} aria-disabled="true"{% endif %}><span class="vbog__cell-inventory" data-vbog-display data-inventory="{{ grid_variant.inventory_quantity | default: 0 }}">{{ grid_variant.inventory_quantity | default: 0 }}</span><input type="number" class="vbog__cell-qty-input" min="0" step="1" inputmode="numeric"{% if grid_max != blank %} max="{{ grid_max }}"{% endif %} aria-label="{{ color | escape }} / {% render 'variant-option-label', value: size, option_name: size_option.name %} quantity" data-grid-qty data-grid-size="{{ size | escape }}" data-variant-id="{{ grid_variant.id }}"{% unless grid_variant.available %} disabled{% endunless %}></td>
                         {%- else -%}<td class="vbog__cell vbog__cell--empty" aria-hidden="true">—</td>{%- endif -%}
                       {%- endfor -%}
                     </tr>
@@ -517,14 +555,16 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
                         {%- assign related_is_dark = false -%}
                         {%- if related_color_value.swatch.color -%}{%- assign related_brightness = related_color_value.swatch.color | color_brightness -%}{%- if related_brightness < 128 -%}{%- assign related_is_dark = true -%}{%- endif -%}{%- elsif related_color_lower contains 'black' or related_color_lower contains 'navy' or related_color_lower contains 'caviar' -%}{%- assign related_is_dark = true -%}{%- endif -%}
                         <tr class="vbog__row vbog__row--color" data-color="{{ related_color_label | escape }}" data-related-product-id="{{ related_product.id }}" role="row"><td class="vbog__cell vbog__cell--swatch" scope="row" role="rowheader"><div class="vbog__swatch{% if related_is_dark %} vbog__swatch--dark{% endif %}" title="{{ related_color_label | escape }}" style="{% if related_color_value.swatch.image %}background-image: url({{ related_color_value.swatch.image | image_url: width: 72 }});{% elsif related_color_value.swatch.color %}background-color: {{ related_swatch }};{% else %}background-image: url({{ related_product.featured_image | image_url: width: 72 }});{% endif %}"><span class="vbog__swatch-name">{{ related_color_label | upcase }}</span></div></td>
-                          {%- for size in size_option.values -%}
+                          {%- for size in grid_sizes -%}
+                            {%- capture grid_size_key -%}{%- render 'variant-size-key', value: size -%}{%- endcapture -%}
                             {%- assign related_grid_variant = nil -%}
                             {%- for candidate_variant in related_product.variants -%}
-                              {%- if candidate_variant.options[related_size_index] == size -%}{%- assign related_grid_variant = candidate_variant -%}{%- break -%}{%- endif -%}
+                              {%- capture candidate_size_key -%}{%- render 'variant-size-key', value: candidate_variant.options[related_size_index] -%}{%- endcapture -%}
+                              {%- if candidate_size_key == grid_size_key -%}{%- assign related_grid_variant = candidate_variant -%}{%- break -%}{%- endif -%}
                             {%- endfor -%}
                             {%- if related_grid_variant -%}
                               {%- assign related_grid_max = '' -%}{%- if related_grid_variant.inventory_management == 'shopify' and related_grid_variant.inventory_policy == 'deny' -%}{%- assign related_grid_max = related_grid_variant.inventory_quantity -%}{%- endif -%}
-                              <td class="vbog__cell vbog__cell--variant vbog__qty-cell product-showcase__bulk-cell{% unless related_grid_variant.available %} vbog__cell--disabled is-unavailable{% endunless %}" data-variant-id="{{ related_grid_variant.id }}" data-size="{{ size | escape }}" data-color="{{ related_color_label | escape }}" role="gridcell"{% if related_grid_variant.available %} tabindex="0" aria-label="{{ related_color_label | escape }} / {{ size | escape }} – Quantity"{% else %} aria-disabled="true"{% endif %}><span class="vbog__cell-inventory" data-vbog-display data-inventory="{{ related_grid_variant.inventory_quantity | default: 0 }}">{{ related_grid_variant.inventory_quantity | default: 0 }}</span><input type="number" class="vbog__cell-qty-input" min="0" step="1" inputmode="numeric"{% if related_grid_max != blank %} max="{{ related_grid_max }}"{% endif %} aria-label="{{ related_color_label | escape }} / {% render 'variant-option-label', value: size.name, option_name: size_option.name %} quantity" data-grid-qty data-grid-size="{{ size | escape }}" data-variant-id="{{ related_grid_variant.id }}"{% unless related_grid_variant.available %} disabled{% endunless %}></td>
+                              <td class="vbog__cell vbog__cell--variant vbog__qty-cell product-showcase__bulk-cell{% unless related_grid_variant.available %} vbog__cell--disabled is-unavailable{% endunless %}" data-variant-id="{{ related_grid_variant.id }}" data-size="{{ size | escape }}" data-color="{{ related_color_label | escape }}" role="gridcell"{% if related_grid_variant.available %} tabindex="0" aria-label="{{ related_color_label | escape }} / {{ size | escape }} – Quantity"{% else %} aria-disabled="true"{% endif %}><span class="vbog__cell-inventory" data-vbog-display data-inventory="{{ related_grid_variant.inventory_quantity | default: 0 }}">{{ related_grid_variant.inventory_quantity | default: 0 }}</span><input type="number" class="vbog__cell-qty-input" min="0" step="1" inputmode="numeric"{% if related_grid_max != blank %} max="{{ related_grid_max }}"{% endif %} aria-label="{{ related_color_label | escape }} / {% render 'variant-option-label', value: size, option_name: size_option.name %} quantity" data-grid-qty data-grid-size="{{ size | escape }}" data-variant-id="{{ related_grid_variant.id }}"{% unless related_grid_variant.available %} disabled{% endunless %}></td>
                             {%- else -%}<td class="vbog__cell vbog__cell--empty" aria-hidden="true">—</td>{%- endif -%}
                           {%- endfor -%}
                         </tr>
@@ -532,7 +572,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
                     {%- endunless -%}
                   {%- endfor -%}
                 </tbody>
-                <tfoot class="vbog__tfoot"><tr class="vbog__total-divider" aria-hidden="true"><td colspan="{{ size_option.values.size | plus: 1 }}"></td></tr><tr class="vbog__row vbog__row--total" role="row"><td class="vbog__cell vbog__cell--total-label" role="rowheader">TOTAL</td>{%- for size in size_option.values -%}<td class="vbog__cell vbog__cell--total-value" data-grid-total="{{ size | escape }}" role="gridcell" aria-label="{{ size | escape }} total"><span>—</span></td>{%- endfor -%}</tr></tfoot>
+                <tfoot class="vbog__tfoot"><tr class="vbog__total-divider" aria-hidden="true"><td colspan="{{ grid_sizes.size | plus: 1 }}"></td></tr><tr class="vbog__row vbog__row--total" role="row"><td class="vbog__cell vbog__cell--total-label" role="rowheader">TOTAL</td>{%- for size in grid_sizes -%}<td class="vbog__cell vbog__cell--total-value" data-grid-total="{{ size | escape }}" role="gridcell" aria-label="{{ size | escape }} total"><span>—</span></td>{%- endfor -%}</tr></tfoot>
               </table>
               </div>
             </div>

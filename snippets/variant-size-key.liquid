@@ -1,0 +1,27 @@
+{%- liquid
+  assign size_key = value | default: '' | downcase | strip | remove: ' ' | remove: '-' | remove: '_' | remove: '.' | remove: '/'
+
+  case size_key
+    when 'xxs', '2xs', '2xsmall'
+      assign size_key = '2xs'
+    when 'xs', 'xsmall'
+      assign size_key = 'xs'
+    when 's', 'sm', 'small'
+      assign size_key = 's'
+    when 'm', 'md', 'medium'
+      assign size_key = 'm'
+    when 'l', 'lg', 'large'
+      assign size_key = 'l'
+    when 'xl', 'xlarge', '1xl'
+      assign size_key = 'xl'
+    when '2x', 'xxl', 'xxlarge', '2xlarge'
+      assign size_key = '2xl'
+    when '3x', 'xxxl', 'xxxlarge', '3xlarge'
+      assign size_key = '3xl'
+    when '4x', 'xxxxl', 'xxxxlarge', '4xlarge'
+      assign size_key = '4xl'
+    when '5x', 'xxxxxl', 'xxxxxlarge', '5xlarge'
+      assign size_key = '5xl'
+  endcase
+-%}
+{{- size_key -}}
