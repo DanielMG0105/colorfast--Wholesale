@@ -447,7 +447,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
           <div id='wcp_vd_table' data-app-tiers></div>
         {%- endform -%}
 
-        {%- if customer and section.settings.show_bulk_grid and size_option_position > 0 and color_option_position > 0 -%}
+        {%- if customer and customer.tags contains 'wholesale' and section.settings.show_bulk_grid and size_option_position > 0 and color_option_position > 0 -%}
           {%- assign size_index = size_option_position | minus: 1 -%}
           {%- assign color_index = color_option_position | minus: 1 -%}
           {%- assign size_option = product.options_with_values[size_index] -%}
