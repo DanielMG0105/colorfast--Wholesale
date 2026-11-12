@@ -621,7 +621,7 @@ data-original-price="{{ current_variant.price | money_with_currency }}">
               {{ section.settings.wholesale_heading | escape }}
               <span class="product-showcase__circle-plus" aria-hidden="true"></span>
             </summary>
-            {%- if customer -%}
+            {%- if customer and customer.tags contains 'wholesale' -%}
               <table class="product-showcase__table product-showcase__tiers">
                 <tbody data-tiers>
                   {%- for line in tier_lines -%}
