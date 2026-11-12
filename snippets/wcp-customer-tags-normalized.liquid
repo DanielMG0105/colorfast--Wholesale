@@ -1,0 +1,21 @@
+{%- liquid
+  assign normalized_tags = ''
+  assign normalized_tags_index = '|'
+  if customer
+    for customer_tag in customer.tags
+      assign normalized_tag = customer_tag | downcase | strip
+      if normalized_tag == 'wholesalevip'
+        assign normalized_tag = 'wholesale'
+      endif
+      assign normalized_tag_marker = '|' | append: normalized_tag | append: '|'
+      unless normalized_tag == blank or normalized_tags_index contains normalized_tag_marker
+        unless normalized_tags == blank
+          assign normalized_tags = normalized_tags | append: ','
+        endunless
+        assign normalized_tags = normalized_tags | append: normalized_tag
+        assign normalized_tags_index = normalized_tags_index | append: normalized_tag | append: '|'
+      endunless
+    endfor
+  endif
+-%}
+{{- normalized_tags -}}

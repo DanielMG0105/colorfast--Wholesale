@@ -30,7 +30,14 @@
 
 	  {% include 'wcp_vd_discount' with item %}
 
-	  {% if customer.tags contains p_discount_tag or customer.tags contains v_discount_tag %}
+	  {% capture normalized_customer_tags %}{% render 'wcp-customer-tags-normalized', customer: customer %}{% endcapture %}
+	  {% assign customer_tags = normalized_customer_tags | split: ',' %}
+	  {% assign normalized_p_discount_tag = p_discount_tag | downcase | strip %}
+	  {% assign normalized_v_discount_tag = v_discount_tag | downcase | strip %}
+	  {% if normalized_p_discount_tag != blank and customer_tags contains normalized_p_discount_tag %}
+		{% assign wcp_tag = true %}
+	  {% endif %}
+	  {% if normalized_v_discount_tag != blank and customer_tags contains normalized_v_discount_tag %}
 		{% assign wcp_tag = true %}
 	  {% endif %}
 

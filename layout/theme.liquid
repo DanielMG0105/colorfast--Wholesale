@@ -185,15 +185,8 @@
 {% if customer or wcp_wholesale_customer %}
 {% assign active_discounts = shop.metafields.wcp_active_discounts.wcp_active_discounts %}
 {% assign active_discounts_array = active_discounts | split: ',' %}
-{% assign customer_tags = blank %}
-{% for tag in customer.tags %}
-{% assign tempTag = tag | downcase %}
-{% assign customer_tags = customer_tags | prepend: tempTag %}
-{% unless forloop.last %}
-{% assign customer_tags = customer_tags | prepend: ',' %}
-{% endunless %}
-{% endfor %}
-{% assign customer_tags = customer_tags | split: ',' %}
+{% capture normalized_customer_tags %}{% render 'wcp-customer-tags-normalized', customer: customer %}{% endcapture %}
+{% assign customer_tags = normalized_customer_tags | split: ',' %}
 {% assign active_discounts = active_discounts | downcase %}
 {% if shop.metafields.wcp_status.wcp_status != 'disabled' and customer %}
 {% for discount_key in active_discounts_array %}

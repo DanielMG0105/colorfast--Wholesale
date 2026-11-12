@@ -26,15 +26,8 @@
     {% assign wcp_v_price = wcp_variant.price %}
   {% endif %}
   
-  {% assign customer_tags = blank %}
-  {% for tag in customer.tags %}
-    {% assign tempTag = tag | downcase %}
-    {% assign customer_tags = customer_tags | prepend:tempTag %}
-    {% unless forloop.last %}
-      {% assign customer_tags = customer_tags | prepend:','  %}
-    {% endunless %}
-  {% endfor %}
-  {% assign customer_tags = customer_tags | split:',' %}
+  {% capture normalized_customer_tags %}{% render 'wcp-customer-tags-normalized', customer: customer %}{% endcapture %}
+  {% assign customer_tags = normalized_customer_tags | split: ',' %}
   
   {% assign ivp_price = 99999999999999999999999999999 %}
   {% if v_discount_tag %}

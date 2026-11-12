@@ -12,15 +12,8 @@
 {%- assign wcp_price_max = wcp_discount.price_max -%}
 {%- assign wcp_price = wcp_discount.price -%}
     
-{% assign customer_tags = blank %}
-{% for tag in customer.tags %}
-  {% assign tempTag = tag | downcase %}
-  {% assign customer_tags = customer_tags | prepend:tempTag %}
-  {% unless forloop.last %}
-    {% assign customer_tags = customer_tags | prepend:','  %}
-  {% endunless %}
-{% endfor %}
-{% assign customer_tags = customer_tags | split:',' %}
+{% capture normalized_customer_tags %}{% render 'wcp-customer-tags-normalized', customer: customer %}{% endcapture %}
+{% assign customer_tags = normalized_customer_tags | split: ',' %}
     
 {%- assign active_discounts = active_discounts | downcase -%}
 {%- assign active_discounts_tag_array = blank -%}
