@@ -64,6 +64,7 @@
         "line_logo",
         "line_by_you"
       ],
+      "disabled": true,
       "settings": {
         "content_mode": "text",
         "image_alt": "",
@@ -79,8 +80,7 @@
         "background_color": "#c8c8c7",
         "text_color": "#000000",
         "border_color": "#000000"
-      },
-      "disabled": true
+      }
     },
     "program_links": {
       "type": "program-links",
@@ -185,9 +185,9 @@
         "media_2": {
           "type": "media",
           "settings": {
-            "media_type": "image",
+            "media_type": "video",
             "image": "shopify://shop_images/CF_SCREENPRINT.jpg",
-            "video": "shopify://files/videos/f294cc78-85dee34a.mp4",
+            "video": "shopify://files/videos/ad344ec5-cd727030.mp4",
             "alt": "",
             "overlay_width": 30
           }
@@ -308,6 +308,7 @@
         "line_by_you",
         "line_tagline"
       ],
+      "disabled": true,
       "settings": {
         "content_mode": "text",
         "image_alt": "",
@@ -323,8 +324,7 @@
         "background_color": "#000000",
         "text_color": "#ffffff",
         "border_color": "#ffffff"
-      },
-      "disabled": true
+      }
     },
     "dye_color_preview": {
       "type": "dye-color-preview",
@@ -397,9 +397,9 @@
         "media_RTUcGD": {
           "type": "media",
           "settings": {
-            "media_type": "image",
+            "media_type": "video",
             "image": "shopify://shop_images/CF_EMBROIDERY.jpg",
-            "video": "shopify://files/videos/f294cc78-85dee34a.mp4",
+            "video": "shopify://files/videos/f07b7a28-18c98138.mp4",
             "alt": "",
             "overlay_width": 30
           }
