@@ -25,7 +25,7 @@
         "button_link": "shopify://collections/shop-all",
         "open_in_new_tab": false,
         "button_font_size": 17,
-        "button_padding_x": 46,
+        "button_padding_x": 44,
         "button_padding_y": 48,
         "button_text_color": "#000000",
         "button_border_color": "#000000",
